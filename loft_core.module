@@ -37,3 +37,37 @@ function loft_core_form_disable_elements(&$form, $paths, $module_name = null, $m
         }
     }
 }
+
+/**
+ * Return the maximum weight in a render array, top level only.
+ *
+ * @param $render_array
+ *
+ * @return int
+ */
+function loft_core_max_weight($render_array)
+{
+    $max = 0;
+    array_walk($render_array, function ($value) use (&$max) {
+        $max = max($max, data_api()->get($value, '#weight', 0));
+    });
+
+    return $max;
+}
+
+/**
+ * Return the minimum weight in a render array, top level only.
+ *
+ * @param $render_array
+ *
+ * @return int
+ */
+function loft_core_min_weight($render_array)
+{
+    $min = 0;
+    array_walk($render_array, function ($value) use (&$min) {
+        $min = min($min, data_api()->get($value, '#weight', 0));
+    });
+
+    return $min;
+}

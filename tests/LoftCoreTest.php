@@ -2,6 +2,44 @@
 
 class LoftCoreTest extends PHPUnit_Framework_TestCase
 {
+
+
+    /**
+     * Provides data for testMinWeight.
+     */
+    function DataForTestWeightProvider()
+    {
+        $tests = array();
+        $tests[] = array(
+            -10,
+            9,
+            array(
+                array('#weight' => 0),
+                array('#weight' => 9),
+                array('#weight' => -5),
+                array('#weight' => -10),
+            ),
+        );
+
+        return $tests;
+    }
+
+    /**
+     * @dataProvider DataForTestWeightProvider
+     */
+    public function testMaxWeight($min, $max, $subject)
+    {
+        $this->assertSame($max, loft_core_max_weight($subject));
+    }
+
+    /**
+     * @dataProvider DataForTestWeightProvider
+     */
+    public function testMinWeight($min, $max, $subject)
+    {
+        $this->assertSame($min, loft_core_min_weight($subject));
+    }
+
     /**
      * Provides data for testFormDisableElements.
      */
