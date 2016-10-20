@@ -1,0 +1,11 @@
+[mtemplate = drupal[0m
+[mmaster = "8.x-1.x 8.x-2.x 7.x-1.x 7.x-2.x 6.x-1.x 6.x-2.x 5.x-1.x"[0m
+[mdevelop = "8.x-1.x 8.x-2.x 7.x-1.x 7.x-2.x 6.x-1.x 6.x-2.x 5.x-1.x"[0m
+[mremote = origin[0m
+[mcreate_tags = patch[0m
+[mpush_tags = ask[0m
+[mpush_master = ask[0m
+[mpush_develop = no[0m
+[mpatch_prefix = -rc[0m
+[mgit_root = /Volumes/Data/Users/aklump/Code/Projects/globalonenessproject/site-dev/dist/web/sites/all/modules/custom/loft_core[0m
+[minfo_file = loft_core.info[0m
