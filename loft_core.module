@@ -32,8 +32,27 @@ function loft_core_form_disable_elements(&$form, $paths, $module_name = null, $m
     }
     foreach ($paths as $path) {
         if ($g->get($form, $path)) {
+            $type = $g->get($form, "$path.#type");
             $g->set($form, "$path.#disabled", true);
-            $g->set($form, "$path.#description", $message);
+            switch ($type) {
+                case 'container':
+                    $message_path = "$path.#suffix";
+                    break;
+                default:
+                    $message_path = "$path.#description";
+                    break;
+            }
+            $g->set($form, $message_path, $message);
+        }
+    }
+}
+
+function loft_core_form_hide_elements(&$form, $paths)
+{
+    $g = data_api();
+    foreach ($paths as $path) {
+        if ($g->get($form, $path)) {
+            $g->set($form, "$path.#access", false);
         }
     }
 }
