@@ -1,0 +1,18 @@
+{
+    "name": "aklump/loft_core",
+    "description": "Missing Drupal core functionality, IMHO.",
+    "type": "library",
+    "license": "BSD-3-Clause",
+    "authors": [
+        {
+            "name": "aklump",
+            "email": "sourcecode@intheloftstudios.com"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Drupal\\loft_core\\": "src/Drupal/loft_core/"
+        }
+    }
+}

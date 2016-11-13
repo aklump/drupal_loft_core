@@ -1,8 +1,41 @@
 <?php
+use Drupal\loft_core\Attribute;
 
 class LoftCoreTest extends PHPUnit_Framework_TestCase
 {
 
+    public function testRemovePartOfStyle()
+    {
+        $attributes = new Attribute(['style' => 'background-repeat:repeat;color:red;']);
+        $attributes->removeStyle('background-repeat');
+        $this->assertSame(' style="color:red"', strval($attributes));
+        $this->assertTrue($attributes->hasStyle('color'));
+
+
+    }
+
+    public function testRemoveStyle()
+    {
+        $attributes = new Attribute(['style' => 'background-repeat:repeat']);
+        $return = $attributes->removeStyle('background-repeat');
+        $this->assertEmpty(strval($attributes));
+        $this->assertSame($attributes, $return);
+    }
+
+    public function testAddStyleReplace()
+    {
+        $attributes = new Attribute(['style' => 'background-repeat:repeat']);
+        $attributes->addStyle('background-repeat', 'no-repeat');
+        $this->assertSame(' style="background-repeat:no-repeat"', strval($attributes));
+    }
+
+    public function testAddStyle()
+    {
+        $attributes = new Attribute;
+        $return = $attributes->addStyle('background-repeat', 'no-repeat');
+        $this->assertSame(' style="background-repeat:no-repeat"', strval($attributes));
+        $this->assertSame($attributes, $return);
+    }
 
     /**
      * Provides data for testMinWeight.

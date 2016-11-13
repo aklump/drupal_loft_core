@@ -31,6 +31,7 @@
     <filter>
         <whitelist>
             <directory suffix=".module">.</directory>
+            <directory suffix=".php">src</directory>
             <exclude>
                 <directory>./vendor</directory>
             </exclude>
