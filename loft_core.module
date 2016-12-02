@@ -7,13 +7,17 @@
  * @{
  */
 
- /**
-  * Implements hook_boot().
-  */
- function loft_core_boot() {
-   // You must load the composer autoload in this fashion.
-   include_once dirname(__FILE__) . '/vendor/autoload.php';
- }
+if ($conf['loft_core_autoload']) {
+    /**
+     * Implements hook_boot().
+     */
+    function loft_core_boot()
+    {
+        // You must load the composer autoload in this fashion.
+        include_once dirname(__FILE__) . '/vendor/autoload.php';
+    }
+}
+
 
 /**
  * Disable an array of form elements with a consistent message.

@@ -20,11 +20,16 @@ class ComposerStaticInita53fe36df132dd600a8787a349a9d1f5
         ),
     );
 
+    public static $classMap = array (
+        'Drupal\\loft_core\\Attribute' => __DIR__ . '/../..' . '/src/Drupal/loft_core/Attribute.php',
+    );
+
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
             $loader->prefixLengthsPsr4 = ComposerStaticInita53fe36df132dd600a8787a349a9d1f5::$prefixLengthsPsr4;
             $loader->prefixDirsPsr4 = ComposerStaticInita53fe36df132dd600a8787a349a9d1f5::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInita53fe36df132dd600a8787a349a9d1f5::$classMap;
 
         }, null, ClassLoader::class);
     }

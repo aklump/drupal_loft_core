@@ -6,4 +6,5 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'Drupal\\loft_core\\Attribute' => $baseDir . '/src/Drupal/loft_core/Attribute.php',
 );
