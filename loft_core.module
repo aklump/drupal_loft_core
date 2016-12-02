@@ -7,7 +7,7 @@
  * @{
  */
 
-if ($conf['loft_core_autoload']) {
+if (!empty($GLOBALS['conf']['loft_core_autoload'])) {
     /**
      * Implements hook_boot().
      */
