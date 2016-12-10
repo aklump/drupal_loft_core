@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Use this class to use YAML based configuration files.
+ * Use this class to use INI based configuration files.
  */
 namespace AKlump\LoftLib\Component\Config;
 
