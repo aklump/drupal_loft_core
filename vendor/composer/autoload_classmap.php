@@ -6,5 +6,10 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'AKlump\\LoftLib\\Code\\Exposer' => $baseDir . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Code/Exposer.php',
+    'AKlump\\LoftLib\\Code\\Grammar' => $baseDir . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Code/Grammar.php',
+    'AKlump\\LoftLib\\Code\\PhpDocBlock' => $baseDir . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Code/PhpDocBlock.php',
+    'AKlump\\LoftLib\\Code\\String' => $baseDir . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Code/String.php',
+    'AKlump\\LoftLib\\Code\\Strings' => $baseDir . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Code/Strings.php',
     'Drupal\\loft_core\\Attribute' => $baseDir . '/src/Drupal/loft_core/Attribute.php',
 );

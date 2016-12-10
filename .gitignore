@@ -1,1 +1,11 @@
 tests/build
+lib/loft_php_lib/*
+!lib/loft_php_lib/dist
+lib/loft_php_lib/dist/src/AKlump/LoftLib/*
+!lib/loft_php_lib/dist/src/AKlump/LoftLib/Code
+!lib/loft_php_lib/dist/src/AKlump/LoftLib/Component
+lib/loft_php_lib/dist/src/AKlump/LoftLib/Component/*
+!lib/loft_php_lib/dist/src/AKlump/LoftLib/Component/Config
+lib/loft_php_lib/dist/src/AKlump/LoftLib/Code/*
+!lib/loft_php_lib/dist/src/AKlump/LoftLib/Code/Strings.php
+!lib/loft_php_lib/dist/src/AKlump/LoftLib/Code/Grammar.php

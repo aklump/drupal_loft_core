@@ -7,4 +7,5 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'Drupal\\loft_core\\' => array($baseDir . '/src/Drupal/loft_core'),
+    'AKlump\\LoftLib\\Code\\' => array($baseDir . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Code'),
 );

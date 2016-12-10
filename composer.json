@@ -12,7 +12,8 @@
     "require": {},
     "autoload": {
         "psr-4": {
-            "Drupal\\loft_core\\": "src/Drupal/loft_core/"
+            "Drupal\\loft_core\\": "src/Drupal/loft_core/",
+            "AKlump\\LoftLib\\Code\\": "lib/loft_php_lib/dist/src/AKlump/LoftLib/Code"
         }
     }
 }
