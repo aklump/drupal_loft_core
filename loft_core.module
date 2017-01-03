@@ -18,6 +18,30 @@ if (!empty($GLOBALS['conf']['loft_core_autoload'])) {
     }
 }
 
+/**
+ * Adds a tabindex to a form element
+ *
+ * @param array &$element The form element to add to.
+ * @param null  $index    You can omit and each subsequent call will increment.
+ *
+ * Near the bottom of the form do something like this
+ * @code
+ *   loft_core_form_tabindex($form['title'], 100);
+ *   loft_core_form_tabindex($form['actions']['create']);
+ *   loft_core_form_tabindex($form['actions']['cancel']);
+ * @endcode
+ */
+function loft_core_form_tabindex(array &$element, $index = null)
+{
+    static $tabindex = 1;
+    if ($index) {
+        $tabindex = $index;
+    }
+    $element['#attributes']['tabindex'] = $tabindex;
+
+    ++$tabindex;
+}
+
 
 /**
  * Disable an array of form elements with a consistent message.
@@ -70,6 +94,22 @@ function loft_core_form_hide_elements(&$form, $paths)
 }
 
 /**
+ * Implements hook_element_info().
+ */
+function loft_core_element_info()
+{
+    $types = array();
+    $types['form_help'] = array(
+        '#weight'         => -99,
+        // string|array If array, elements are separate paragraphs, without <p> tag wrappers.
+        '#message'        => array(),
+        '#theme_wrappers' => array('form_help', 'form_element'),
+    );
+
+    return $types;
+}
+
+/**
  * Return the maximum weight in a render array, top level only.
  *
  * @param $render_array
@@ -101,4 +141,49 @@ function loft_core_min_weight($render_array)
     });
 
     return $min;
+}
+
+function loft_core_theme($existing, $type, $theme, $path)
+{
+    return array(
+        'form_help' => array(
+            'render element' => 'element',
+        ),
+    );
+}
+
+/**
+ * Implements hook_preprocess_form_help().
+ */
+function loft_core_preprocess_form_help(&$vars)
+{
+    $element =& $vars['element'];
+
+    // Wrap all elements of #message in p tags, if array.
+    if (is_array($element['#message'])) {
+        array_walk($element['#message'], function (&$value) {
+            if (strpos($value, '<p') !== 0) {
+                $value = '<p>' . $value . '</p>';
+            }
+        });
+        $element['#message'] = implode('', $element['#message']);
+    }
+}
+
+
+/**
+ * Provides output for form help..
+ *
+ * @param array $vars
+ *
+ * @return string
+ *
+ * @ingroup themeable
+ */
+function theme_form_help($vars)
+{
+    $element = $vars['element'];
+    $element['#attributes']['class'][] = 'form-help';
+
+    return '<div' . drupal_attributes($element['#attributes']) . '>' . $element['#message'] . $element['#children'] . '</div>';
 }
