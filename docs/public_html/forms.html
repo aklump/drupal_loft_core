@@ -1,0 +1,92 @@
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Forms API</title>
+    <link href="search/tipuesearch.css" rel="stylesheet">
+    <style type="text/css" media="all">
+      @import url("style.css");
+    </style>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script src="search/tipuesearch_content.js"></script>
+    <script src="search/tipuesearch_set.js"></script>
+    <script src="search/tipuesearch.min.js"></script>
+    <script src="js/core.js"></script>
+
+</head>
+
+<body class="page-forms">
+<header>
+<div class="pager">
+  <a href="README.html" class="prev README">&laquo;Loft Core</a>
+  <a href="index.html" class="index">Index</a>
+  <a href="index.html" class="next index">Index&raquo;</a>
+</div>
+
+</header>
+
+<div class="search__wrapper">
+  <form action="search--results.html">
+    <input type="text" class="search-input" name="q" id="tipue_search_input" autocomplete="off" required>
+  </form>
+</div>
+
+<h1>Forms API</h1>
+<div class="breadcrumb"><a href="index.html">Index</a></div>
+
+<section>
+
+
+<h2>Hide elements</h2>
+
+<p>See <code>loft_core_form_hide_elements()</code>.</p>
+
+<h2>Disable elements</h2>
+
+<p>It is nice to be able to keep an element visible, yet disable it.  Making this easy is the goal of <code>loft_core_form_disable_elements()</code>.</p>
+
+<h2>Form help</h2>
+
+<p>This module defines a new element called 'form_help'. It can also take <code>#weight</code> and <code>#attributes</code> (not shown).</p>
+
+<pre><code>    &lt;?php
+    $form['help'] = [
+        '#type'    =&gt; 'form_help',
+
+        // Notice an array, where each value is a separate paragraph and will be themed as such. It does not have to be an array, and passing a string is considered a single paragraph.
+        '#message' =&gt; array(
+            t("You are editing the template for all user collections."),
+            t("When a user account is created, the values of this node at the time the user account is created will be copied to the users's account as a Sample Collection.  Changes made to the node are not retroactive and only affect the user collections created from that point forward."),
+        ),
+    ];
+</code></pre>
+</section>
+
+<div class="search__results">
+  <div id="tipue_search_content"></div>  
+</div>
+
+<footer>
+<div class="pager">
+  <a href="README.html" class="prev README">&laquo;Loft Core</a>
+  <a href="index.html" class="index">Index</a>
+  <a href="index.html" class="next index">Index&raquo;</a>
+</div>
+
+
+  <div id="footer-legaleeze">
+    <p class="legaleeze center">Version: 0.8.16 &bull; Last Updated: Tue, 03 Jan 2017 12:40:16 -0800</p>
+  </div>
+</footer>
+
+<script>
+$(document).ready(function() {
+  $('#tipue_search_input').tipuesearch();
+});
+</script>
+
+</body>
+</html>
+

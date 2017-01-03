@@ -6,6 +6,12 @@
             "title": "Loft Core",
             "file": "README.md",
             "sort": 0
+        },
+        {
+            "id": "forms",
+            "title": "Forms API",
+            "file": "forms.md",
+            "sort": 1
         }
     ],
     "settings": {
