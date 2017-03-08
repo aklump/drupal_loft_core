@@ -6,6 +6,7 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'AKlump\\LoftLib\\Code\\Arrays' => $baseDir . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Code/Arrays.php',
     'AKlump\\LoftLib\\Code\\Exposer' => $baseDir . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Code/Exposer.php',
     'AKlump\\LoftLib\\Code\\Grammar' => $baseDir . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Code/Grammar.php',
     'AKlump\\LoftLib\\Code\\PhpDocBlock' => $baseDir . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Code/PhpDocBlock.php',

@@ -24,6 +24,8 @@ if (!empty($GLOBALS['conf']['loft_core_autoload'])) {
  * @param array &$element The form element to add to.
  * @param null  $index    You can omit and each subsequent call will increment.
  *
+ * @return int The next tabindex available.
+ *
  * Near the bottom of the form do something like this
  * @code
  *   loft_core_form_tabindex($form['title'], 100);
@@ -39,7 +41,7 @@ function loft_core_form_tabindex(array &$element, $index = null)
     }
     $element['#attributes']['tabindex'] = $tabindex;
 
-    ++$tabindex;
+    return ++$tabindex;
 }
 
 
@@ -186,4 +188,47 @@ function theme_form_help($vars)
     $element['#attributes']['class'][] = 'form-help';
 
     return '<div' . drupal_attributes($element['#attributes']) . '>' . $element['#message'] . $element['#children'] . '</div>';
+}
+
+/**
+ * Callback for #post_render to add a cache-busting token to image derivatives.
+ *
+ * This example shows how to add a cache buster to a certain node image field
+ * when the user is logged in to the website.
+ * @code
+ *   function HOOK_node_view_alter(&$build)
+ *   {
+ *       if (!empty($build['product:field_image']) && user_is_logged_in()) {
+ *           $build['product:field_image']['#post_render'][] =
+ *           'loft_core_image_src_itok_cache_buster';
+ *       }
+ *   }
+ * @endcode
+ *
+ * @param string $html  Expecting to contain ?itok=123"
+ * @param array  $build Expecting to find:
+ *                      - #object->changed
+ *
+ * @return string The modified html
+ */
+function loft_core_image_src_itok_cache_buster($html, $build)
+{
+    global $user;
+    $buster = array(
+        0 => variable_get('loft_core_cache_bust_token', 'cb'),
+        1 => null,
+    );
+    if ((!empty($build['#object']->changed))) {
+        $buster[1] = $build['#object']->changed;
+    }
+    elseif ((!empty($user->access))) {
+        $buster[1] = $user->access;
+    }
+    else {
+        $buster[1] = time();
+    }
+    $regex = '/' . preg_quote(IMAGE_DERIVATIVE_TOKEN) . '[^"]+/';
+    $html = preg_replace($regex, '$0&' . implode('=', $buster), $html);
+
+    return $html;
 }

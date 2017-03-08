@@ -29,6 +29,7 @@ class ComposerStaticInita53fe36df132dd600a8787a349a9d1f5
     );
 
     public static $classMap = array (
+        'AKlump\\LoftLib\\Code\\Arrays' => __DIR__ . '/../..' . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Code/Arrays.php',
         'AKlump\\LoftLib\\Code\\Exposer' => __DIR__ . '/../..' . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Code/Exposer.php',
         'AKlump\\LoftLib\\Code\\Grammar' => __DIR__ . '/../..' . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Code/Grammar.php',
         'AKlump\\LoftLib\\Code\\PhpDocBlock' => __DIR__ . '/../..' . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Code/PhpDocBlock.php',
