@@ -6,6 +6,7 @@
  * @defgroup loft_core Loft Core
  * @{
  */
+require_once dirname(__FILE__) . '/includes/loft_core.redirect.inc';
 
 if (!empty($GLOBALS['conf']['loft_core_autoload'])) {
     /**
@@ -195,6 +196,7 @@ function theme_form_help($vars)
  *
  * This example shows how to add a cache buster to a certain node image field
  * when the user is logged in to the website.
+ *
  * @code
  *   function HOOK_node_view_alter(&$build)
  *   {
@@ -232,3 +234,44 @@ function loft_core_image_src_itok_cache_buster($html, $build)
 
     return $html;
 }
+
+/**
+ * Invokes a hook on the default them if that implements it.
+ *
+ * @param $hook
+ *   The name of the hook to invoke.
+ * @param ...
+ *   Arguments to pass to the hook.
+ *
+ * @return
+ *   An array of return values of the hook implementations. If the theme returns
+ *   arrays from it's implementation, those are merged into one array
+ *   recursively. Note: integer keys in arrays will be lost, as the merge is
+ *   done using array_merge_recursive().
+ *
+ * @see   drupal_alter()
+ */
+//function theme_invoke($hook)
+//{
+//    if (!($theme = variable_get('theme_default', null))) {
+//        return;
+//    }
+//    $args = func_get_args();
+//    // Remove $hook from the arguments.
+//    unset($args[0]);
+//    $return = array();
+//
+//    $function = $theme . '_' . $hook;
+//    if (function_exists($function)) {
+//        $result = call_user_func_array($function, $args);
+//        if (isset($result) && is_array($result)) {
+//            $return = array_merge_recursive($return, $result);
+//        }
+//        elseif (isset($result)) {
+//            $return[] = $result;
+//        }
+//    }
+//
+//    return $return;
+//}
+
