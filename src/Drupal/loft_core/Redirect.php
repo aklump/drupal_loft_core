@@ -9,142 +9,72 @@ namespace Drupal\loft_core;
  */
 class Redirect {
 
-    protected $bundle;
-    protected $itemBase;
-    protected $cache = [];
-
-    /**
-     * Redirect constructor.
-     *
-     * @param string $bundle       The type of bundle.
-     * @param array  $menuItemBase The base array for generating all new menu
-     *                             items. This SHOULD come from the menu item
-     *                             'node/%node' available during
-     *                             hook_menu_alter().
-     */
-    public function __construct($bundle, array $menuItemBase = [])
-    {
-        $this->bundle = $bundle;
-        $this->itemBase = $menuItemBase;
-    }
-
-    /**
-     * Return all node bundles that should be considered by us.
-     *
-     * @return array
-     */
-    public static function getSupportedBundles()
-    {
-        $info = entity_get_info('node');
-
-        return array_keys($info['bundles']);
-    }
-
     /**
      * Tell if a node is being redirected by our hooks.
      *
      * You can check a node type by spoofing $node, e.g. (object) ['type' =>
      * 'blog']
      *
-     * @param \stdClass $node Must have one of either:
-     *                        - nid
-     *                        - type
+     * @param \stdClass $node
      *
      * @return bool
      */
     public static function isNodeRedirected(\stdClass $node)
     {
-        // First see if we have a record in the menu_router table, if we have a nid.
-        if (isset($node->nid) && menu_get_item('node/' . $node->nid)) {
+        if (isset($node->nid) && static::getNodeRedirect($node)) {
             return true;
         }
 
         // Then look at the modules implemented our hooks, at the node type.
         // This will be used when nodes are creating, before their id is set.
-        return module_implements('loft_core_redirect_node_' . $node->type);
+        return boolval(static::getImplementingModuleName($node->type));
     }
 
     /**
-     * Determine if a node's redirect has changed such that the menu needs to
-     * be rebuilt.
+     * Return a redirect based on a menu object
      *
-     * @param \stdClass $node
-     *   Must include the key 'original' to compare against.
+     * @param null $path
      *
-     * @return bool
+     * @return array|null
      */
-    public static function detectNodeChange(\stdClass $node)
+    public static function getNodeMenuObjectRedirect($path = null)
     {
-        $needs_update = false;
-        $after = empty($node->original) ? new \stdClass : $node->original;
-        drupal_alter('loft_core_redirect_needs_update', $needs_update, $node->type, $node, $after);
+        $path = empty($path) ? current_path() : $path;
+        if (strpos($path, 'node/') === 0
+            // use preg match to make sure with in the viewing path
+            && preg_match('/^node\/\d+$/', $path)
 
-        return $needs_update;
-    }
-
-    /**
-     * Return an array of node data elements to be used for the redirect
-     * callbacks.
-     *
-     * @return array
-     */
-    public function getNodeData()
-    {
-        if (!isset($this->cache['nodes'])) {
-            $this->cache['nodes'] = $this->getQuery()
-                                         ->execute()
-                                         ->fetchAllAssoc('nid');
+            // finally get the node.  Of course this approach will not work if the standard node view pages have changed, in which case such a custom module needs to do something else like this.
+            && ($node = menu_get_object('node', 1, $path))
+        ) {
+            return Redirect::getNodeRedirect($node);
         }
 
-        return $this->cache['nodes'];
-    }
-
-    /**
-     * Return an array of all redirect menu items for this bundle.
-     *
-     * @return array
-     */
-    public function getBundleRedirects()
-    {
-        if (!isset($this->cache['redirects'])) {
-            $redirect = null;
-            $items = [];
-            if (($module = $this->getImplementingModuleName())) {
-                foreach ($this->getNodeData() as $datum) {
-                    $datum = (object) $datum;
-                    if ($item = $this->getRedirect($datum)) {
-                        $items['node/' . $datum->nid] = $item;
-                    }
-                }
-            }
-
-            $this->cache['redirects'] = $items;
-        }
-
-        return $this->cache['redirects'];
+        return null;
     }
 
     /**
      * Return redirects for a given $datum (node)
      *
-     * @param \stdClass $node This really just needs:
-     *                        - nid
+     * @param \stdClass $node
      *
      * @return array|null
+     *
+     * // TODO Benchmark how this would work with db caching enabled.
      */
-    public function getRedirect(\stdClass $node)
+    public static function getNodeRedirect(\stdClass $node)
     {
-        $item = null;;
-        if (!$module = $this->getImplementingModuleName()) {
-            return $item;
-        }
-        $datum = $this->getNodeData();
-        $datum = $datum[$node->nid];
-        $item = $this->getItem();
-        $item['module'] = $module;
-        $function = $module . '_' . $this->getHook();
-        $result = $function($datum, $item);
-        if ($item) {
+        $redirects = &drupal_static(__CLASS__ . '::' . __FUNCTION__, []);
+        $static_key = $node->nid;
+        if (!array_key_exists($static_key, $redirects)) {
+            $bundle = $node->type;
+            $item = null;
+            if (!$module = static::getImplementingModuleName($bundle)) {
+                return $item;
+            }
+            $function = $module . '_' . static::getHook($bundle);
+            $item = ['page callback' => 'drupal_goto'];
+            $result = $function($node);
             switch ($result) {
                 case MENU_ACCESS_DENIED:
                     $item['page callback'] = 'drupal_access_denied';
@@ -155,60 +85,34 @@ class Redirect {
                     $item['page arguments'] = [];
                     break;
                 default:
-                    if ($item['page callback'] === 'drupal_goto') {
-                        $result = is_array($result) ? array_values($result) : array($result);
-                        if (empty($result[0])) {
-                            $item = null;
-                        }
-                        else {
-                            $item['page arguments'] = $result + array(
-                                    '<front>',
-                                    array(),
-                                    // We want to make all redirects permanent by default.
-                                    301,
-                                );
-                        }
+                    $result = is_array($result) ? array_values($result) : array($result);
+                    if (empty($result[0])) {
+                        $item = null;
+                    }
+                    else {
+                        $item['page arguments'] = $result + array(
+                                '<front>',
+                                array(),
+                                // We want to make all redirects permanent by default.
+                                301,
+                            );
                     }
                     break;
             }
+            $redirects[$static_key] = $item;
         }
 
-        return $item;
+        return $redirects[$static_key];
     }
 
-    protected function getQuery()
+    protected static function getHook($bundle)
     {
-        $hook = 'loft_core_redirect_node_' . $this->bundle;
-        $query = db_select('node', 'n')
-            ->fields('n', array('nid', 'title'))
-            ->condition('type', $this->bundle)
-            ->addTag($hook);
-
-        return $query;
+        return 'loft_core_redirect_node_' . $bundle;
     }
 
-    protected function getItem()
+    protected static function getImplementingModuleName($bundle)
     {
-        $item = $this->itemBase;
-        $item['load_functions'] = array();
-        $item['title callback'] = '';
-        unset($item['title arguments']);
-        $item['access callback'] = 'user_access';
-        $item['access arguments'] = array('access content');
-        $item['page callback'] = 'drupal_goto';
-        $item['page arguments'] = array();
-
-        return $item;
-    }
-
-    protected function getHook()
-    {
-        return 'loft_core_redirect_node_' . $this->bundle;
-    }
-
-    protected function getImplementingModuleName()
-    {
-        $modules = module_implements($this->getHook());
+        $modules = module_implements(static::getHook($bundle));
 
         // For performance, only the last module hook will be used.  If you need to, set the weight of your module high so it becomes the last.
         return end($modules);
