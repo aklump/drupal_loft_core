@@ -22,6 +22,39 @@ if (!empty($GLOBALS['conf']['loft_core_autoload'])) {
 }
 
 /**
+ * Implements hook_init().
+ *
+ * This will handle the redirects with queries, fragments, or not found and
+ * denied menu flags.
+ */
+function loft_core_init()
+{
+    if (($redirect = Redirect::getNodeMenuObjectRedirect())) {
+        call_user_func_array($redirect['page callback'], $redirect['page arguments']);
+    }
+}
+
+/**
+ * Implements hook_url_inbound_alter().
+ *
+ * This will handle the redirects to internal drupal paths, which do not have
+ * query strings or fragments.  In the case of the latter, then hook_init will
+ * handle it.
+ */
+function loft_core_url_inbound_alter(&$path, $original_path, $path_language)
+{
+    if (($redirect = Redirect::getNodeMenuObjectRedirect($path))
+        && $redirect['page callback'] === 'drupal_goto'
+
+        // If we don't have any arguments for drupal_goto then we can redirect this internally, without a php header send.
+        && empty($redirect['page arguments'][1])
+        && drupal_valid_path($redirect['page arguments'][0])
+    ) {
+        $path = $redirect['page arguments'][0];
+    }
+}
+
+/**
  * Adds a tabindex to a form element
  *
  * @param array &$element The form element to add to.
