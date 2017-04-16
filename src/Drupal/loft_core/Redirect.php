@@ -47,8 +47,8 @@ class Redirect {
      * 'blog']
      *
      * @param \stdClass $node Must have one of either:
-     *                       - nid
-     *                       - type
+     *                        - nid
+     *                        - type
      *
      * @return bool
      */
@@ -75,21 +75,9 @@ class Redirect {
      */
     public static function detectNodeChange(\stdClass $node)
     {
-        $n = data_api('node');
         $needs_update = false;
         $after = empty($node->original) ? new \stdClass : $node->original;
-
-        // First we'll detect based on our node properties.
-        foreach (array('title') as $prop) {
-            if ($n->get($node, $prop) !== $n->get($after, $prop)) {
-                $needs_update = true;
-                break;
-            }
-        }
-
-        if (!$needs_update) {
-            drupal_alter('loft_core_redirect_needs_update', $needs_update, $node->type, $node, $after);
-        }
+        drupal_alter('loft_core_redirect_needs_update', $needs_update, $node->type, $node, $after);
 
         return $needs_update;
     }
@@ -146,11 +134,14 @@ class Redirect {
      */
     public function getRedirect(\stdClass $node)
     {
-        // Create the new menu item before altering.
+        $item = null;;
+        if (!$module = $this->getImplementingModuleName()) {
+            return $item;
+        }
         $datum = $this->getNodeData();
         $datum = $datum[$node->nid];
         $item = $this->getItem();
-        $item['module'] = $module = $this->getImplementingModuleName();
+        $item['module'] = $module;
         $function = $module . '_' . $this->getHook();
         $result = $function($datum, $item);
         if ($item) {
@@ -176,12 +167,10 @@ class Redirect {
                                     // We want to make all redirects permanent by default.
                                     301,
                                 );
-
                         }
                     }
                     break;
             }
-
         }
 
         return $item;

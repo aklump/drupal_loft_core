@@ -23,6 +23,7 @@ function loft_core_node_update($node)
 {
     if (Redirect::isNodeRedirected($node) && Redirect::detectNodeChange($node)) {
         variable_set('menu_rebuild_needed', true);
+        drupal_set_message(t("The redirect for %title has been updated.", ['%title' => $node->title]), 'status', FALSE);
     }
 }
 

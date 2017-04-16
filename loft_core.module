@@ -6,6 +6,8 @@
  * @defgroup loft_core Loft Core
  * @{
  */
+use Drupal\loft_core\Redirect;
+
 require_once dirname(__FILE__) . '/includes/loft_core.redirect.inc';
 
 if (!empty($GLOBALS['conf']['loft_core_autoload'])) {

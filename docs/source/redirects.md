@@ -2,7 +2,7 @@
 
 ## To redirect by node type
 
-This module provides a clean means of redirecting node in page view by bundle.  So you could redirect all nodes in a certain bundle to a different page, mark them as access denied or even not found.
+This module provides a clean means of redirecting node in page view by bundle.  So you could redirect all nodes in a certain bundle to a different page, mark them as access denied or even not found.  It takes the approach of creating a menu item for every redirect, rather than invoking something during hook_init().
 
 see `HOOK_loft_core_redirect_node_BUNDLE_TYPE()`.
 
