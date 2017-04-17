@@ -8,8 +8,10 @@
  */
 use Drupal\loft_core\Redirect;
 
-require_once dirname(__FILE__) . '/includes/loft_core.redirect.inc';
-
+//
+//
+// Register hook_boot ONLY if we are using the autoload feature.
+//
 if (!empty($GLOBALS['conf']['loft_core_autoload'])) {
     /**
      * Implements hook_boot().
