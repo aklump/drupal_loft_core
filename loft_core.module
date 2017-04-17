@@ -22,35 +22,64 @@ if (!empty($GLOBALS['conf']['loft_core_autoload'])) {
 }
 
 /**
- * Implements hook_init().
+ * Menu callback: Displays a single node, but checks for a redirect first.
  *
- * This will handle the redirects with queries, fragments, or not found and
- * denied menu flags.
+ * @param $node
+ *   The node object.
+ *
+ * @return
+ *   A page array suitable for use by drupal_render().
+ *
+ * @see node_menu()
  */
-function loft_core_init()
+function loft_core_node_page_view($node)
 {
+    // When viewing this node in page view, check to see if we're to redirect it instead.
     if (($redirect = Redirect::getNodeMenuObjectRedirect())) {
-        call_user_func_array($redirect['page callback'], $redirect['page arguments']);
+        switch ($redirect['page callback']) {
+            case 'drupal_not_found':
+                return MENU_NOT_FOUND;
+            case 'drupal_access_denied':
+                return MENU_ACCESS_DENIED;
+            default:
+                call_user_func_array($redirect['page callback'], $redirect['page arguments']);
+                break;
+        }
+    }
+
+    // ... otherwise do the normal.
+    return node_page_view($node);
+}
+
+function loft_core_menu_alter(&$items)
+{
+    if (isset($items['node/%node'])) {
+        $items['node/%node']['page callback'] = 'loft_core_node_page_view';
     }
 }
 
 /**
- * Implements hook_url_inbound_alter().
+ * Implements hook_form_alter().
  *
- * This will handle the redirects to internal drupal paths, which do not have
- * query strings or fragments.  In the case of the latter, then hook_init will
- * handle it.
+ * Make sure we don't redirect admins after editing a "redirected" node.
  */
-function loft_core_url_inbound_alter(&$path, $original_path, $path_language)
+function loft_core_form_node_form_alter(&$form, &$form_state)
 {
-    if (($redirect = Redirect::getNodeMenuObjectRedirect($path))
-        && $redirect['page callback'] === 'drupal_goto'
+    if (Redirect::isNodeRedirected($form_state['node'])) {
+        $form['actions']['submit']['#submit'][] = 'loft_core_node_form_submit_redirect_handler';
+    }
+}
 
-        // If we don't have any arguments for drupal_goto then we can redirect this internally, without a php header send.
-        && empty($redirect['page arguments'][1])
-        && drupal_valid_path($redirect['page arguments'][0])
-    ) {
-        $path = $redirect['page arguments'][0];
+/**
+ * Redirect a node form to the edit page, no the view page as normal.
+ *
+ * @param $form
+ * @param $form_state
+ */
+function loft_core_node_form_submit_redirect_handler($form, &$form_state)
+{
+    if (!empty($form_state['redirect']) && $form_state['nid']) {
+        $form_state['redirect'] = node_access('update', $form_state['nid']) ? 'node/' . $form_state['nid'] . '/edit' : '<front>';
     }
 }
 
