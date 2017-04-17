@@ -28,23 +28,11 @@ class ComposerStaticInita53fe36df132dd600a8787a349a9d1f5
         ),
     );
 
-    public static $classMap = array (
-        'AKlump\\LoftLib\\Code\\Arrays' => __DIR__ . '/../..' . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Code/Arrays.php',
-        'AKlump\\LoftLib\\Code\\Exposer' => __DIR__ . '/../..' . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Code/Exposer.php',
-        'AKlump\\LoftLib\\Code\\Grammar' => __DIR__ . '/../..' . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Code/Grammar.php',
-        'AKlump\\LoftLib\\Code\\PhpDocBlock' => __DIR__ . '/../..' . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Code/PhpDocBlock.php',
-        'AKlump\\LoftLib\\Code\\String' => __DIR__ . '/../..' . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Code/String.php',
-        'AKlump\\LoftLib\\Code\\Strings' => __DIR__ . '/../..' . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Code/Strings.php',
-        'Drupal\\loft_core\\Attribute' => __DIR__ . '/../..' . '/src/Drupal/loft_core/Attribute.php',
-        'Drupal\\loft_core\\Redirect' => __DIR__ . '/../..' . '/src/Drupal/loft_core/Redirect.php',
-    );
-
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
             $loader->prefixLengthsPsr4 = ComposerStaticInita53fe36df132dd600a8787a349a9d1f5::$prefixLengthsPsr4;
             $loader->prefixDirsPsr4 = ComposerStaticInita53fe36df132dd600a8787a349a9d1f5::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInita53fe36df132dd600a8787a349a9d1f5::$classMap;
 
         }, null, ClassLoader::class);
     }
