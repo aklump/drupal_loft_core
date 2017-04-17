@@ -12,6 +12,12 @@
             "title": "Forms API",
             "file": "forms.md",
             "sort": 1
+        },
+        {
+            "id": "redirects",
+            "title": "Redirects",
+            "file": "redirects.md",
+            "sort": 2
         }
     ],
     "settings": {

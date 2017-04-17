@@ -36,6 +36,7 @@ class ComposerStaticInita53fe36df132dd600a8787a349a9d1f5
         'AKlump\\LoftLib\\Code\\String' => __DIR__ . '/../..' . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Code/String.php',
         'AKlump\\LoftLib\\Code\\Strings' => __DIR__ . '/../..' . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Code/Strings.php',
         'Drupal\\loft_core\\Attribute' => __DIR__ . '/../..' . '/src/Drupal/loft_core/Attribute.php',
+        'Drupal\\loft_core\\Redirect' => __DIR__ . '/../..' . '/src/Drupal/loft_core/Redirect.php',
     );
 
     public static function getInitializer(ClassLoader $loader)
