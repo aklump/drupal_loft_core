@@ -13,4 +13,5 @@ return array(
     'AKlump\\LoftLib\\Code\\String' => $baseDir . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Code/String.php',
     'AKlump\\LoftLib\\Code\\Strings' => $baseDir . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Code/Strings.php',
     'Drupal\\loft_core\\Attribute' => $baseDir . '/src/Drupal/loft_core/Attribute.php',
+    'Drupal\\loft_core\\Redirect' => $baseDir . '/src/Drupal/loft_core/Redirect.php',
 );
