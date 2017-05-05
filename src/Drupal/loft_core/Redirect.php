@@ -19,9 +19,9 @@ class Redirect {
      *
      * @return bool
      */
-    public static function isNodeRedirected(\stdClass $node)
+    public static function isNodeRedirected(\stdClass $node, $op = 'view')
     {
-        if (isset($node->nid) && static::getNodeRedirect($node)) {
+        if (isset($node->nid) && static::getNodeRedirect($node, $op)) {
             return true;
         }
 
@@ -33,11 +33,12 @@ class Redirect {
     /**
      * Return a redirect based on a menu object
      *
-     * @param null $path
+     * @param null $op  One of: create, view, edit, delete
+     * @param null $path *
      *
      * @return array|null
      */
-    public static function getNodeMenuObjectRedirect($path = null)
+    public static function getNodeMenuObjectRedirect($op = 'view', $path = null)
     {
         $path = empty($path) ? current_path() : $path;
         if (strpos($path, 'node/') === 0
@@ -47,7 +48,7 @@ class Redirect {
             // finally get the node.  Of course this approach will not work if the standard node view pages have changed, in which case such a custom module needs to do something else like this.
             && ($node = menu_get_object('node', 1, $path))
         ) {
-            return Redirect::getNodeRedirect($node);
+            return Redirect::getNodeRedirect($node, $op);
         }
 
         return null;
@@ -62,7 +63,7 @@ class Redirect {
      *
      * // TODO Benchmark how this would work with db caching enabled.
      */
-    public static function getNodeRedirect(\stdClass $node)
+    public static function getNodeRedirect(\stdClass $node, $op = 'view')
     {
         $redirects = &drupal_static(__CLASS__ . '::' . __FUNCTION__, []);
         $static_key = $node->nid;
@@ -72,7 +73,7 @@ class Redirect {
             if (!$module = static::getImplementingModuleName($bundle)) {
                 return $item;
             }
-            $function = $module . '_' . static::getHook($bundle);
+            $function = $module . '_' . static::getHook($bundle, $op);
             $item = ['page callback' => 'drupal_goto'];
             $result = $function($node);
             switch ($result) {
@@ -105,9 +106,17 @@ class Redirect {
         return $redirects[$static_key];
     }
 
-    protected static function getHook($bundle)
+    /**
+     * Get the hook name based on an op.
+     *
+     * @param string $bundle
+     * @param string $op One of: view, update, delete. Defaults to view.
+     *
+     * @return string
+     */
+    protected static function getHook($bundle, $op = 'view')
     {
-        return 'loft_core_redirect_node_' . $bundle;
+        return 'loft_core_redirect_node_' . $bundle . "__$op";
     }
 
     protected static function getImplementingModuleName($bundle)

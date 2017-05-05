@@ -34,10 +34,10 @@ if (!empty($GLOBALS['conf']['loft_core_autoload'])) {
  *
  * @see node_menu()
  */
-function loft_core_node_page_view($node)
+function loft_core_node_page(\stdClass $node, $op)
 {
     // When viewing this node in page view, check to see if we're to redirect it instead.
-    if (($redirect = Redirect::getNodeMenuObjectRedirect())) {
+    if (($redirect = Redirect::getNodeMenuObjectRedirect($op))) {
         switch ($redirect['page callback']) {
             case 'drupal_not_found':
                 return MENU_NOT_FOUND;
@@ -50,13 +50,41 @@ function loft_core_node_page_view($node)
     }
 
     // ... otherwise do the normal.
-    return node_page_view($node);
+    switch ($op) {
+        case 'delete':
+            return drupal_get_form('node_delete_confirm', $node);
+            break;
+            //        case 'create':
+            //            return node_add($node->type);
+            break;
+        default:
+            $func = "node_page_{$op}";
+
+            return $func($node);
+    }
 }
 
 function loft_core_menu_alter(&$items)
 {
-    if (isset($items['node/%node'])) {
-        $items['node/%node']['page callback'] = 'loft_core_node_page_view';
+    $key = 'node/%node';
+    if (isset($items[$key])) {
+        $items[$key]['page callback'] = 'loft_core_node_page';
+        $items[$key]['page arguments'][] = 'view';
+    }
+    $key = 'node/%node/view';
+    if (isset($items[$key])) {
+        $items[$key]['page callback'] = 'loft_core_node_page';
+        $items[$key]['page arguments'][] = 'view';
+    }
+    $key = 'node/%node/edit';
+    if (isset($items[$key])) {
+        $items[$key]['page callback'] = 'loft_core_node_page';
+        $items[$key]['page arguments'][] = 'edit';
+    }
+    $key = 'node/%node/delete';
+    if (isset($items[$key])) {
+        $items[$key]['page callback'] = 'loft_core_node_page';
+        $items[$key]['page arguments'][] = 'delete';
     }
 }
 
@@ -67,7 +95,7 @@ function loft_core_menu_alter(&$items)
  */
 function loft_core_form_node_form_alter(&$form, &$form_state)
 {
-    if (Redirect::isNodeRedirected($form_state['node'])) {
+    if (Redirect::isNodeRedirected($form_state['node'], 'view')) {
         $form['actions']['submit']['#submit'][] = 'loft_core_node_form_submit_redirect_handler';
     }
 }
@@ -169,9 +197,9 @@ function loft_core_element_info()
 {
     $types = array();
     $types['form_help'] = array(
-        '#weight'         => -99,
+        '#weight' => -99,
         // string|array If array, elements are separate paragraphs, without <p> tag wrappers.
-        '#message'        => array(),
+        '#message' => array(),
         '#theme_wrappers' => array('form_help', 'form_element'),
     );
 
@@ -372,7 +400,7 @@ function is_live($feature)
  */
 function loft_test_class($class)
 {
-    if (in_array(DRUPAL_ENV, ['local', 'local_devserver'])) {
+    if (strpos(DRUPAL_ENV, 'local') === 0) {
         return 't-' . $class;
     }
 }
