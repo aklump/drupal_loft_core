@@ -341,3 +341,38 @@ function loft_core_image_src_itok_cache_buster($html, $build)
 //    return $return;
 //}
 
+/**
+ * Test if a feature is live.
+ *
+ * If $feature is not registered it defaults to live.
+ *
+ * @param string $feature The id of the feature as declared by
+ *                        HOOK_loft_core_features_switch().
+ *
+ * @return bool
+ */
+function is_live($feature)
+{
+    static $features = null;
+    if (is_null($features)) {
+        $features = module_invoke_all('loft_core_code_release_info');
+        $features[$feature]['is_live'] = isset($features[$feature]) ? $features[$feature]['is_live'] : true;
+    }
+
+    return $features[$feature]['is_live'];
+}
+
+
+/**
+ * Provides a test css class when environment is not prod.
+ *
+ * @param string $class
+ *
+ * @return string
+ */
+function loft_test_class($class)
+{
+    if (in_array(DRUPAL_ENV, ['local', 'local_devserver'])) {
+        return 't-' . $class;
+    }
+}
