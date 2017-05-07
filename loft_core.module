@@ -404,3 +404,21 @@ function loft_test_class($class)
         return 't-' . $class;
     }
 }
+
+/**
+ * Use this to get a form during an ajax response; it suppressed the $_POST so
+ * the form doesn't think it's already submitted.
+ *
+ * @param string $form_id
+ *
+ * @return array|mixed
+ */
+function loft_core_get_form_during_ajaxing($form_id)
+{
+    $stash = $_POST;
+    $_POST = array();
+    $form = drupal_get_form($form_id);
+    $_POST = $stash;
+
+    return $form;
+}
