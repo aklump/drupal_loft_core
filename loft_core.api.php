@@ -27,10 +27,28 @@ function HOOK_loft_core_redirect_node_BUNDLE_TYPE($node, $op)
 }
 
 /**
+ * Create a node view page per bundle.
+ *
+ * Include this function and when a node of BUNDLE_TYPE is viewed, this
+ * function will be called instead of the default node_page_view.
+ *
+ * No messing with hook_menu is needed, just create the function.
+ *
+ * @param $node
+ *
+ * @return array
+ */
+function HOOK_loft_core_node_BUNDLE_TYPE_page($node)
+{
+    return node_page_view($node);
+}
+
+/**
  * Implements hook_loft_core_code_release_info().
  *
  * @return array
- *   Each element key is a unique feature key/tag.  Each element is an array with:
+ *   Each element key is a unique feature key/tag.  Each element is an array
+ *   with:
  *     - is_live bool False to disable the feature.
  */
 function hook_loft_core_code_release_info()

@@ -36,7 +36,26 @@ if (!empty($GLOBALS['conf']['loft_core_autoload'])) {
  */
 function loft_core_node_page(\stdClass $node, $op)
 {
-    // When viewing this node in page view, check to see if we're to redirect it instead.
+
+    //
+    //
+    // First check for a BUNDLE_TYPE_page...
+    //
+    if ($op === 'view') {
+        $type = $node->type;
+        $hook = 'loft_core_node_' . $type . '_page';
+        if (($modules = module_implements($hook))) {
+            // We only take the last one.
+            $callback = end($modules) . '_' . $hook;
+
+            return $callback($node);
+        }
+    }
+
+    //
+    //
+    // ... then look for a redirect.
+    //
     if (($redirect = Redirect::getNodeMenuObjectRedirect($op))) {
         switch ($redirect['page callback']) {
             case 'drupal_not_found':
