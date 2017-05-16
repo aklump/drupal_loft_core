@@ -17,13 +17,26 @@
  *                            FOR drupal_goto.  You may also return
  *                            MENU_ACCESS_DENIED or MENU_NOT_FOUND if you wish
  *                            and the appropriate action will be taken.
+ *                            Finally, if you return FALSE, no redirect will
+ *                            take place.
  */
-function HOOK_loft_core_redirect_node_BUNDLE_TYPE($node, $op)
+function HOOK_loft_core_redirect_node_BUNDLE_TYPE_view($node)
 {
     return [
         'node/' . BLOG_PAGE_NID,
         ['fragment' => 'm[]=modal,blog_entry__' . $node->nid],
     ];
+}
+
+function HOOK_loft_core_redirect_node_BUNDLE_TYPE_edit($node)
+{
+    // Only allow admins to edit, otherwise deny access.  This overrides the normal access check of node_access('update'...
+    return user_is_admin() ? false : MENU_ACCESS_DENIED;
+}
+
+function HOOK_loft_core_redirect_node_BUNDLE_TYPE_delete($node)
+{
+
 }
 
 /**

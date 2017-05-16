@@ -33,9 +33,21 @@ if (!empty($GLOBALS['conf']['loft_core_autoload'])) {
  *   A page array suitable for use by drupal_render().
  *
  * @see node_menu()
+ * 
+ *
+ * // TODO Support node create?
  */
-function loft_core_node_page(\stdClass $node, $op)
+function loft_core_node_page($node, $op)
 {
+    if (is_string($node)) {
+        switch ($node) {
+            case 'node_delete_confirm':
+                $form_id = $node;
+                $node = $op;
+                $op = 'delete';
+                break;
+        }
+    }
 
     //
     //
@@ -71,11 +83,7 @@ function loft_core_node_page(\stdClass $node, $op)
     // ... otherwise do the normal.
     switch ($op) {
         case 'delete':
-            return drupal_get_form('node_delete_confirm', $node);
-            break;
-            //        case 'create':
-            //            return node_add($node->type);
-            break;
+            return drupal_get_form($form_id, $node);
         default:
             $func = "node_page_{$op}";
 

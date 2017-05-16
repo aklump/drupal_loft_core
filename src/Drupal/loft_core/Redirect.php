@@ -27,13 +27,13 @@ class Redirect {
 
         // Then look at the modules implemented our hooks, at the node type.
         // This will be used when nodes are creating, before their id is set.
-        return boolval(static::getImplementingModuleName($node->type));
+        return boolval(static::getImplementingModuleName($node->type, $op));
     }
 
     /**
      * Return a redirect based on a menu object
      *
-     * @param null $op  One of: create, view, edit, delete
+     * @param null $op   One of: create, view, edit, delete
      * @param null $path *
      *
      * @return array|null
@@ -41,14 +41,29 @@ class Redirect {
     public static function getNodeMenuObjectRedirect($op = 'view', $path = null)
     {
         $path = empty($path) ? current_path() : $path;
-        if (strpos($path, 'node/') === 0
-            // use preg match to make sure with in the viewing path
-            && preg_match('/^node\/\d+$/', $path)
 
-            // finally get the node.  Of course this approach will not work if the standard node view pages have changed, in which case such a custom module needs to do something else like this.
-            && ($node = menu_get_object('node', 1, $path))
-        ) {
-            return Redirect::getNodeRedirect($node, $op);
+        if (strpos($path, 'node/') === 0) {
+
+            switch ($op) {
+                case 'view':
+                    $regex = '/^node\/\d+$/';
+                    break;
+                case 'edit':
+                    $regex = '/^node\/\d+\/edit$/';
+                    break;
+                case 'delete':
+                    $regex = '/^node\/\d+\/delete/';
+                    break;
+            }
+
+            // use preg match to make sure we're in a node path
+            if (preg_match($regex, $path)
+
+                // finally get the node.  Of course this approach will not work if the standard node view pages have changed, in which case such a custom module needs to do something else like this.
+                && ($node = menu_get_object('node', 1, $path))
+            ) {
+                return Redirect::getNodeRedirect($node, $op);
+            }
         }
 
         return null;
@@ -70,7 +85,7 @@ class Redirect {
         if (!array_key_exists($static_key, $redirects)) {
             $bundle = $node->type;
             $item = null;
-            if (!$module = static::getImplementingModuleName($bundle)) {
+            if (!$module = static::getImplementingModuleName($bundle, $op)) {
                 return $item;
             }
             $function = $module . '_' . static::getHook($bundle, $op);
@@ -84,6 +99,9 @@ class Redirect {
                 case MENU_NOT_FOUND:
                     $item['page callback'] = 'drupal_not_found';
                     $item['page arguments'] = [];
+                    break;
+                case false:
+                    $item = $result;
                     break;
                 default:
                     $result = is_array($result) ? array_values($result) : array($result);
@@ -116,12 +134,12 @@ class Redirect {
      */
     protected static function getHook($bundle, $op = 'view')
     {
-        return 'loft_core_redirect_node_' . $bundle . "__$op";
+        return 'loft_core_redirect_node_' . $bundle . "_$op";
     }
 
-    protected static function getImplementingModuleName($bundle)
+    protected static function getImplementingModuleName($bundle, $op)
     {
-        $modules = module_implements(static::getHook($bundle));
+        $modules = module_implements(static::getHook($bundle, $op));
 
         // For performance, only the last module hook will be used.  If you need to, set the weight of your module high so it becomes the last.
         return end($modules);
