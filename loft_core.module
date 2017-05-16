@@ -427,7 +427,7 @@ function is_live($feature)
  */
 function loft_test_class($class)
 {
-    if (strpos(DRUPAL_ENV, 'local') === 0) {
+    if (strpos(DRUPAL_ENV, 'prod') !== 0) {
         return 't-' . $class;
     }
 }
