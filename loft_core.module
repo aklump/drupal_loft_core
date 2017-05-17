@@ -33,7 +33,7 @@ if (!empty($GLOBALS['conf']['loft_core_autoload'])) {
  *   A page array suitable for use by drupal_render().
  *
  * @see node_menu()
- * 
+ *
  *
  * // TODO Support node create?
  */
@@ -193,6 +193,7 @@ function loft_core_form_disable_elements(&$form, $paths, $module_name = null, $m
     foreach ($paths as $path) {
         if ($g->get($form, $path)) {
             $type = $g->get($form, "$path.#type");
+            $g->set($form, "$path.#required", false);
             $g->set($form, "$path.#disabled", true);
             switch ($type) {
                 case 'container':
@@ -212,6 +213,9 @@ function loft_core_form_hide_elements(&$form, $paths)
     $g = data_api();
     foreach ($paths as $path) {
         if ($g->get($form, $path)) {
+            $g->onlyIfHas($form, "$path.#required")->call(function () {
+                return false;
+            })->set($form);
             $g->set($form, "$path.#access", false);
         }
     }
