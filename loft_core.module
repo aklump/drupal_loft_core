@@ -28,6 +28,7 @@ if (!empty($GLOBALS['conf']['loft_core_autoload'])) {
  */
 function loft_core_preprocess_html(&$vars)
 {
+    $vars['loft_core_tracking'] = '';
     if (DRUPAL_ENV_ROLE === 'prod' && ($token = variable_get('loft_core_trackjs_token', null))) {
         $vars['loft_core_tracking'] = <<<EOD
 <!-- BEGIN TRACKJS -->
