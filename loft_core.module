@@ -24,6 +24,21 @@ if (!empty($GLOBALS['conf']['loft_core_autoload'])) {
 }
 
 /**
+ * Implements hook_preprocess_html().
+ */
+function loft_core_preprocess_html(&$vars)
+{
+    if (DRUPAL_ENV_ROLE === 'prod' && ($token = variable_get('loft_core_trackjs_token', null))) {
+        $vars['loft_core_tracking'] = <<<EOD
+<!-- BEGIN TRACKJS -->
+<script type="text/javascript">window._trackJs = { token: '{$token}' };</script>
+<script type="text/javascript" src="https://cdn.trackjs.com/releases/current/tracker.js"></script>
+<!-- END TRACKJS -->        
+EOD;
+    }
+}
+
+/**
  * Menu callback: Displays a single node, but checks for a redirect first.
  *
  * @param $node
