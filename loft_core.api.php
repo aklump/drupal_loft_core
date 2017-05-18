@@ -103,3 +103,18 @@ function hook_loft_core_code_release_info()
         ],
     ];
 }
+
+/**
+ * Implements hook_loft_core_trackjs_alter().
+ *
+ * @link http://docs.trackjs.com/tracker/configuration
+ * @link http://docs.trackjs.com/tracker/top-level-api
+ */
+function HOOK_loft_core_trackjs_alter(&$config)
+{
+    // Set the application.
+    $config['config']['application'] = 'my_first_app';
+
+    // Add some metadata
+    $config['metadata']['do'] = 're';
+}

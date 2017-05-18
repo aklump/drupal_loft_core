@@ -11,3 +11,7 @@
         <?= $scripts; ?>
 
 4. This will only be present when `DRUPAL_ENV_ROLE` is `prod`.
+
+## Config and Metadata
+
+See `HOOK_loft_core_trackjs_alter()` for more info.

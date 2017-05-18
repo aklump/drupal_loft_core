@@ -28,12 +28,49 @@ if (!empty($GLOBALS['conf']['loft_core_autoload'])) {
  */
 function loft_core_preprocess_html(&$vars)
 {
+    global $user;
     $vars['loft_core_tracking'] = '';
     if (DRUPAL_ENV_ROLE === 'prod' && ($token = variable_get('loft_core_trackjs_token', null))) {
+
+        // @link http://docs.trackjs.com/tracker/configuration
+        $trackjs = array(
+            'config' => '',
+            'metadata' => [],
+        );
+
+        $trackjs['config']['token'] = $token;
+
+        if (function_exists('web_package_get_version')) {
+            $trackjs['config']['version'] = web_package_get_version();
+        }
+
+        // TrackJS allows you to track errors for multiple applications from the same account.
+        // See the UI documentation for how to setup applications.
+        $trackjs['config']['application'] = null;
+
+        // If you have some identifiable string that represents a user or customer, please include it.
+        // In the TrackJS UI we allow you to group and filter by this value.
+        $trackjs['config']['userId'] = user_is_logged_in() ? $user->uid : null;
+        $trackjs['metadata']['username'] = user_is_logged_in() ? $user->name : null;
+
+        // Similar to userId, if you have a session guid or something you can set it here.
+        // We allow you to search on this value in the UI.
+        $trackjs['config']['sessionId'] = session_id();
+
+        drupal_alter('loft_core_trackjs', $trackjs);
+
+        $config = json_encode(array_filter($trackjs['config']));
+
+        $meta = array();
+        foreach (array_filter($trackjs['metadata']) as $key => $value) {
+            $meta[] = 'trackJs.addMetadata("' . $key . '", "' . $value . '");';
+        }
+        $meta = implode(';', $meta);
         $vars['loft_core_tracking'] = <<<EOD
 <!-- BEGIN TRACKJS -->
-<script type="text/javascript">window._trackJs = { token: '{$token}' };</script>
+<script type="text/javascript">window._trackJs = {$config};</script>
 <script type="text/javascript" src="https://cdn.trackjs.com/releases/current/tracker.js"></script>
+<script type="text/javascript">{$meta};</script>
 <!-- END TRACKJS -->        
 EOD;
     }
