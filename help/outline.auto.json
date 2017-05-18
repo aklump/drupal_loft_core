@@ -18,6 +18,12 @@
             "title": "Redirects",
             "file": "redirects.md",
             "sort": 2
+        },
+        {
+            "id": "trackjs",
+            "title": "Add TrackJS.com to your website",
+            "file": "trackjs.md",
+            "sort": 3
         }
     ],
     "settings": {
