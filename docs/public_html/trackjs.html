@@ -3,7 +3,7 @@
 
 <html>
 <head>
-    <title>Loft Core</title>
+    <title>Add TrackJS.com to your website</title>
     <link href="search/tipuesearch.css" rel="stylesheet">
     <style type="text/css" media="all">
       @import url("style.css");
@@ -17,12 +17,12 @@
 
 </head>
 
-<body class="page-readme">
+<body class="page-trackjs">
 <header>
 <div class="pager">
-  <a href="index.html" class="prev index">&laquo;Index</a>
+  <a href="redirects.html" class="prev redirects">&laquo;Redirects</a>
   <a href="index.html" class="index">Index</a>
-  <a href="forms.html" class="next forms">Forms API&raquo;</a>
+  <a href="index.html" class="next index">Index&raquo;</a>
 </div>
 
 </header>
@@ -33,31 +33,25 @@
   </form>
 </div>
 
-<h1>Loft Core</h1>
+<h1>Add TrackJS.com to your website</h1>
 <div class="breadcrumb"><a href="index.html">Index</a></div>
 
 <section>
 
 
-<p>This module contains features that I wish were in core, and which I often use for all my projects.</p>
+<ol>
+<li>Sign up for an account at http://www.trackjs.com</li>
+<li><p>Obtain your token and add it to <code>settings.php</code></p>
 
-<h2>Autoloading</h2>
+<pre><code>$conf['loft_core_trackjs_token'] = '5302679c8b624e0395a6a6da5b1199d6';
+</code></pre></li>
+<li><p>Add the following snippet in <code>html.tpl.php</code> in your theme before <code>$scripts</code> output.</p>
 
-<p>Some features require the autoloading, if you use these features you have to enable them.  To activate the autoloading feature of this module add this to settings.php:</p>
-
-<pre><code>$conf['loft_core_autoload'] = true;
-</code></pre>
-
-<h2>Contact</h2>
-
-<ul>
-<li><strong>In the Loft Studios</strong></li>
-<li>Aaron Klump - Developer</li>
-<li>PO Box 29294 Bellingham, WA 98228-1294</li>
-<li><em>skype</em>: intheloftstudios</li>
-<li><em>d.o</em>: aklump</li>
-<li><a href="http://www.InTheLoftStudios.com">http://www.InTheLoftStudios.com</a></li>
-</ul>
+<pre><code>&lt;?= $loft_core_tracking ?&gt;
+&lt;?= $scripts; ?&gt;
+</code></pre></li>
+<li><p>This will only be present when <code>DRUPAL_ENV_ROLE</code> is <code>prod</code>.</p></li>
+</ol>
 </section>
 
 <div class="search__results">
@@ -66,14 +60,14 @@
 
 <footer>
 <div class="pager">
-  <a href="index.html" class="prev index">&laquo;Index</a>
+  <a href="redirects.html" class="prev redirects">&laquo;Redirects</a>
   <a href="index.html" class="index">Index</a>
-  <a href="forms.html" class="next forms">Forms API&raquo;</a>
+  <a href="index.html" class="next index">Index&raquo;</a>
 </div>
 
 
   <div id="footer-legaleeze">
-    <p class="legaleeze center">Version: 0.8.16 &bull; Last Updated: Thu, 18 May 2017 13:33:48 -0700</p>
+    <p class="legaleeze center">Version: 0.8.16 &bull; Last Updated: Thu, 18 May 2017 13:33:49 -0700</p>
   </div>
 </footer>
 
