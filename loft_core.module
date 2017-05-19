@@ -23,22 +23,22 @@ if (!empty($GLOBALS['conf']['loft_core_autoload'])) {
     }
 }
 
-if (!empty($GLOBALS['conf']['loft_core_trackjs_token'])) {
-    /**
-     * Implements hook_init().
-     */
-    function loft_core_init()
-    {
-        if (DRUPAL_ENV_ROLE === 'prod') {
-            drupal_add_js(drupal_get_path('module',
-                    'loft_core') . '/loft_core.js',
-                array(
-                    'scope' => 'header',
-                    'group' => JS_DEFAULT,
-                ),
-                'file');
-        }
-    }
+/**
+ * Implements hook_init().
+ */
+function loft_core_init()
+{
+    drupal_add_js(array(
+        'DRUPAL_ENV' => DRUPAL_ENV,
+        'DRUPAL_ENV_ROLE' => DRUPAL_ENV_ROLE,
+    ), 'setting');
+    drupal_add_js(drupal_get_path('module',
+            'loft_core') . '/loft_core.js',
+        array(
+            'scope' => 'header',
+            'group' => JS_DEFAULT,
+        ),
+        'file');
 }
 
 /**
@@ -51,7 +51,6 @@ function loft_core_preprocess_html(&$vars)
     if (DRUPAL_ENV_ROLE === 'prod' && ($token = variable_get('loft_core_trackjs_token',
             null))
     ) {
-
 
         // @link http://docs.trackjs.com/tracker/configuration
         $trackjs = array(
@@ -650,10 +649,10 @@ function loft_core_ajax_command_trackjs_console($severity,
  * @see _loft_core_trackjs_get_severities().
  */
 function loft_core_trackjs_echo_drupal_messages(array &$commands,
-                                                    array $severities = array(
-                                                        'warning',
-                                                        'error',
-                                                    )
+                                                array $severities = array(
+                                                    'warning',
+                                                    'error',
+                                                )
 ) {
     $groups = drupal_get_messages(null,
         false);
