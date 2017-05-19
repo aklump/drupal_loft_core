@@ -23,6 +23,24 @@ if (!empty($GLOBALS['conf']['loft_core_autoload'])) {
     }
 }
 
+if (!empty($GLOBALS['conf']['loft_core_trackjs_token'])) {
+    /**
+     * Implements hook_init().
+     */
+    function loft_core_init()
+    {
+        if (DRUPAL_ENV_ROLE === 'prod') {
+            drupal_add_js(drupal_get_path('module',
+                    'loft_core') . '/loft_core.js',
+                array(
+                    'scope' => 'header',
+                    'group' => JS_DEFAULT,
+                ),
+                'file');
+        }
+    }
+}
+
 /**
  * Implements hook_preprocess_html().
  */
@@ -30,7 +48,10 @@ function loft_core_preprocess_html(&$vars)
 {
     global $user;
     $vars['loft_core_tracking'] = '';
-    if (DRUPAL_ENV_ROLE === 'prod' && ($token = variable_get('loft_core_trackjs_token', null))) {
+    if (DRUPAL_ENV_ROLE === 'prod' && ($token = variable_get('loft_core_trackjs_token',
+            null))
+    ) {
+
 
         // @link http://docs.trackjs.com/tracker/configuration
         $trackjs = array(
@@ -48,24 +69,29 @@ function loft_core_preprocess_html(&$vars)
         // See the UI documentation for how to setup applications.
         $trackjs['config']['application'] = null;
 
-        // If you have some identifiable string that represents a user or customer, please include it.
+        // If you have some identifiable string that represents a user or customer,
+        //please include it.
         // In the TrackJS UI we allow you to group and filter by this value.
         $trackjs['config']['userId'] = user_is_logged_in() ? $user->uid : null;
         $trackjs['metadata']['username'] = user_is_logged_in() ? $user->name : null;
 
-        // Similar to userId, if you have a session guid or something you can set it here.
+        // Similar to userId,
+        //if you have a session guid or something you can set it here.
         // We allow you to search on this value in the UI.
         $trackjs['config']['sessionId'] = session_id();
 
-        drupal_alter('loft_core_trackjs', $trackjs);
+        drupal_alter('loft_core_trackjs',
+            $trackjs);
 
         $config = json_encode(array_filter($trackjs['config']));
 
         $meta = array();
         foreach (array_filter($trackjs['metadata']) as $key => $value) {
-            $meta[] = 'trackJs.addMetadata("' . $key . '", "' . $value . '");';
+            $meta[] = 'trackJs.addMetadata("' . $key . '",
+            "' . $value . '");';
         }
-        $meta = implode(';', $meta);
+        $meta = implode(';',
+            $meta);
         $vars['loft_core_tracking'] = <<<EOD
 <!-- BEGIN TRACKJS -->
 <script type="text/javascript">window._trackJs = {$config};</script>
@@ -77,7 +103,8 @@ EOD;
 }
 
 /**
- * Menu callback: Displays a single node, but checks for a redirect first.
+ * Menu callback: Displays a single node,
+ * but checks for a redirect first.
  *
  * @param $node
  *   The node object.
@@ -90,8 +117,9 @@ EOD;
  *
  * // TODO Support node create?
  */
-function loft_core_node_page($node, $op)
-{
+function loft_core_node_page($node,
+                             $op
+) {
     if (is_string($node)) {
         switch ($node) {
             case 'node_delete_confirm':
@@ -128,7 +156,8 @@ function loft_core_node_page($node, $op)
             case 'drupal_access_denied':
                 return MENU_ACCESS_DENIED;
             default:
-                call_user_func_array($redirect['page callback'], $redirect['page arguments']);
+                call_user_func_array($redirect['page callback'],
+                    $redirect['page arguments']);
                 break;
         }
     }
@@ -136,7 +165,8 @@ function loft_core_node_page($node, $op)
     // ... otherwise do the normal.
     switch ($op) {
         case 'delete':
-            return drupal_get_form($form_id, $node);
+            return drupal_get_form($form_id,
+                $node);
         default:
             $func = "node_page_{$op}";
 
@@ -173,23 +203,29 @@ function loft_core_menu_alter(&$items)
  *
  * Make sure we don't redirect admins after editing a "redirected" node.
  */
-function loft_core_form_node_form_alter(&$form, &$form_state)
-{
-    if (Redirect::isNodeRedirected($form_state['node'], 'view')) {
+function loft_core_form_node_form_alter(&$form,
+                                        &$form_state
+) {
+    if (Redirect::isNodeRedirected($form_state['node'],
+        'view')
+    ) {
         $form['actions']['submit']['#submit'][] = 'loft_core_node_form_submit_redirect_handler';
     }
 }
 
 /**
- * Redirect a node form to the edit page, no the view page as normal.
+ * Redirect a node form to the edit page,
+ * no the view page as normal.
  *
  * @param $form
  * @param $form_state
  */
-function loft_core_node_form_submit_redirect_handler($form, &$form_state)
-{
+function loft_core_node_form_submit_redirect_handler($form,
+                                                     &$form_state
+) {
     if (!empty($form_state['redirect']) && $form_state['nid']) {
-        $form_state['redirect'] = node_access('update', $form_state['nid']) ? 'node/' . $form_state['nid'] . '/edit' : '<front>';
+        $form_state['redirect'] = node_access('update',
+            $form_state['nid']) ? 'node/' . $form_state['nid'] . '/edit' : '<front>';
     }
 }
 
@@ -203,13 +239,15 @@ function loft_core_node_form_submit_redirect_handler($form, &$form_state)
  *
  * Near the bottom of the form do something like this
  * @code
- *   loft_core_form_tabindex($form['title'], 100);
+ *   loft_core_form_tabindex($form['title'],
+ * 100);
  *   loft_core_form_tabindex($form['actions']['create']);
  *   loft_core_form_tabindex($form['actions']['cancel']);
  * @endcode
  */
-function loft_core_form_tabindex(array &$element, $index = null)
-{
+function loft_core_form_tabindex(array &$element,
+                                 $index = null
+) {
     static $tabindex = 1;
     if ($index) {
         $tabindex = $index;
@@ -227,27 +265,40 @@ function loft_core_form_tabindex(array &$element, $index = null)
  * $paths = array();
  * $paths[] = 'field_description.und.0';
  * $paths[] = 'field_keywords.und';
- * loft_core_form_disable_elements($form, $paths);
+ * loft_core_form_disable_elements($form,
+ * $paths);
  * @endcode
  *
  * @param array  &$form
  * @param array  $paths       An array of paths to be used by data_api().
  * @param string $module_name This will be used in the default message.
- * @param null   $message     If the default message is not sufficient, enter a
+ * @param null   $message     If the default message is not sufficient,
+ *                            enter a
  *                            custom message here.
  */
-function loft_core_form_disable_elements(&$form, $paths, $module_name = null, $message = null)
-{
+function loft_core_form_disable_elements(&$form,
+                                         $paths,
+                                         $module_name = null,
+                                         $message = null
+) {
     $g = data_api();
     if (is_null($message)) {
         $module_name = empty($module_name) ? 'Loft Core' : $module_name;
-        $message = t('This field is controlled by the %module module and cannot be modified in the UI.', array('%module' => $module_name));
+        $message = t('This field is controlled by the %module module and cannot be modified in the UI.',
+            array('%module' => $module_name));
     }
     foreach ($paths as $path) {
-        if ($g->get($form, $path)) {
-            $type = $g->get($form, "$path.#type");
-            $g->set($form, "$path.#required", false);
-            $g->set($form, "$path.#disabled", true);
+        if ($g->get($form,
+            $path)
+        ) {
+            $type = $g->get($form,
+                "$path.#type");
+            $g->set($form,
+                "$path.#required",
+                false);
+            $g->set($form,
+                "$path.#disabled",
+                true);
             switch ($type) {
                 case 'container':
                     $message_path = "$path.#suffix";
@@ -256,20 +307,28 @@ function loft_core_form_disable_elements(&$form, $paths, $module_name = null, $m
                     $message_path = "$path.#description";
                     break;
             }
-            $g->set($form, $message_path, $message);
+            $g->set($form,
+                $message_path,
+                $message);
         }
     }
 }
 
-function loft_core_form_hide_elements(&$form, $paths)
-{
+function loft_core_form_hide_elements(&$form,
+                                      $paths
+) {
     $g = data_api();
     foreach ($paths as $path) {
-        if ($g->get($form, $path)) {
-            $g->onlyIfHas($form, "$path.#required")->call(function () {
+        if ($g->get($form,
+            $path)
+        ) {
+            $g->onlyIfHas($form,
+                "$path.#required")->call(function () {
                 return false;
             })->set($form);
-            $g->set($form, "$path.#access", false);
+            $g->set($form,
+                "$path.#access",
+                false);
         }
     }
 }
@@ -282,16 +341,22 @@ function loft_core_element_info()
     $types = array();
     $types['form_help'] = array(
         '#weight' => -99,
-        // string|array If array, elements are separate paragraphs, without <p> tag wrappers.
+        // string|array If array,
+        //elements are separate paragraphs,
+        //without <p> tag wrappers.
         '#message' => array(),
-        '#theme_wrappers' => array('form_help', 'form_element'),
+        '#theme_wrappers' => array(
+            'form_help',
+            'form_element',
+        ),
     );
 
     return $types;
 }
 
 /**
- * Return the maximum weight in a render array, top level only.
+ * Return the maximum weight in a render array,
+ * top level only.
  *
  * @param $render_array
  *
@@ -300,15 +365,20 @@ function loft_core_element_info()
 function loft_core_max_weight($render_array)
 {
     $max = 0;
-    array_walk($render_array, function ($value) use (&$max) {
-        $max = max($max, data_api()->get($value, '#weight', 0));
-    });
+    array_walk($render_array,
+        function ($value) use (&$max) {
+            $max = max($max,
+                data_api()->get($value,
+                    '#weight',
+                    0));
+        });
 
     return $max;
 }
 
 /**
- * Return the minimum weight in a render array, top level only.
+ * Return the minimum weight in a render array,
+ * top level only.
  *
  * @param $render_array
  *
@@ -317,15 +387,22 @@ function loft_core_max_weight($render_array)
 function loft_core_min_weight($render_array)
 {
     $min = 0;
-    array_walk($render_array, function ($value) use (&$min) {
-        $min = min($min, data_api()->get($value, '#weight', 0));
-    });
+    array_walk($render_array,
+        function ($value) use (&$min) {
+            $min = min($min,
+                data_api()->get($value,
+                    '#weight',
+                    0));
+        });
 
     return $min;
 }
 
-function loft_core_theme($existing, $type, $theme, $path)
-{
+function loft_core_theme($existing,
+                         $type,
+                         $theme,
+                         $path
+) {
     return array(
         'form_help' => array(
             'render element' => 'element',
@@ -340,14 +417,19 @@ function loft_core_preprocess_form_help(&$vars)
 {
     $element =& $vars['element'];
 
-    // Wrap all elements of #message in p tags, if array.
+    // Wrap all elements of #message in p tags,
+    //if array.
     if (is_array($element['#message'])) {
-        array_walk($element['#message'], function (&$value) {
-            if (strpos($value, '<p') !== 0) {
-                $value = '<p>' . $value . '</p>';
-            }
-        });
-        $element['#message'] = implode('', $element['#message']);
+        array_walk($element['#message'],
+            function (&$value) {
+                if (strpos($value,
+                        '<p') !== 0
+                ) {
+                    $value = '<p>' . $value . '</p>';
+                }
+            });
+        $element['#message'] = implode('',
+            $element['#message']);
     }
 }
 
@@ -391,11 +473,13 @@ function theme_form_help($vars)
  *
  * @return string The modified html
  */
-function loft_core_image_src_itok_cache_buster($html, $build)
-{
+function loft_core_image_src_itok_cache_buster($html,
+                                               $build
+) {
     global $user;
     $buster = array(
-        0 => variable_get('loft_core_cache_bust_token', 'cb'),
+        0 => variable_get('loft_core_cache_bust_token',
+            'cb'),
         1 => null,
     );
     if ((!empty($build['#object']->changed))) {
@@ -408,7 +492,10 @@ function loft_core_image_src_itok_cache_buster($html, $build)
         $buster[1] = time();
     }
     $regex = '/' . preg_quote(IMAGE_DERIVATIVE_TOKEN) . '[^"]+/';
-    $html = preg_replace($regex, '$0&' . implode('=', $buster), $html);
+    $html = preg_replace($regex,
+        '$0&' . implode('=',
+            $buster),
+        $html);
 
     return $html;
 }
@@ -423,15 +510,18 @@ function loft_core_image_src_itok_cache_buster($html, $build)
  *
  * @return
  *   An array of return values of the hook implementations. If the theme returns
- *   arrays from it's implementation, those are merged into one array
- *   recursively. Note: integer keys in arrays will be lost, as the merge is
+ *   arrays from it's implementation,
+ * those are merged into one array
+ *   recursively. Note: integer keys in arrays will be lost,
+ * as the merge is
  *   done using array_merge_recursive().
  *
  * @see   drupal_alter()
  */
 //function theme_invoke($hook)
 //{
-//    if (!($theme = variable_get('theme_default', null))) {
+//    if (!($theme = variable_get('theme_default',
+//null))) {
 //        return;
 //    }
 //    $args = func_get_args();
@@ -441,9 +531,11 @@ function loft_core_image_src_itok_cache_buster($html, $build)
 //
 //    $function = $theme . '_' . $hook;
 //    if (function_exists($function)) {
-//        $result = call_user_func_array($function, $args);
+//        $result = call_user_func_array($function,
+//$args);
 //        if (isset($result) && is_array($result)) {
-//            $return = array_merge_recursive($return, $result);
+//            $return = array_merge_recursive($return,
+//$result);
 //        }
 //        elseif (isset($result)) {
 //            $return[] = $result;
@@ -484,7 +576,9 @@ function is_live($feature)
  */
 function loft_test_class($class)
 {
-    if (strpos(DRUPAL_ENV_ROLE, 'prod') !== 0) {
+    if (strpos(DRUPAL_ENV_ROLE,
+            'prod') !== 0
+    ) {
         return 't-' . $class;
     }
 }
@@ -505,4 +599,82 @@ function loft_core_get_form_during_ajaxing($form_id)
     $_POST = $stash;
 
     return $form;
+}
+
+/**
+ * Send an ajax command to fire off trackjs.console.
+ *
+ * @param $severity One of 'log',
+ *                  'debug',
+ *                  'info',
+ *                  'warn',
+ *                  'error'
+ * @param $message
+ *
+ * @return array
+ *
+ * @see  Drupal.ajax.prototype.commands.loftCoreTrackJsConsole().
+ * @link http://docs.trackjs.com/tracker/top-level-api#trackjsconsole
+ *
+ * @throws InvalidArgumentException if $severity is not valid.
+ */
+function loft_core_ajax_command_trackjs_console($severity,
+                                                $message
+) {
+    if (!in_array($severity,
+        array('log', 'debug', 'info', 'warn', 'error'))
+    ) {
+        throw new \InvalidArgumentException("$severity must be one of: " . implode(',',
+                $valid));
+    }
+
+    return array(
+        'command' => 'loftCoreTrackJsConsole',
+        'data' => array(
+            'severity' => $severity,
+            'message' => $message,
+        ),
+    );
+}
+
+/**
+ * Adds commands echoing all drupal messages to trackjs
+ *
+ * Place this in an ajax response function where you have access to the
+ * $commands array that is being build for the response.s
+ *
+ * @param array &$commands
+ * @param array $severities Which drupal_get_messages() severity levels to
+ *                          send.  Defaults to warning and error.
+ *
+ * @see _loft_core_trackjs_get_severities().
+ */
+function loft_core_trackjs_echo_drupal_messages(array &$commands,
+                                                    array $severities = array(
+                                                        'warning',
+                                                        'error',
+                                                    )
+) {
+    $groups = drupal_get_messages(null,
+        false);
+    foreach ($groups as $level => $messages) {
+        if (!in_array($level, $severities)) {
+            continue;
+        }
+        switch ($level) {
+            case 'warning':
+                $trackjs_level = 'warn';
+                break;
+            case 'error':
+                $trackjs_level = 'error';
+                break;
+            default:
+                $trackjs_level = 'info';
+                break;
+        }
+        foreach ($messages as $message) {
+            $commands[] = loft_core_ajax_command_trackjs_console($trackjs_level,
+                $message);
+        }
+    }
 }
