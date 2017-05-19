@@ -20,10 +20,16 @@
             "sort": 2
         },
         {
+            "id": "settings",
+            "title": "Two new constants",
+            "file": "settings.md",
+            "sort": 3
+        },
+        {
             "id": "trackjs",
             "title": "Add TrackJS.com to your website",
             "file": "trackjs.md",
-            "sort": 3
+            "sort": 4
         }
     ],
     "settings": {
