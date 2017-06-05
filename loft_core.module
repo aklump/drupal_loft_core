@@ -677,3 +677,32 @@ function loft_core_trackjs_echo_drupal_messages(array &$commands,
         }
     }
 }
+
+/**
+ * Return a function to use for SMACSS classes
+ *
+ * @code
+ * $cl = loft_core_cl('my-base');
+ * $class = $cl('title');
+ *
+ * $class === 'my-base__title';
+ * @endcode
+ *
+ * @param string $base The SMACSS module base.
+ *
+ * @return callable
+ */
+function loft_core_cl($base)
+{
+    $base = preg_replace('/[_ ]/', '-', $base);
+    return function($name = '', $isComponent = true) use ($base) {
+        $names = is_array($name) ? $name : [$name];
+        $glue = $isComponent ? '_' : '-';
+        $classes = [];
+        foreach ($names as $name) {
+            $classes[] = $base . ($name ? str_repeat($glue, 2) . $name : '');
+        }
+
+        return implode(' ', $classes);
+    };
+}
