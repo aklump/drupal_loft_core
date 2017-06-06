@@ -19,7 +19,7 @@ var trackJS = trackJS || null;
    * @see loft_core_ajax_command_trackjs_console().
    */
   Drupal.ajax.prototype.commands.loftCoreTrackJsConsole = function (ajax, response, status) {
-    trackJs.console[response.data.severity](response.data.message);
+    trackJS && trackJS.console[response.data.severity](response.data.message);
   };
 
   /**
