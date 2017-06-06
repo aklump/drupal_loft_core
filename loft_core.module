@@ -6,6 +6,7 @@
  * @defgroup loft_core Loft Core
  * @{
  */
+use Drupal\loft_core\Attribute;
 use Drupal\loft_core\Redirect;
 
 //
@@ -231,8 +232,9 @@ function loft_core_node_form_submit_redirect_handler($form,
 /**
  * Adds a tabindex to a form element
  *
- * @param array &$element The form element to add to.
- * @param null  $index    You can omit and each subsequent call will increment.
+ * @param array  &$element The form element to add to.
+ * @param null   $index    You can omit and each subsequent call will increment.
+ * @param string $key What is the array key to add to? Defaults to #attributes.
  *
  * @return int The next tabindex available.
  *
@@ -245,13 +247,20 @@ function loft_core_node_form_submit_redirect_handler($form,
  * @endcode
  */
 function loft_core_form_tabindex(array &$element,
-                                 $index = null
+                                 $index = null,
+                                 $key = '#attributes'
 ) {
     static $tabindex = 1;
     if ($index) {
         $tabindex = $index;
     }
-    $element['#attributes']['tabindex'] = $tabindex;
+
+    if ($element[$key] instanceof Attribute) {
+        $element[$key]->setAttribute('tabindex', $tabindex);
+    }
+    else {
+        $element[$key]['tabindex'] = $tabindex;
+    }
 
     return ++$tabindex;
 }
@@ -695,7 +704,8 @@ function loft_core_trackjs_echo_drupal_messages(array &$commands,
 function loft_core_cl($base)
 {
     $base = preg_replace('/[_ ]/', '-', $base);
-    return function($name = '', $isComponent = true) use ($base) {
+
+    return function ($name = '', $isComponent = true) use ($base) {
         $names = is_array($name) ? $name : [$name];
         $glue = $isComponent ? '_' : '-';
         $classes = [];
