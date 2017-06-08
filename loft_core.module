@@ -717,12 +717,10 @@ function loft_core_user_stash($stunt_double = null, $callback = null, $callback_
 
     // Unstash the user.
     if (is_null($stunt_double)) {
-        if (!isset($_loft_core_user_stash)) {
-            throw new \RuntimeException("You can't unstash a user that has not been stashed.");
+        if (isset($_loft_core_user_stash)) {
+            $user = $_loft_core_user_stash;
+            $_loft_core_user_stash = null;
         }
-
-        $user = $_loft_core_user_stash;
-        $_loft_core_user_stash = null;
     }
 
     // Stash the user.

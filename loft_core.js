@@ -18,9 +18,11 @@ var trackJS = trackJS || null;
    *
    * @see loft_core_ajax_command_trackjs_console().
    */
-  Drupal.ajax.prototype.commands.loftCoreTrackJsConsole = function (ajax, response, status) {
-    trackJS && trackJS.console[response.data.severity](response.data.message);
-  };
+  if (Drupal.ajax) {
+    Drupal.ajax.prototype.commands.loftCoreTrackJsConsole = function (ajax, response, status) {
+      trackJS && trackJS.console[response.data.severity](response.data.message);
+    };
+  }
 
   /**
    * Displays a JavaScript error from an Ajax response when appropriate to do so.
