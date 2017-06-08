@@ -1,8 +1,69 @@
 <?php
 use Drupal\loft_core\Attribute;
 
-class LoftCoreTest extends PHPUnit_Framework_TestCase
-{
+class LoftCoreTest extends PHPUnit_Framework_TestCase {
+
+    public function testLoftCoreTestClass()
+    {
+        $this->assertEmpty(loft_core_test_class('golden'));
+        define('DRUPAL_ENV_ROLE', 'staging');
+        $this->assertSame('t-golden', loft_core_test_class('golden'));
+    }
+
+    /**
+     * Provides data for testLoftCoreCl.
+     */
+    function DataForTestLoftCoreClProvider()
+    {
+        $tests = array();
+        $tests[] = array(
+            'do',
+            're',
+            'do__re',
+            'do--re',
+        );
+        $tests[] = array(
+            'a_list_apart',
+            'chapter-one-thing',
+            'a-list-apart__chapter-one-thing',
+            'a-list-apart--chapter-one-thing',
+        );
+
+        return $tests;
+    }
+
+    /**
+     * @dataProvider DataForTestLoftCoreClProvider
+     */
+    public function testLoftCoreCl($base, $subject, $control_component, $control_version)
+    {
+        $cl = loft_core_cl($base);
+        $this->assertSame($control_component, $cl($subject));
+        $this->assertSame($control_component, $cl($subject, true));
+        $this->assertSame($control_version, $cl($subject, false));
+    }
+
+    public function testLoftCoreTabIndexWithObject()
+    {
+        $tabindex = $ti_control = 100;
+        $el = ['#attributes' => new Attribute()];
+        $control = ['tabindex' => 100];
+        loft_core_form_tabindex($el, $tabindex);
+        $this->assertSame($control, $el['#attributes']->toArray());
+        $this->assertSame($ti_control + 1, $tabindex);
+    }
+
+    public function testLoftCoreTabIndexWithArray()
+    {
+        $tabindex = $ti_control = 100;
+        $el = [];
+        $control = [
+            '#attributes' => ['tabindex' => 100],
+        ];
+        loft_core_form_tabindex($el, $tabindex);
+        $this->assertSame($control, $el);
+        $this->assertSame($ti_control + 1, $tabindex);
+    }
 
     public function testRemovePartOfStyle()
     {
@@ -87,6 +148,7 @@ class LoftCoreTest extends PHPUnit_Framework_TestCase
 
         $control_form = $form;
         $control_form['field_description']['und'][0]['#disabled'] = true;
+        $control_form['field_description']['und'][0]['#required'] = false;
         $control_form['field_description']['und'][0]['#description'] = "This field is controlled by the Loft Core module and cannot be modified in the UI.";
 
         $tests[] = array(
@@ -104,6 +166,7 @@ class LoftCoreTest extends PHPUnit_Framework_TestCase
 
         $control_form = $form;
         $control_form['field_description']['und'][0]['#disabled'] = true;
+        $control_form['field_description']['und'][0]['#required'] = false;
         $control_form['field_description']['und'][0]['#description'] = "You can't enter data here, my friend.";
 
         $tests[] = array(
@@ -120,8 +183,9 @@ class LoftCoreTest extends PHPUnit_Framework_TestCase
         $form['field_description']['und'][0]['#description'] = "Enter data";
 
         $control_form = $form;
-        $control_form['field_description']['und'][0]['#disabled'] = true;
         $control_form['field_description']['und'][0]['#description'] = "This field is controlled by the Test Bot module and cannot be modified in the UI.";
+        $control_form['field_description']['und'][0]['#required'] = false;
+        $control_form['field_description']['und'][0]['#disabled'] = true;
 
         $tests[] = array(
             $form,
@@ -140,6 +204,6 @@ class LoftCoreTest extends PHPUnit_Framework_TestCase
     public function testFormDisableElements($form, $paths, $module_name, $message, $control_form)
     {
         loft_core_form_disable_elements($form, $paths, $module_name, $message);
-        $this->assertSame($control_form, $form);
+        $this->assertEquals($control_form, $form);
     }
 }
