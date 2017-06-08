@@ -233,36 +233,30 @@ function loft_core_node_form_submit_redirect_handler($form,
  * Adds a tabindex to a form element
  *
  * @param array  &$element The form element to add to.
- * @param null   $index    You can omit and each subsequent call will increment.
- * @param string $key What is the array key to add to? Defaults to #attributes.
+ * @param int    $index    The next tabindex, will automatically be incremented.
+ * @param string $key      What is the array key to add to? Defaults to
+ *                         #attributes.
  *
  * @return int The next tabindex available.
  *
  * Near the bottom of the form do something like this
  * @code
- *   loft_core_form_tabindex($form['title'],
- * 100);
- *   loft_core_form_tabindex($form['actions']['create']);
- *   loft_core_form_tabindex($form['actions']['cancel']);
+ *   $tabindex = 100;
+ *   loft_core_form_tabindex($form['title'], $tabindex);
+ *   loft_core_form_tabindex($form['actions']['create'], $tabindex);
+ *   loft_core_form_tabindex($form['actions']['cancel'], $tabindex);
  * @endcode
  */
-function loft_core_form_tabindex(array &$element,
-                                 $index = null,
-                                 $key = '#attributes'
+function loft_core_form_tabindex(array &$element, &$index, $key = '#attributes'
 ) {
-    static $tabindex = 1;
-    if ($index) {
-        $tabindex = $index;
-    }
-
+    $g = data_api();
+    $g->ensure($element, $key, []);
     if ($element[$key] instanceof Attribute) {
-        $element[$key]->setAttribute('tabindex', $tabindex);
+        $element[$key]->setAttribute('tabindex', $index++);
     }
     else {
-        $element[$key]['tabindex'] = $tabindex;
+        $element[$key]['tabindex'] = $index++;
     }
-
-    return ++$tabindex;
 }
 
 
@@ -582,9 +576,9 @@ function is_live($feature)
  *
  * @return string
  */
-function loft_test_class($class)
+function loft_core_test_class($class)
 {
-    if (strpos(DRUPAL_ENV_ROLE,
+    if (defined('DRUPAL_ENV_ROLE') && strpos(DRUPAL_ENV_ROLE,
             'prod') !== 0
     ) {
         return 't-' . $class;
@@ -715,4 +709,45 @@ function loft_core_cl($base)
 
         return implode(' ', $classes);
     };
+}
+
+function loft_core_user_stash($stunt_double = null, $callback = null, $callback_args = [])
+{
+    global $user, $_loft_core_user_stash;
+
+    // Unstash the user.
+    if (is_null($stunt_double)) {
+        if (!isset($_loft_core_user_stash)) {
+            throw new \RuntimeException("You can't unstash a user that has not been stashed.");
+        }
+
+        $user = $_loft_core_user_stash;
+        $_loft_core_user_stash = null;
+    }
+
+    // Stash the user.
+    else {
+
+        $_loft_core_user_stash = $user;
+        $user = $stunt_double;
+        if (is_callable($callback)) {
+            $callback($callback_args);
+
+            // for a callable we will immediately unstash.  If no callable we will assume a stash that will persist until function is called again.
+            loft_core_user_stash();
+        }
+    }
+}
+
+/**
+ * Implements hook_exit().
+ */
+function loft_core_exit()
+{
+    global $_loft_core_user_stash;
+
+    // If the user has not been unstashed by now, we need to force it before drupal_session_commit() happens.
+    if ($_loft_core_user_stash) {
+        loft_core_user_stash();
+    }
 }
