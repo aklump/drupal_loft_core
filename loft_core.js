@@ -9,18 +9,29 @@ var trackJS = trackJS || null;
 (function ($, Drupal, trackJS) {
   "use strict";
 
-  /**
-   * Receive an ajax command to fire off trackjs.console.
-   *
-   * @param ajax
-   * @param response
-   * @param status
-   *
-   * @see loft_core_ajax_command_trackjs_console().
-   */
   if (Drupal.ajax) {
+    /**
+     * Receive an ajax command to fire off trackjs.console.
+     *
+     * @param ajax
+     * @param response
+     * @param status
+     *
+     * @see loft_core_ajax_command_trackjs_console().
+     */
     Drupal.ajax.prototype.commands.loftCoreTrackJsConsole = function (ajax, response, status) {
       trackJS && trackJS.console[response.data.severity](response.data.message);
+    };
+
+    /**
+     * Ajax command for pushing a jquery bbq state.
+     * @param ajax
+     * @param response
+     *   - hash string
+     * @param status
+     */
+    Drupal.ajax.prototype.commands.loftCoreAjaxBbqPushState = function (ajax, response, status) {
+      $.bbq && $.bbq.pushState(response.data.hash);
     };
   }
 

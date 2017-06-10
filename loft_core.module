@@ -639,6 +639,16 @@ function loft_core_ajax_command_trackjs_console($severity,
     );
 }
 
+
+function loft_core_ajax_command_bbq_push_state($hash_string) {
+    return array(
+        'command' => 'loftCoreAjaxBbqPushState',
+        'data' => array(
+            'hash' => '#' . ltrim($hash_string, '#'),
+        ),
+    );
+}
+
 /**
  * Adds commands echoing all drupal messages to trackjs
  *
