@@ -761,28 +761,57 @@ function loft_core_exit()
     }
 }
 
-
 /**
- * Block the current user and log them out with a warning message.
+ * This can be used as an menu page callback to trap robots.
+ *
+ * The basic idea is that if a visitor hits an url that they shouldn't then by
+ * doing so they are exposing their nefarious intentions.  Their account will
+ * immediately be blocked and they are logged out.  Watchdog messages will show
+ * this has happened.
+ *
+ * To implement this feature, you need to modify a menu page callback.  And set
+ * this function as the page callback.  In this next example we are going to
+ * modify a node/add/user-collection to trap users.
+ *
+ * @code
+ *   if (isset($items['node/add/user-collection'])) {
+ *     array_unshift($items['node/add/user-collection']['page arguments'],
+ *     $items['node/add/user-collection']['page callback']);
+ *     $items['node/add/user-collection']['page callback'] =
+ *     'loft_core_robotrap_page_callback';
+ *   }
+ * @endcode
+ *
+ * You MUST implement hook_loft_core_robotrap_access().
+ * You MAY implement hook_loft_core_robotrap_goto_alter().
  */
-function loft_core_robotrap()
+function loft_core_robotrap_page_callback()
 {
     global $user;
-    if (!empty($user->uid) && !user_is_admin($user)) {
+    $args = func_get_args();
+    $callback = array_shift($args);
+    $context = [
+        'account' => $user,
+        'page callback' => $callback,
+        'page arguments' => $args,
+    ];
+    $access = module_invoke_all('loft_core_robotrap_access', $context);
+    $access = end($access);
+    if (!$access) {
         watchdog('loft_core', 'Robotrap: Blocked user %name.', array('%name' => $user->name));
         user_block_user_action($user);
         module_load_include('inc', 'user', 'user.pages');
         user_logout_current_user();
-        drupal_set_message(t('You have visited a forbidden url; your account has been locked for review.  Please contact us using the form below to unlock your account.', ['!url' => url('contact', ['query' => ['cid' => 6]])]), 'warning', false);
+        drupal_set_message(t('You have visited a forbidden url; your account has been locked for review.  Please contact us using the form below to unlock your account.', array('!url' => url('contact', array('query' => array('cid' => 6))))), 'warning', false);
+        $path = module_exists('contact') ? 'contact' : '<front>';
         unset($_GET['destination']);
-        drupal_goto('contact', ['query' => ['cid' => 6]]);
+        $options = array();
+        drupal_alter('loft_core_robotrap_goto', $path, $options, $context);
+        drupal_goto($path, $options);
 
         return false;
     }
     else {
-        $args = func_get_args();
-        $callback = array_shift($args);
-
         return call_user_func_array($callback, $args);
     }
 }

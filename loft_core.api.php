@@ -118,3 +118,15 @@ function HOOK_loft_core_trackjs_alter(&$config)
     // Add some metadata
     $config['metadata']['do'] = 're';
 }
+
+/**
+ * Implements hook_loft_core_robotrap_goto_alter().
+ *
+ * Allow modules to alter the final destination of a robot who was trapped.
+ */
+function HOOK_loft_core_robotrap_goto_alter(&$path, &$options, $context)
+{
+    if ($path === 'contact') {
+        $options = ['query' => ['cid' => 6]];
+    }
+}
