@@ -623,8 +623,8 @@ function loft_core_get_form_during_ajaxing($form_id)
 function loft_core_ajax_command_trackjs_console($severity,
                                                 $message
 ) {
-    if (!in_array($severity,
-        array('log', 'debug', 'info', 'warn', 'error'))
+    $valid = array('log', 'debug', 'info', 'warn', 'error');
+    if (!in_array($severity, $valid)
     ) {
         throw new \InvalidArgumentException("$severity must be one of: " . implode(',',
                 $valid));
@@ -640,7 +640,8 @@ function loft_core_ajax_command_trackjs_console($severity,
 }
 
 
-function loft_core_ajax_command_bbq_push_state($hash_string) {
+function loft_core_ajax_command_bbq_push_state($hash_string)
+{
     return array(
         'command' => 'loftCoreAjaxBbqPushState',
         'data' => array(
@@ -757,5 +758,31 @@ function loft_core_exit()
     // If the user has not been unstashed by now, we need to force it before drupal_session_commit() happens.
     if ($_loft_core_user_stash) {
         loft_core_user_stash();
+    }
+}
+
+
+/**
+ * Block the current user and log them out with a warning message.
+ */
+function loft_core_robotrap()
+{
+    global $user;
+    if (!empty($user->uid) && !user_is_admin($user)) {
+        watchdog('loft_core', 'Robotrap: Blocked user %name.', array('%name' => $user->name));
+        user_block_user_action($user);
+        module_load_include('inc', 'user', 'user.pages');
+        user_logout_current_user();
+        drupal_set_message(t('You have visited a forbidden url; your account has been locked for review.  Please contact us using the form below to unlock your account.', ['!url' => url('contact', ['query' => ['cid' => 6]])]), 'warning', false);
+        unset($_GET['destination']);
+        drupal_goto('contact', ['query' => ['cid' => 6]]);
+
+        return false;
+    }
+    else {
+        $args = func_get_args();
+        $callback = array_shift($args);
+
+        return call_user_func_array($callback, $args);
     }
 }
