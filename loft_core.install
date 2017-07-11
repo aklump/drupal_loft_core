@@ -4,7 +4,6 @@
  */
 function loft_core_schema()
 {
-
     // The table name here is plural, despite Drupal table naming standards,
     // because "user" is a reserved word in many databases.
     $schema['loft_core_users'] = [
@@ -14,7 +13,7 @@ function loft_core_schema()
                 'type' => 'int',
                 'unsigned' => true,
                 'not null' => true,
-                'description' => 'Primary Key: Unique user ID.',
+                'description' => 'User ID or 0',
                 'default' => 0,
             ],
             'status' => [
@@ -24,17 +23,26 @@ function loft_core_schema()
                 'size' => 'tiny',
                 'description' => 'Extra status flag, e.g. LOFT_CORE_USER_STATUS_*.',
             ],
-            'init_domain' => array(
+            'domain' => array(
                 'type' => 'varchar',
                 'length' => 254,
                 'not null' => false,
                 'default' => '',
-                'description' => 'E-mail address DOMAIN used for initial account creation.',
+                'description' => 'Last associated email domain.',
+            ),
+            'ip' => array(
+                'type' => 'varchar',
+                'length' => 28,
+                'not null' => false,
+                'description' => 'Last IP address associated with this account.',
             ),
         ],
-        'unique keys' => [
-            'uid' => ['uid'],
-        ],
+        'unique keys' => array(
+            'uid_domain' => array('uid', 'domain'),
+        ),
+        'indexes' => array(
+            'mail' => array('domain'),
+        ),
         'foreign keys' => [
             'user' => [
                 'table' => 'user',
@@ -52,8 +60,6 @@ function loft_core_schema()
  */
 function loft_core_update_7100(&$sandbox)
 {
-
-    // For help refer to hook_update_N in system.api.php D7
     $output = [];
     try {
         if (!db_table_exists('loft_core_users')) {
@@ -72,3 +78,4 @@ function loft_core_update_7100(&$sandbox)
 
     return implode(PHP_EOL, $output);
 }
+
