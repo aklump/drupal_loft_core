@@ -3,7 +3,7 @@
 
 <html>
 <head>
-    <title>Add TrackJS.com to your website</title>
+    <title>Database</title>
     <link href="search/tipuesearch.css" rel="stylesheet">
     <style type="text/css" media="all">
       @import url("style.css");
@@ -17,12 +17,12 @@
 
 </head>
 
-<body class="page-trackjs">
+<body class="page-database">
 <header>
 <div class="pager">
-  <a href="settings.html" class="prev settings">&laquo;Two new constants</a>
+  <a href="README.html" class="prev README">&laquo;Loft Core</a>
   <a href="index.html" class="index">Index</a>
-  <a href="index.html" class="next index">Index&raquo;</a>
+  <a href="forms.html" class="next forms">Forms API&raquo;</a>
 </div>
 
 </header>
@@ -33,29 +33,19 @@
   </form>
 </div>
 
-<h1>Add TrackJS.com to your website</h1>
+<h1>Database</h1>
 <div class="breadcrumb"><a href="index.html">Index</a></div>
 
 <section>
 
 
-<ol>
-<li>Sign up for an account at http://www.trackjs.com</li>
-<li><p>Obtain your token and add it to <code>settings.php</code></p>
+<h2>loft_core_users</h2>
 
-<pre><code>$conf['loft_core_trackjs_token'] = '5302679c8b624e0395a6a6da5b1199d6';
-</code></pre></li>
-<li><p>Add the following snippet in <code>html.tpl.php</code> in your theme before <code>$scripts</code> output.</p>
+<p>This table augments the <code>users</code> table.</p>
 
-<pre><code>&lt;?= $loft_core_tracking ?&gt;
-&lt;?= $scripts; ?&gt;
-</code></pre></li>
-<li><p>This will only be present when <code>DRUPAL_ENV_ROLE</code> is <code>prod</code>.</p></li>
-</ol>
+<h3><code>loft_core_users.status</code></h3>
 
-<h2>Config and Metadata</h2>
-
-<p>See <code>HOOK_loft_core_trackjs_alter()</code> for more info.</p>
+<p>This column shows if a user has been blocked as a robotrap.</p>
 </section>
 
 <div class="search__results">
@@ -64,14 +54,14 @@
 
 <footer>
 <div class="pager">
-  <a href="settings.html" class="prev settings">&laquo;Two new constants</a>
+  <a href="README.html" class="prev README">&laquo;Loft Core</a>
   <a href="index.html" class="index">Index</a>
-  <a href="index.html" class="next index">Index&raquo;</a>
+  <a href="forms.html" class="next forms">Forms API&raquo;</a>
 </div>
 
 
   <div id="footer-legaleeze">
-    <p class="legaleeze center">Version: 0.8.16 &bull; Last Updated: Tue, 11 Jul 2017 08:44:54 -0700</p>
+    <p class="legaleeze center">Version: 0.8.16 &bull; Last Updated: Tue, 11 Jul 2017 08:44:53 -0700</p>
   </div>
 </footer>
 

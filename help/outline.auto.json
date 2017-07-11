@@ -8,28 +8,34 @@
             "sort": 0
         },
         {
+            "id": "database",
+            "title": "Database",
+            "file": "database.md",
+            "sort": 1
+        },
+        {
             "id": "forms",
             "title": "Forms API",
             "file": "forms.md",
-            "sort": 1
+            "sort": 2
         },
         {
             "id": "redirects",
             "title": "Redirects",
             "file": "redirects.md",
-            "sort": 2
+            "sort": 3
         },
         {
             "id": "settings",
             "title": "Two new constants",
             "file": "settings.md",
-            "sort": 3
+            "sort": 4
         },
         {
             "id": "trackjs",
             "title": "Add TrackJS.com to your website",
             "file": "trackjs.md",
-            "sort": 4
+            "sort": 5
         }
     ],
     "settings": {
