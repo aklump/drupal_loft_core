@@ -7,6 +7,13 @@ Some features require the autoloading, if you use these features you have to ena
 
     $conf['loft_core_autoload'] = true;
 
+## Integrations
+
+### [User restrictions](https://www.drupal.org/project/user_restrictions)
+
+Automatically trap any new user whose email domain matches that of a robo-trapped user.
+
+
 ## Contact
 * **In the Loft Studios**
 * Aaron Klump - Developer

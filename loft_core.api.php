@@ -134,7 +134,8 @@ function HOOK_loft_core_robotrap_access($context)
 /**
  * Implements hook_loft_core_robotrap_goto_alter().
  *
- * Allow modules to alter the final destination of a robot who was trapped.
+ * Alter the destination of the path used when trapping users.  Use $context
+ * for additional information as needed.
  */
 function HOOK_loft_core_robotrap_goto_alter(&$path, &$options, $context)
 {

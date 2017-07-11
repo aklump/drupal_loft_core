@@ -9,6 +9,13 @@
 use Drupal\loft_core\Attribute;
 use Drupal\loft_core\Redirect;
 
+/**
+ * @var LOFT_CORE_USER_STATUS_ROBOT
+ *
+ * description
+ */
+define('LOFT_CORE_USER_STATUS_ROBOT', 2);
+
 //
 //
 // Register hook_boot ONLY if we are using the autoload feature.
@@ -29,17 +36,30 @@ if (!empty($GLOBALS['conf']['loft_core_autoload'])) {
  */
 function loft_core_init()
 {
-    drupal_add_js(array(
+    drupal_add_js([
         'DRUPAL_ENV' => DRUPAL_ENV,
         'DRUPAL_ENV_ROLE' => DRUPAL_ENV_ROLE,
-    ), 'setting');
+    ], 'setting');
     drupal_add_js(drupal_get_path('module',
             'loft_core') . '/loft_core.js',
-        array(
+        [
             'scope' => 'header',
             'group' => JS_DEFAULT,
-        ),
+        ],
         'file');
+}
+
+/**
+ * Implements hook_module_implements_alter().
+ */
+function loft_core_module_implements_alter(&$implementations, $hook)
+{
+    if ($hook == 'user_restrictions_alter') {
+        // user_restrictions module overwrites our $error unless we call it first.
+        $group = $implementations['loft_core'];
+        unset($implementations['loft_core']);
+        $implementations['loft_core'] = $group;
+    }
 }
 
 /**
@@ -54,10 +74,10 @@ function loft_core_preprocess_html(&$vars)
     ) {
 
         // @link http://docs.trackjs.com/tracker/configuration
-        $trackjs = array(
+        $trackjs = [
             'config' => '',
             'metadata' => [],
-        );
+        ];
 
         $trackjs['config']['token'] = $token;
 
@@ -85,7 +105,7 @@ function loft_core_preprocess_html(&$vars)
 
         $config = json_encode(array_filter($trackjs['config']));
 
-        $meta = array();
+        $meta = [];
         foreach (array_filter($trackjs['metadata']) as $key => $value) {
             $meta[] = 'trackJs.addMetadata("' . $key . '",
             "' . $value . '");';
@@ -287,7 +307,7 @@ function loft_core_form_disable_elements(&$form,
     if (is_null($message)) {
         $module_name = empty($module_name) ? 'Loft Core' : $module_name;
         $message = t('This field is controlled by the %module module and cannot be modified in the UI.',
-            array('%module' => $module_name));
+            ['%module' => $module_name]);
     }
     foreach ($paths as $path) {
         if ($g->get($form,
@@ -340,18 +360,18 @@ function loft_core_form_hide_elements(&$form,
  */
 function loft_core_element_info()
 {
-    $types = array();
-    $types['form_help'] = array(
+    $types = [];
+    $types['form_help'] = [
         '#weight' => -99,
         // string|array If array,
         //elements are separate paragraphs,
         //without <p> tag wrappers.
-        '#message' => array(),
-        '#theme_wrappers' => array(
+        '#message' => [],
+        '#theme_wrappers' => [
             'form_help',
             'form_element',
-        ),
-    );
+        ],
+    ];
 
     return $types;
 }
@@ -405,11 +425,11 @@ function loft_core_theme($existing,
                          $theme,
                          $path
 ) {
-    return array(
-        'form_help' => array(
+    return [
+        'form_help' => [
             'render element' => 'element',
-        ),
-    );
+        ],
+    ];
 }
 
 /**
@@ -479,11 +499,11 @@ function loft_core_image_src_itok_cache_buster($html,
                                                $build
 ) {
     global $user;
-    $buster = array(
+    $buster = [
         0 => variable_get('loft_core_cache_bust_token',
             'cb'),
         1 => null,
-    );
+    ];
     if ((!empty($build['#object']->changed))) {
         $buster[1] = $build['#object']->changed;
     }
@@ -596,7 +616,7 @@ function loft_core_test_class($class)
 function loft_core_get_form_during_ajaxing($form_id)
 {
     $stash = $_POST;
-    $_POST = array();
+    $_POST = [];
     $form = drupal_get_form($form_id);
     $_POST = $stash;
 
@@ -623,31 +643,31 @@ function loft_core_get_form_during_ajaxing($form_id)
 function loft_core_ajax_command_trackjs_console($severity,
                                                 $message
 ) {
-    $valid = array('log', 'debug', 'info', 'warn', 'error');
+    $valid = ['log', 'debug', 'info', 'warn', 'error'];
     if (!in_array($severity, $valid)
     ) {
         throw new \InvalidArgumentException("$severity must be one of: " . implode(',',
                 $valid));
     }
 
-    return array(
+    return [
         'command' => 'loftCoreTrackJsConsole',
-        'data' => array(
+        'data' => [
             'severity' => $severity,
             'message' => $message,
-        ),
-    );
+        ],
+    ];
 }
 
 
 function loft_core_ajax_command_bbq_push_state($hash_string)
 {
-    return array(
+    return [
         'command' => 'loftCoreAjaxBbqPushState',
-        'data' => array(
+        'data' => [
             'hash' => '#' . ltrim($hash_string, '#'),
-        ),
-    );
+        ],
+    ];
 }
 
 /**
@@ -663,10 +683,10 @@ function loft_core_ajax_command_bbq_push_state($hash_string)
  * @see _loft_core_trackjs_get_severities().
  */
 function loft_core_trackjs_echo_drupal_messages(array &$commands,
-                                                array $severities = array(
+                                                array $severities = [
                                                     'warning',
                                                     'error',
-                                                )
+                                                ]
 ) {
     $groups = drupal_get_messages(null,
         false);
@@ -732,9 +752,7 @@ function loft_core_user_stash($stunt_double = null, $callback = null, $callback_
             $user = $_loft_core_user_stash;
             $_loft_core_user_stash = null;
         }
-    }
-
-    // Stash the user.
+    } // Stash the user.
     else {
 
         $_loft_core_user_stash = $user;
@@ -791,6 +809,7 @@ function loft_core_robotrap_page_callback()
     $args = func_get_args();
     $callback = array_shift($args);
     $context = [
+        'parent' => __FUNCTION__,
         'account' => $user,
         'page callback' => $callback,
         'page arguments' => $args,
@@ -798,14 +817,15 @@ function loft_core_robotrap_page_callback()
     $access = module_invoke_all('loft_core_robotrap_access', $context);
     $access = end($access);
     if (!$access) {
-        watchdog('loft_core', 'Robotrap: Blocked user %name.', array('%name' => $user->name));
-        user_block_user_action($user);
+        watchdog('loft_core', 'Robotrap: Blocked user %name.', ['%name' => $user->name]);
+        loft_core_block_user($user, LOFT_CORE_USER_STATUS_ROBOT);
         module_load_include('inc', 'user', 'user.pages');
         user_logout_current_user();
-        drupal_set_message(t('You have visited a forbidden url; your account has been locked for review.  Please contact us using the form below to unlock your account.', array('!url' => url('contact', array('query' => array('cid' => 6))))), 'warning', false);
+        drupal_set_message(t('You have visited a forbidden url; your account has been locked for review.  Please contact us using the form below to unlock your account.', ['!url' => url('contact', ['query' => ['cid' => 6]])]), 'warning', false);
         $path = module_exists('contact') ? 'contact' : '<front>';
         unset($_GET['destination']);
-        $options = array();
+        $options = [];
+        $context['parent'] = __FUNCTION__;
         drupal_alter('loft_core_robotrap_goto', $path, $options, $context);
         drupal_goto($path, $options);
 
@@ -815,3 +835,100 @@ function loft_core_robotrap_page_callback()
         return call_user_func_array($callback, $args);
     }
 }
+
+/**
+ * Block a user with optional augmented status.
+ *
+ * @param \stdClass $account
+ * @param int       $status
+ *
+ * @see LOFT_CORE_USER_STATUS_*
+ */
+function loft_core_block_user($account, $status = 0)
+{
+    if ($status > 1) {
+        loft_core_set_user_status($account, $status);
+    }
+    user_block_user_action($account);
+}
+
+/**
+ * Set the Loft Core status of a user.
+ *
+ * You MUST update users.status separate; this module does not handle that.
+ *
+ * @param $account
+ * @param $status
+ *
+ * @see loft_core_block_user().
+ */
+function loft_core_set_user_status($account, $status)
+{
+    $meta = [
+        'uid' => $account->uid,
+        'status' => $status,
+        // Store the initial domain of a user to use in blocking future accounts, potentially.
+        'init_domain' => _loft_core_get_email_domain($account->init),
+    ];
+    $query = db_select('loft_core_users', 'lu')
+        ->fields('lu', ['uid'])
+        ->condition('uid', $meta['uid']);
+    $primary_key = $query->execute()->fetchField() ? 'uid' : null;
+    drupal_write_record('loft_core_users', $meta, $primary_key);
+}
+
+/**
+ * Return the domain of an email address.
+ *
+ * @param string $email
+ *
+ * @return string
+ */
+function _loft_core_get_email_domain($email)
+{
+    return preg_replace('/^.+@/', '', $email);
+}
+
+/**
+ * Implements hook_hook_user_restrictions_alter().
+ */
+function loft_core_user_restrictions_alter(&$denied, &$error, &$context)
+{
+    //
+    //
+    // Restrict any email address whose domain matches that of an already robo-trapped user.
+    //
+    if ($context['type'] === 'mail') {
+
+        // Check if the domain has been trapped.
+        $domain = _loft_core_get_email_domain($context['form_state']['values']['mail']);
+        $query = db_select('loft_core_users', 'lu')
+            ->fields('lu', ['uid', 'init_domain'])
+            ->condition('status', [LOFT_CORE_USER_STATUS_ROBOT], 'IN')
+            ->condition('init_domain', $domain);
+
+        // If trapped, leverage user_restrictions module to block by email address.
+        if ($is_suspicious = $query->execute()->fetchAllAssoc('uid')) {
+            watchdog('loft_core', 'Suspicious Domain: Blocked new user @ %domain.', ['%domain' => $domain]);
+            $context['mask'] = '*' . $domain;
+            $denied = true;
+            $error['field'] = 'mail';
+            $contact = 'contact us';
+
+            // With the contact module enabled we give an easy way for mistakes to get corrected.
+            if (module_exists('contact')) {
+                unset($_GET['destination']);
+                $options = [];
+                $path = 'contact';
+                $contact = '<a href="!url">contact us</a>';
+                $context['parent'] = __FUNCTION__;
+                drupal_alter('loft_core_robotrap_goto', $path, $options, $context);
+            }
+            $error['message'] = t('Your email address is associated with a suspicious domain (%domain); please ' . $contact . ' if this is in error.', [
+                '%domain' => $domain,
+                '!url' => url($path, $options),
+            ]);
+        }
+    }
+}
+
