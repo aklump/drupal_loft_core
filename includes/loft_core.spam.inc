@@ -206,33 +206,24 @@ function loft_core_user_restrictions_alter(&$denied, &$error, &$context)
 }
 
 /**
- * React to the rejection of a form submission.
+ * Implements hook_honeypot_reject().
  *
- * When honeypot rejects a form submission, it calls this hook with the form ID,
- * the user ID (0 if anonymous) of the user that was disallowed from submitting
- * the form, and the reason (type) for the rejection of the form submission.
- *
- * @param string $form_id
- *     Form ID of the form the user was disallowed from submitting.
- * @param int    $uid
- *     0 for anonymous users, otherwise the user ID of the user.
- * @param string $type
- *     String indicating the reason the submission was blocked. Allowed values:
- *     - honeypot: If honeypot field was filled in.
- *     - honeypot_time: If form was completed before the configured time limit.
+ * Make a note of this email address/user as a honeybear.
  */
 function loft_core_honeypot_reject($form_id, $uid, $type)
 {
-    $account = (object) [
-        'uid' => $uid,
-        'init' => $_POST['mail'],
-    ];
-    $domain = _loft_core_get_email_domain($account->init);
-    $default = explode(',', LOFT_CORE_HONEYPOT_REJECT_DOMAINS_WHITELIST);
-    $may_block = !in_array($domain, variable_get('loft_core_honeypot_reject_domains_whitelist', $default));
-
-    if ($may_block) {
-        loft_core_set_user_status($account, LOFT_CORE_USER_STATUS_HONEYBEAR);
+    $g = data_api();
+    if (($mail = $g->get($_POST, 'mail'))) {
+        $domain = _loft_core_get_email_domain($mail);
+        $default = explode(',', LOFT_CORE_HONEYPOT_REJECT_DOMAINS_WHITELIST);
+        $may_block = !in_array($domain, variable_get('loft_core_honeypot_reject_domains_whitelist', $default));
+        if ($may_block) {
+            $account = (object) [
+                'uid' => $uid,
+                'init' => $mail,
+            ];
+            loft_core_set_user_status($account, LOFT_CORE_USER_STATUS_HONEYBEAR);
+        }
     }
 }
 
