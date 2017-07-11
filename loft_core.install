@@ -18,8 +18,7 @@ function loft_core_schema()
             ],
             'status' => [
                 'type' => 'int',
-                'not null' => true,
-                'default' => 0,
+                'not null' => false,
                 'size' => 'tiny',
                 'description' => 'Extra status flag, e.g. LOFT_CORE_USER_STATUS_*.',
             ],
