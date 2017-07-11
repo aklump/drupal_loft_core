@@ -27,18 +27,37 @@ define('LOFT_CORE_USER_STATUS_SPAMMY', 4);
 define('LOFT_CORE_HONEYPOT_REJECT_DOMAINS_WHITELIST', 'gmail.com');
 
 /**
+ * Return the domain of an email address.
+ *
+ * @param string $email
+ *
+ * @return string
+ */
+function _loft_core_get_email_domain($email)
+{
+    $domain = preg_replace('/^.+@/', '', $email);
+    $domain = explode('.', $domain);
+
+    return implode('.', array_slice($domain, -2));
+}
+
+/**
  * Block a user with optional augmented status.
  *
  * @param \stdClass $account
  * @param int       $status
+ * @param string    $ip
  *
  * @see LOFT_CORE_USER_STATUS_*
  */
-function loft_core_block_user($account, $status = 0)
+function loft_core_block_user($uid, $mail, $status = 0, $ip = null)
 {
     if ($status > 1) {
-        loft_core_set_user_status($account, $status);
+        loft_core_set_user_status($uid, $mail, $status, $ip);
     }
+    $account = (object)[
+        'uid' => $uid,
+    ];
     user_block_user_action($account);
 }
 
@@ -53,21 +72,20 @@ function loft_core_block_user($account, $status = 0)
  *
  * @see loft_core_block_user().
  */
-function loft_core_set_user_status($account, $status)
+function loft_core_set_user_status($uid, $mail, $status, $ip = null)
 {
     $meta = [
-        'uid' => $account->uid,
+        'uid' => $uid,
         'status' => $status,
-        // Store the initial domain of a user to use in blocking future accounts, potentially.
-        'domain' => _loft_core_get_email_domain($account->init),
-        'ip' => ip_address(),
+        'domain' => _loft_core_get_email_domain($mail),
+        'ip' => $ip,
     ];
     $meta = array_filter($meta);
 
-    if ($meta['uid']) {
+    if ($uid) {
         $query = db_select('loft_core_users', 'lu')
             ->fields('lu', ['uid'])
-            ->condition('uid', $meta['uid']);
+            ->condition('uid', $uid);
         $primary_key = $query->execute()->fetchField() ? 'uid' : null;
         drupal_write_record('loft_core_users', $meta, $primary_key);
     }
@@ -78,18 +96,6 @@ function loft_core_set_user_status($account, $status)
             ->countQuery()->execute()->fetchField();
         $primary_key = $exists ? ['uid', 'domain'] : null;
         drupal_write_record('loft_core_users', $meta, $primary_key);
-
-        //        if ($exists) {
-        //            $num_updated = db_update('loft_core_users')
-        //                ->fields($meta)
-        //                ->condition('uid', 0)
-        //                ->condition('domain', $meta['domain'])
-        //                ->execute();
-        //        }
-        //        else {
-        //            db_insert('loft_core_users')
-        //                ->fields($meta);
-        //        }
     }
 }
 
@@ -132,7 +138,7 @@ function loft_core_robotrap_page_callback()
     $access = end($access);
     if (!$access) {
         watchdog('loft_core', 'Robotrap: Blocked user %name.', ['%name' => $user->name]);
-        loft_core_block_user($user, LOFT_CORE_USER_STATUS_ROBOT);
+        loft_core_block_user($user->uid, $user->mail, LOFT_CORE_USER_STATUS_ROBOT, ip_address());
         module_load_include('inc', 'user', 'user.pages');
         user_logout_current_user();
         drupal_set_message(t('You have visited a forbidden url; your account has been locked for review.  Please contact us using the form below to unlock your account.', ['!url' => url('contact', ['query' => ['cid' => 6]])]), 'warning', false);
@@ -151,22 +157,16 @@ function loft_core_robotrap_page_callback()
 }
 
 /**
- * Return the domain of an email address.
- *
- * @param string $email
- *
- * @return string
- */
-function _loft_core_get_email_domain($email)
-{
-    return preg_replace('/^.+@/', '', $email);
-}
-
-/**
  * Implements hook_hook_user_restrictions_alter().
  */
 function loft_core_user_restrictions_alter(&$denied, &$error, &$context)
 {
+    // List all statuses which indicate a domain has been blocked.
+    $statuses_which_block_users = [
+        LOFT_CORE_USER_STATUS_ROBOT,
+        LOFT_CORE_USER_STATUS_SPAMMY,
+    ];
+
     //
     //
     // Restrict any email address whose domain matches that of an already robo-trapped user.
@@ -177,7 +177,7 @@ function loft_core_user_restrictions_alter(&$denied, &$error, &$context)
         $domain = _loft_core_get_email_domain($context['form_state']['values']['mail']);
         $query = db_select('loft_core_users', 'lu')
             ->fields('lu', ['uid', 'domain'])
-            ->condition('status', [LOFT_CORE_USER_STATUS_ROBOT], 'IN')
+            ->condition('status', $statuses_which_block_users, 'IN')
             ->condition('domain', $domain);
 
         // If trapped, leverage user_restrictions module to block by email address.
@@ -218,12 +218,25 @@ function loft_core_honeypot_reject($form_id, $uid, $type)
         $default = explode(',', LOFT_CORE_HONEYPOT_REJECT_DOMAINS_WHITELIST);
         $may_block = !in_array($domain, variable_get('loft_core_honeypot_reject_domains_whitelist', $default));
         if ($may_block) {
-            $account = (object) [
-                'uid' => $uid,
-                'init' => $mail,
-            ];
-            loft_core_set_user_status($account, LOFT_CORE_USER_STATUS_HONEYBEAR);
+            loft_core_set_user_status($uid, $mail, LOFT_CORE_USER_STATUS_HONEYBEAR, ip_address());
         }
     }
 }
 
+function loft_core_user_block_spammy_user_action(&$entity, $context = array())
+{
+    // First priority: If there is a $entity->uid, block that user.
+    // This is most likely a user object or the author if a node or comment.
+    if (isset($entity->uid)) {
+        $uid = $entity->uid;
+    }
+    elseif (isset($context['uid'])) {
+        $uid = $context['uid'];
+    }
+    // If neither of those are valid, then block the current user.
+    else {
+        $uid = $GLOBALS['user']->uid;
+    }
+    $account = user_load($uid);
+    loft_core_block_user($uid, $account->mail, LOFT_CORE_USER_STATUS_SPAMMY);
+}

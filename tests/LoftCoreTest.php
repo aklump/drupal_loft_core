@@ -3,6 +3,26 @@ use Drupal\loft_core\Attribute;
 
 class LoftCoreTest extends PHPUnit_Framework_TestCase {
 
+    /**
+     * Provides data for test_loft_core_get_email_domain.
+     */
+    function DataForTest_loft_core_get_email_domainProvider() {
+      $tests = array();
+      $tests[] = array(
+          'brainboostingsupplements.org', 'heath@e.brainboostingsupplements.org'
+      );
+
+      return $tests;
+    }
+
+    /**
+     * @dataProvider DataForTest_loft_core_get_email_domainProvider
+     */
+    public function test_loft_core_get_email_domain($control, $mail)
+    {
+        $this->assertSame($control, _loft_core_get_email_domain($mail));
+    }
+
     public function testLoftCoreTestClass()
     {
         $this->assertEmpty(loft_core_test_class('golden'));
