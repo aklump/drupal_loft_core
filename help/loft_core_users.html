@@ -1,0 +1,10 @@
+
+<h2>Suggested modules to use:</h2>
+
+<h3><a href="https://www.drupal.org/project/honeypot">Honeypot</a></h3>
+
+<p>Honeypot rejections will be tracked as "honey bears" and can later be converted to "spammy" users.  This only works if the <code>$_POST</code> array contains the key <code>mail</code>.  An example is <code>user_register_form</code>, where this works nicely.  Honeybears can be found in the table <code>loft_core_users</code> with a status of <code>LOFT_CORE_USERS_STATUS_HONEYBEAR</code>.</p>
+
+<h3><a href="https://www.drupal.org/project/user_restrictions">User Restrictions</a></h3>
+
+<p>Blocks users with an email address containing any domains that have been found as "spammy".  The list of domains are found in <code>loft_core_users</code>.  Check the status because honeybear domains do not block new users.</p>
