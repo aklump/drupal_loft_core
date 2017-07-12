@@ -1,30 +1,47 @@
 <?php
 /**
- * @file Functions concerned with controlling users and SPAM.
+ * @file
+ * Base file for the loft_core_users module.
  *
+ * @defgroup loft_core_users Loft Core Users
+ * @{
  */
+
 /**
  * This account was trapped as a robot.
  */
-define('LOFT_CORE_USER_STATUS_ROBOT', 2);
+define('LOFT_CORE_USERS_STATUS_ROBOT', 2);
 
 /**
  * This account was trapped by the honepot module.
  */
-define('LOFT_CORE_USER_STATUS_HONEYBEAR', 3);
+define('LOFT_CORE_USERS_STATUS_HONEYBEAR', 3);
 
 /**
  * For one reason or another this account appears spammy.
  */
-define('LOFT_CORE_USER_STATUS_SPAMMY', 4);
+define('LOFT_CORE_USERS_STATUS_SPAMMY', 4);
 
 /**
- * @var LOFT_CORE_HONEYPOT_REJECT_DOMAINS_WHITELIST
+ * @var LOFT_CORE_USERS_HONEYPOT_REJECT_DOMAINS_WHITELIST
  *
  * CSV list of domains to whitelist that cannot be considered SPAM when
  * honeypot rejects.
  */
-define('LOFT_CORE_HONEYPOT_REJECT_DOMAINS_WHITELIST', 'gmail.com');
+define('LOFT_CORE_USERS_HONEYPOT_REJECT_DOMAINS_WHITELIST', 'gmail.com');
+
+/**
+ * Implements hook_module_implements_alter().
+ */
+function loft_core_users_module_implements_alter(&$implementations, $hook)
+{
+    if ($hook == 'user_restrictions_alter') {
+        // user_restrictions module overwrites our $error unless we call it first.
+        $group = $implementations['loft_core_users'];
+        unset($implementations['loft_core_users']);
+        $implementations['loft_core_users'] = $group;
+    }
+}
 
 /**
  * Return the domain of an email address.
@@ -33,7 +50,7 @@ define('LOFT_CORE_HONEYPOT_REJECT_DOMAINS_WHITELIST', 'gmail.com');
  *
  * @return string
  */
-function _loft_core_get_email_domain($email)
+function _loft_core_users_get_email_domain($email)
 {
     $domain = preg_replace('/^.+@/', '', $email);
     $domain = explode('.', $domain);
@@ -48,12 +65,12 @@ function _loft_core_get_email_domain($email)
  * @param int       $status
  * @param string    $ip
  *
- * @see LOFT_CORE_USER_STATUS_*
+ * @see LOFT_CORE_USERS_STATUS_*
  */
-function loft_core_block_user($uid, $mail, $status = 0, $ip = null)
+function loft_core_users_block_user($uid, $mail, $status = 0, $ip = null)
 {
     if ($status > 1) {
-        loft_core_set_user_status($uid, $mail, $status, $ip);
+        loft_core_users_set_user_status($uid, $mail, $status, $ip);
     }
     $account = (object)[
         'uid' => $uid,
@@ -70,14 +87,14 @@ function loft_core_block_user($uid, $mail, $status = 0, $ip = null)
  * @param $account
  * @param $status
  *
- * @see loft_core_block_user().
+ * @see loft_core_users_block_user().
  */
-function loft_core_set_user_status($uid, $mail, $status, $ip = null)
+function loft_core_users_set_user_status($uid, $mail, $status, $ip = null)
 {
     $meta = [
         'uid' => $uid,
         'status' => $status,
-        'domain' => _loft_core_get_email_domain($mail),
+        'domain' => _loft_core_users_get_email_domain($mail),
         'ip' => $ip,
     ];
     $meta = array_filter($meta);
@@ -116,14 +133,14 @@ function loft_core_set_user_status($uid, $mail, $status, $ip = null)
  *     array_unshift($items['node/add/user-collection']['page arguments'],
  *     $items['node/add/user-collection']['page callback']);
  *     $items['node/add/user-collection']['page callback'] =
- *     'loft_core_robotrap_page_callback';
+ *     'loft_core_users_robotrap_page_callback';
  *   }
  * @endcode
  *
- * You MUST implement hook_loft_core_robotrap_access().
- * You MAY implement hook_loft_core_robotrap_goto_alter().
+ * You MUST implement hook_loft_core_users_robotrap_access().
+ * You MAY implement hook_loft_core_users_robotrap_goto_alter().
  */
-function loft_core_robotrap_page_callback()
+function loft_core_users_robotrap_page_callback()
 {
     global $user;
     $args = func_get_args();
@@ -134,11 +151,11 @@ function loft_core_robotrap_page_callback()
         'page callback' => $callback,
         'page arguments' => $args,
     ];
-    $access = module_invoke_all('loft_core_robotrap_access', $context);
+    $access = module_invoke_all('loft_core_users_robotrap_access', $context);
     $access = end($access);
     if (!$access) {
         watchdog('loft_core', 'Robotrap: Blocked user %name.', ['%name' => $user->name]);
-        loft_core_block_user($user->uid, $user->mail, LOFT_CORE_USER_STATUS_ROBOT, ip_address());
+        loft_core_users_block_user($user->uid, $user->mail, LOFT_CORE_USERS_STATUS_ROBOT, ip_address());
         module_load_include('inc', 'user', 'user.pages');
         user_logout_current_user();
         drupal_set_message(t('You have visited a forbidden url; your account has been locked for review.  Please contact us using the form below to unlock your account.', ['!url' => url('contact', ['query' => ['cid' => 6]])]), 'warning', false);
@@ -157,14 +174,14 @@ function loft_core_robotrap_page_callback()
 }
 
 /**
- * Implements hook_hook_user_restrictions_alter().
+ * Implements hook_user_restrictions_alter().
  */
-function loft_core_user_restrictions_alter(&$denied, &$error, &$context)
+function loft_core_users_user_restrictions_alter(&$denied, &$error, &$context)
 {
     // List all statuses which indicate a domain has been blocked.
     $statuses_which_block_users = [
-        LOFT_CORE_USER_STATUS_ROBOT,
-        LOFT_CORE_USER_STATUS_SPAMMY,
+        LOFT_CORE_USERS_STATUS_ROBOT,
+        LOFT_CORE_USERS_STATUS_SPAMMY,
     ];
 
     //
@@ -174,7 +191,7 @@ function loft_core_user_restrictions_alter(&$denied, &$error, &$context)
     if ($context['type'] === 'mail') {
 
         // Check if the domain has been trapped.
-        $domain = _loft_core_get_email_domain($context['form_state']['values']['mail']);
+        $domain = _loft_core_users_get_email_domain($context['form_state']['values']['mail']);
         $query = db_select('loft_core_users', 'lu')
             ->fields('lu', ['uid', 'domain'])
             ->condition('status', $statuses_which_block_users, 'IN')
@@ -210,20 +227,20 @@ function loft_core_user_restrictions_alter(&$denied, &$error, &$context)
  *
  * Make a note of this email address/user as a honeybear.
  */
-function loft_core_honeypot_reject($form_id, $uid, $type)
+function loft_core_users_honeypot_reject($form_id, $uid, $type)
 {
     $g = data_api();
     if (($mail = $g->get($_POST, 'mail'))) {
-        $domain = _loft_core_get_email_domain($mail);
-        $default = explode(',', LOFT_CORE_HONEYPOT_REJECT_DOMAINS_WHITELIST);
-        $may_block = !in_array($domain, variable_get('loft_core_honeypot_reject_domains_whitelist', $default));
+        $domain = _loft_core_users_get_email_domain($mail);
+        $default = explode(',', LOFT_CORE_USERS_HONEYPOT_REJECT_DOMAINS_WHITELIST);
+        $may_block = !in_array($domain, variable_get('loft_core_users_honeypot_reject_domains_whitelist', $default));
         if ($may_block) {
-            loft_core_set_user_status($uid, $mail, LOFT_CORE_USER_STATUS_HONEYBEAR, ip_address());
+            loft_core_users_set_user_status($uid, $mail, LOFT_CORE_USERS_STATUS_HONEYBEAR, ip_address());
         }
     }
 }
 
-function loft_core_user_block_spammy_user_action(&$entity, $context = array())
+function loft_core_users_user_block_spammy_user_action(&$entity, $context = array())
 {
     // First priority: If there is a $entity->uid, block that user.
     // This is most likely a user object or the author if a node or comment.
@@ -238,5 +255,20 @@ function loft_core_user_block_spammy_user_action(&$entity, $context = array())
         $uid = $GLOBALS['user']->uid;
     }
     $account = user_load($uid);
-    loft_core_block_user($uid, $account->mail, LOFT_CORE_USER_STATUS_SPAMMY);
+    loft_core_users_block_user($uid, $account->mail, LOFT_CORE_USERS_STATUS_SPAMMY);
+}
+
+/**
+ * Implements hook_form_user_registration_alter().
+ */
+function loft_core_users_form_user_register_form_alter(&$form, &$form_state)
+{
+    $form['#submit'][] = 'loft_core_users_user_register_form_submit';
+}
+
+function loft_core_users_user_register_form_submit($form, $form_state)
+{
+    // When a new account is submitted, capture the IP.
+    $account = $form_state['user'];
+    loft_core_users_users_set_user_status($account->uid, $account->init, null, ip_address());
 }

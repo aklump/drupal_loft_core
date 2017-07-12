@@ -2,7 +2,7 @@
 /**
  * Implements hook_schema().
  */
-function loft_core_schema()
+function loft_core_users_schema()
 {
     // The table name here is plural, despite Drupal table naming standards,
     // because "user" is a reserved word in many databases.
@@ -57,7 +57,7 @@ function loft_core_schema()
 /**
  * Install the loft_core_users table.
  */
-function loft_core_update_7100(&$sandbox)
+function loft_core_users_update_7100(&$sandbox)
 {
     $output = [];
     try {

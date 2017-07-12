@@ -1,0 +1,11 @@
+name = "Loft Core Users"
+description = "Submodule augments user tracking and SPAM control options"
+package = Other
+version = 7.x-0.1
+core = 7.x
+php = 5.3
+configure = admin/config/system/loft-core-users
+;project = loft_core_users
+;project status url = http://code.intheloftstudios.com/release-history
+;homepage = http://www.intheloftstudios.com/packages/drupal/loft_core_users
+author = aklump

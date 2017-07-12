@@ -9,8 +9,6 @@
 use Drupal\loft_core\Attribute;
 use Drupal\loft_core\Redirect;
 
-require_once dirname(__FILE__) . '/includes/loft_core.spam.inc';
-
 //
 //
 // Register hook_boot ONLY if we are using the autoload feature.
@@ -42,19 +40,6 @@ function loft_core_init()
             'group' => JS_DEFAULT,
         ],
         'file');
-}
-
-/**
- * Implements hook_module_implements_alter().
- */
-function loft_core_module_implements_alter(&$implementations, $hook)
-{
-    if ($hook == 'user_restrictions_alter') {
-        // user_restrictions module overwrites our $error unless we call it first.
-        $group = $implementations['loft_core'];
-        unset($implementations['loft_core']);
-        $implementations['loft_core'] = $group;
-    }
 }
 
 /**
@@ -777,26 +762,11 @@ function loft_core_exit()
 function loft_core_action_info()
 {
     return array(
-        'loft_core_user_block_spammy_user_action' => array(
+        'loft_core_users_user_block_spammy_user_action' => array(
             'label' => t('Block SPAMMY user'),
             'type' => 'user',
             'configurable' => false,
             'triggers' => array('any'),
         ),
     );
-}
-
-/**
- * Implements hook_form_user_registration_alter().
- */
-function loft_core_form_user_register_form_alter(&$form, &$form_state)
-{
-    $form['#submit'][] = 'loft_core_user_register_form_submit';
-}
-
-function loft_core_user_register_form_submit($form, $form_state)
-{
-    // When a new account is submitted, capture the IP.
-    $account = $form_state['user'];
-    loft_core_set_user_status($account->uid, $account->init, null, ip_address());
 }
