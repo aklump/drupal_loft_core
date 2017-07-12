@@ -9,6 +9,14 @@
 use Drupal\loft_core\Attribute;
 use Drupal\loft_core\Redirect;
 
+// By default we will assume production environment.  To control or override this behavior see the documentation regarding these constants, e.g. settings.env.php, etc.
+if (!defined('DRUPAL_ENV')) {
+    define('DRUPAL_ENV', 'prod');
+}
+if (!defined('DRUPAL_ENV_ROLE')) {
+    define('DRUPAL_ENV_ROLE', 'prod');
+}
+
 /**
  * Implements hook_boot().
  */
