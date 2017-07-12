@@ -10,6 +10,13 @@ Autoloading
    add this to settings.php:
 $conf['loft_core_autoload'] = true;
 
+Integrations
+
+  [1]User restrictions
+
+   Automatically trap any new user whose email domain matches that of a
+   robo-trapped user.
+
 Contact
 
      * In the Loft Studios
@@ -17,8 +24,9 @@ Contact
      * PO Box 29294 Bellingham, WA 98228-1294
      * skype: intheloftstudios
      * d.o: aklump
-     * [1]http://www.InTheLoftStudios.com
+     * [2]http://www.InTheLoftStudios.com
 
 References
 
-   1. http://www.InTheLoftStudios.com/
+   1. https://www.drupal.org/project/user_restrictions
+   2. http://www.InTheLoftStudios.com/
