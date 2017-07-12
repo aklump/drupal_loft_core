@@ -240,7 +240,7 @@ function loft_core_users_honeypot_reject($form_id, $uid, $type)
     }
 }
 
-function loft_core_users_user_block_spammy_user_action(&$entity, $context = array())
+function loft_core_users_block_spammy_user_action(&$entity, $context = array())
 {
     // First priority: If there is a $entity->uid, block that user.
     // This is most likely a user object or the author if a node or comment.
