@@ -9,19 +9,13 @@
 use Drupal\loft_core\Attribute;
 use Drupal\loft_core\Redirect;
 
-//
-//
-// Register hook_boot ONLY if we are using the autoload feature.
-//
-if (!empty($GLOBALS['conf']['loft_core_autoload'])) {
-    /**
-     * Implements hook_boot().
-     */
-    function loft_core_boot()
-    {
-        // You must load the composer autoload in this fashion.
-        include_once dirname(__FILE__) . '/vendor/autoload.php';
-    }
+/**
+ * Implements hook_boot().
+ */
+function loft_core_boot()
+{
+    // You must load the composer autoload in this fashion.
+    include_once dirname(__FILE__) . '/vendor/autoload.php';
 }
 
 /**
@@ -49,9 +43,7 @@ function loft_core_preprocess_html(&$vars)
 {
     global $user;
     $vars['loft_core_tracking'] = '';
-    if (DRUPAL_ENV_ROLE === 'prod' && ($token = variable_get('loft_core_trackjs_token',
-            null))
-    ) {
+    if (DRUPAL_ENV_ROLE === 'prod' && ($token = variable_get('loft_core_trackjs_token', null))) {
 
         // @link http://docs.trackjs.com/tracker/configuration
         $trackjs = [
@@ -103,6 +95,35 @@ EOD;
 }
 
 /**
+ * Implements hook_menu_alter().
+ */
+function loft_core_menu_alter(&$items)
+{
+    if (variable_get('loft_core_node_redirects', false)) {
+        $key = 'node/%node';
+        if (isset($items[$key])) {
+            $items[$key]['page callback'] = 'loft_core_node_page';
+            $items[$key]['page arguments'][] = 'view';
+        }
+        $key = 'node/%node/view';
+        if (isset($items[$key])) {
+            $items[$key]['page callback'] = 'loft_core_node_page';
+            $items[$key]['page arguments'][] = 'view';
+        }
+        $key = 'node/%node/edit';
+        if (isset($items[$key])) {
+            $items[$key]['page callback'] = 'loft_core_node_page';
+            $items[$key]['page arguments'][] = 'edit';
+        }
+        $key = 'node/%node/delete';
+        if (isset($items[$key])) {
+            $items[$key]['page callback'] = 'loft_core_node_page';
+            $items[$key]['page arguments'][] = 'delete';
+        }
+    }
+}
+
+/**
  * Menu callback: Displays a single node,
  * but checks for a redirect first.
  *
@@ -117,9 +138,8 @@ EOD;
  *
  * // TODO Support node create?
  */
-function loft_core_node_page($node,
-                             $op
-) {
+function loft_core_node_page($node, $op)
+{
     if (is_string($node)) {
         switch ($node) {
             case 'node_delete_confirm':
@@ -174,41 +194,14 @@ function loft_core_node_page($node,
     }
 }
 
-function loft_core_menu_alter(&$items)
-{
-    $key = 'node/%node';
-    if (isset($items[$key])) {
-        $items[$key]['page callback'] = 'loft_core_node_page';
-        $items[$key]['page arguments'][] = 'view';
-    }
-    $key = 'node/%node/view';
-    if (isset($items[$key])) {
-        $items[$key]['page callback'] = 'loft_core_node_page';
-        $items[$key]['page arguments'][] = 'view';
-    }
-    $key = 'node/%node/edit';
-    if (isset($items[$key])) {
-        $items[$key]['page callback'] = 'loft_core_node_page';
-        $items[$key]['page arguments'][] = 'edit';
-    }
-    $key = 'node/%node/delete';
-    if (isset($items[$key])) {
-        $items[$key]['page callback'] = 'loft_core_node_page';
-        $items[$key]['page arguments'][] = 'delete';
-    }
-}
-
 /**
  * Implements hook_form_alter().
  *
  * Make sure we don't redirect admins after editing a "redirected" node.
  */
-function loft_core_form_node_form_alter(&$form,
-                                        &$form_state
-) {
-    if (Redirect::isNodeRedirected($form_state['node'],
-        'view')
-    ) {
+function loft_core_form_node_form_alter(&$form, &$form_state)
+{
+    if (Redirect::isNodeRedirected($form_state['node'], 'view')) {
         $form['actions']['submit']['#submit'][] = 'loft_core_node_form_submit_redirect_handler';
     }
 }
@@ -475,9 +468,8 @@ function theme_form_help($vars)
  *
  * @return string The modified html
  */
-function loft_core_image_src_itok_cache_buster($html,
-                                               $build
-) {
+function loft_core_image_src_itok_cache_buster($html, $build)
+{
     global $user;
     $buster = [
         0 => variable_get('loft_core_cache_bust_token',
@@ -662,11 +654,10 @@ function loft_core_ajax_command_bbq_push_state($hash_string)
  *
  * @see _loft_core_trackjs_get_severities().
  */
-function loft_core_trackjs_echo_drupal_messages(array &$commands,
-                                                array $severities = [
-                                                    'warning',
-                                                    'error',
-                                                ]
+function loft_core_trackjs_echo_drupal_messages(array &$commands, array $severities = [
+    'warning',
+    'error',
+]
 ) {
     $groups = drupal_get_messages(null,
         false);
@@ -762,7 +753,7 @@ function loft_core_exit()
 function loft_core_action_info()
 {
     return array(
-        'loft_core_users_user_block_spammy_user_action' => array(
+        'loft_core_users_block_spammy_user_action' => array(
             'label' => t('Block SPAMMY user'),
             'type' => 'user',
             'configurable' => false,
