@@ -1,43 +1,31 @@
-
 <!DOCTYPE html>
 
 <html>
 <head>
-    <title>Two new constants</title>
-    <link href="search/tipuesearch.css" rel="stylesheet">
-    <style type="text/css" media="all">
-      @import url("style.css");
-    </style>
-
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-    <script src="search/tipuesearch_content.js"></script>
-    <script src="search/tipuesearch_set.js"></script>
-    <script src="search/tipuesearch.min.js"></script>
-    <script src="js/core.js"></script>
-
+  <title>Two new constants</title>
+  <link href="search/tipuesearch.css" rel="stylesheet">
+  <link href="style.css" rel="stylesheet">
 </head>
 
-<body class="page-settings">
+<body class="page--settings">
 <header>
-<div class="pager">
+  <div class="pager">
   <a href="redirects.html" class="prev redirects">&laquo;Redirects</a>
   <a href="index.html" class="index">Index</a>
   <a href="trackjs.html" class="next trackjs">Add TrackJS.com to your website&raquo;</a>
 </div>
-
 </header>
 
-<div class="search__wrapper">
+  <div class="search__wrapper">
   <form action="search--results.html">
     <input type="text" class="search-input" name="q" id="tipue_search_input" autocomplete="off" required>
   </form>
 </div>
 
-<h1>Two new constants</h1>
-<div class="breadcrumb"><a href="index.html">Index</a></div>
+  <h1>Two new constants</h1>
+  <div class="breadcrumb"><a href="index.html">Index</a></div>
 
 <section>
-
 
 <h2>Files used</h2>
 
@@ -96,28 +84,31 @@ Drupal.settings.DRUPAL_ENV_ROLE
 </section>
 
 <div class="search__results">
-  <div id="tipue_search_content"></div>  
+  <div id="tipue_search_content"></div>
 </div>
 
 <footer>
-<div class="pager">
+  <div class="pager">
   <a href="redirects.html" class="prev redirects">&laquo;Redirects</a>
   <a href="index.html" class="index">Index</a>
   <a href="trackjs.html" class="next trackjs">Add TrackJS.com to your website&raquo;</a>
 </div>
-
-
+  
   <div id="footer-legaleeze">
-    <p class="legaleeze center">Version: 0.8.16 &bull; Last Updated: Wed, 12 Jul 2017 12:44:56 -0700</p>
+    <p class="legaleeze center">Version: 7.x-0.2-rc37 &bull; Last Updated: Wed, 12 Jul 2017 13:12:10 -0700</p>
   </div>
 </footer>
 
-<script>
-$(document).ready(function() {
-  $('#tipue_search_input').tipuesearch();
-});
-</script>
-
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script src="search/tipuesearch_content.js"></script>
+  <script src="search/tipuesearch_set.js"></script>
+  <script src="search/tipuesearch.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      $('#tipue_search_input').tipuesearch();
+    });
+  </script>
+<script src="js/core.js"></script>
 </body>
 </html>
 

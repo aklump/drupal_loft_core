@@ -1,58 +1,38 @@
-
 <!DOCTYPE html>
 
 <html>
 <head>
-    <title>Loft Core</title>
-    <link href="search/tipuesearch.css" rel="stylesheet">
-    <style type="text/css" media="all">
-      @import url("style.css");
-    </style>
-
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-    <script src="search/tipuesearch_content.js"></script>
-    <script src="search/tipuesearch_set.js"></script>
-    <script src="search/tipuesearch.min.js"></script>
-    <script src="js/core.js"></script>
-
+  <title>Loft Core</title>
+  <link href="search/tipuesearch.css" rel="stylesheet">
+  <link href="style.css" rel="stylesheet">
 </head>
 
-<body class="page-readme">
+<body class="page--readme">
 <header>
-<div class="pager">
+  <div class="pager">
   <a href="index.html" class="prev index">&laquo;Index</a>
   <a href="index.html" class="index">Index</a>
   <a href="database.html" class="next database">Database&raquo;</a>
 </div>
-
 </header>
 
-<div class="search__wrapper">
+  <div class="search__wrapper">
   <form action="search--results.html">
     <input type="text" class="search-input" name="q" id="tipue_search_input" autocomplete="off" required>
   </form>
 </div>
 
-<h1>Loft Core</h1>
-<div class="breadcrumb"><a href="index.html">Index</a></div>
+  <h1>Loft Core</h1>
+  <div class="breadcrumb"><a href="index.html">Index</a></div>
 
 <section>
 
+<p>This module contains features that I wish were in core, and which I often use for all my projects.  Documentation can be found in:</p>
 
-<p>This module contains features that I wish were in core, and which I often use for all my projects.</p>
-
-<h2>Autoloading</h2>
-
-<p>Some features require the autoloading, if you use these features you have to enable them.  To activate the autoloading feature of this module add this to settings.php:</p>
-
-<pre><code>$conf['loft_core_autoload'] = true;
+<pre><code>docs/public_html
 </code></pre>
 
-<h2>Integrations</h2>
-
-<h3><a href="https://www.drupal.org/project/user_restrictions">User restrictions</a></h3>
-
-<p>Automatically trap any new user whose email domain matches that of a robo-trapped user.</p>
+<p>of with Advanced Help module.</p>
 
 <h2>Contact</h2>
 
@@ -67,28 +47,31 @@
 </section>
 
 <div class="search__results">
-  <div id="tipue_search_content"></div>  
+  <div id="tipue_search_content"></div>
 </div>
 
 <footer>
-<div class="pager">
+  <div class="pager">
   <a href="index.html" class="prev index">&laquo;Index</a>
   <a href="index.html" class="index">Index</a>
   <a href="database.html" class="next database">Database&raquo;</a>
 </div>
-
-
+  
   <div id="footer-legaleeze">
-    <p class="legaleeze center">Version: 0.8.16 &bull; Last Updated: Wed, 12 Jul 2017 12:44:55 -0700</p>
+    <p class="legaleeze center">Version: 7.x-0.2-rc37 &bull; Last Updated: Wed, 12 Jul 2017 13:12:08 -0700</p>
   </div>
 </footer>
 
-<script>
-$(document).ready(function() {
-  $('#tipue_search_input').tipuesearch();
-});
-</script>
-
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script src="search/tipuesearch_content.js"></script>
+  <script src="search/tipuesearch_set.js"></script>
+  <script src="search/tipuesearch.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      $('#tipue_search_input').tipuesearch();
+    });
+  </script>
+<script src="js/core.js"></script>
 </body>
 </html>
 

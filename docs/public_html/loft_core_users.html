@@ -2,17 +2,17 @@
 
 <html>
 <head>
-  <title></title>
+  <title>Loft Core: Users</title>
   <link href="search/tipuesearch.css" rel="stylesheet">
   <link href="style.css" rel="stylesheet">
 </head>
 
-<body class="">
+<body class="page--loft_core_users">
 <header>
   <div class="pager">
-  <a href="javascript:void(0)" class="prev ">&laquo;</a>
+  <a href="images.html" class="prev images">&laquo;Images</a>
   <a href="index.html" class="index">Index</a>
-  <a href="javascript:void(0)" class="next ">&raquo;</a>
+  <a href="redirects.html" class="next redirects">Redirects&raquo;</a>
 </div>
 </header>
 
@@ -22,10 +22,20 @@
   </form>
 </div>
 
-  <h1></h1>
+  <h1>Loft Core: Users</h1>
   <div class="breadcrumb"><a href="index.html">Index</a></div>
 
 <section>
+
+<h2>Suggested modules to use:</h2>
+
+<h3><a href="https://www.drupal.org/project/honeypot">Honeypot</a></h3>
+
+<p>Honeypot rejections will be tracked as "honey bears" and can later be converted to "spammy" users.  This only works if the <code>$_POST</code> array contains the key <code>mail</code>.  An example is <code>user_register_form</code>, where this works nicely.  Honeybears can be found in the table <code>loft_core_users</code> with a status of <code>LOFT_CORE_USERS_STATUS_HONEYBEAR</code>.</p>
+
+<h3><a href="https://www.drupal.org/project/user_restrictions">User Restrictions</a></h3>
+
+<p>Blocks users with an email address containing any domains that have been found as "spammy".  The list of domains are found in <code>loft_core_users</code>.  Check the status because honeybear domains do not block new users.</p>
 </section>
 
 <div class="search__results">
@@ -34,9 +44,9 @@
 
 <footer>
   <div class="pager">
-  <a href="javascript:void(0)" class="prev ">&laquo;</a>
+  <a href="images.html" class="prev images">&laquo;Images</a>
   <a href="index.html" class="index">Index</a>
-  <a href="javascript:void(0)" class="next ">&raquo;</a>
+  <a href="redirects.html" class="next redirects">Redirects&raquo;</a>
 </div>
   
   <div id="footer-legaleeze">

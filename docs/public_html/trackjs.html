@@ -1,43 +1,31 @@
-
 <!DOCTYPE html>
 
 <html>
 <head>
-    <title>Add TrackJS.com to your website</title>
-    <link href="search/tipuesearch.css" rel="stylesheet">
-    <style type="text/css" media="all">
-      @import url("style.css");
-    </style>
-
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-    <script src="search/tipuesearch_content.js"></script>
-    <script src="search/tipuesearch_set.js"></script>
-    <script src="search/tipuesearch.min.js"></script>
-    <script src="js/core.js"></script>
-
+  <title>Add TrackJS.com to your website</title>
+  <link href="search/tipuesearch.css" rel="stylesheet">
+  <link href="style.css" rel="stylesheet">
 </head>
 
-<body class="page-trackjs">
+<body class="page--trackjs">
 <header>
-<div class="pager">
+  <div class="pager">
   <a href="settings.html" class="prev settings">&laquo;Two new constants</a>
   <a href="index.html" class="index">Index</a>
-  <a href="index.html" class="next index">Index&raquo;</a>
+  <a href="_tasklist.html" class="next _tasklist"> Tasklist&raquo;</a>
 </div>
-
 </header>
 
-<div class="search__wrapper">
+  <div class="search__wrapper">
   <form action="search--results.html">
     <input type="text" class="search-input" name="q" id="tipue_search_input" autocomplete="off" required>
   </form>
 </div>
 
-<h1>Add TrackJS.com to your website</h1>
-<div class="breadcrumb"><a href="index.html">Index</a></div>
+  <h1>Add TrackJS.com to your website</h1>
+  <div class="breadcrumb"><a href="index.html">Index</a></div>
 
 <section>
-
 
 <ol>
 <li>Sign up for an account at http://www.trackjs.com</li>
@@ -59,28 +47,31 @@
 </section>
 
 <div class="search__results">
-  <div id="tipue_search_content"></div>  
+  <div id="tipue_search_content"></div>
 </div>
 
 <footer>
-<div class="pager">
+  <div class="pager">
   <a href="settings.html" class="prev settings">&laquo;Two new constants</a>
   <a href="index.html" class="index">Index</a>
-  <a href="index.html" class="next index">Index&raquo;</a>
+  <a href="_tasklist.html" class="next _tasklist"> Tasklist&raquo;</a>
 </div>
-
-
+  
   <div id="footer-legaleeze">
-    <p class="legaleeze center">Version: 0.8.16 &bull; Last Updated: Wed, 12 Jul 2017 12:44:56 -0700</p>
+    <p class="legaleeze center">Version: 7.x-0.2-rc37 &bull; Last Updated: Wed, 12 Jul 2017 13:12:10 -0700</p>
   </div>
 </footer>
 
-<script>
-$(document).ready(function() {
-  $('#tipue_search_input').tipuesearch();
-});
-</script>
-
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script src="search/tipuesearch_content.js"></script>
+  <script src="search/tipuesearch_set.js"></script>
+  <script src="search/tipuesearch.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      $('#tipue_search_input').tipuesearch();
+    });
+  </script>
+<script src="js/core.js"></script>
 </body>
 </html>
 

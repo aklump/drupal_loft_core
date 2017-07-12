@@ -19,3 +19,7 @@ This module defines a new element called 'form_help'. It can also take `#weight`
                 t("When a user account is created, the values of this node at the time the user account is created will be copied to the users's account as a Sample Collection.  Changes made to the node are not retroactive and only affect the user collections created from that point forward."),
             ),
         ];
+
+## Tabindex
+
+    loft_core_form_tabindex()

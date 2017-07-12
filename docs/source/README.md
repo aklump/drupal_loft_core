@@ -1,18 +1,10 @@
 # Loft Core
 
-This module contains features that I wish were in core, and which I often use for all my projects.
+This module contains features that I wish were in core, and which I often use for all my projects.  Documentation can be found in:
 
-## Autoloading
-Some features require the autoloading, if you use these features you have to enable them.  To activate the autoloading feature of this module add this to settings.php:
-
-    $conf['loft_core_autoload'] = true;
-
-## Integrations
-
-### [User restrictions](https://www.drupal.org/project/user_restrictions)
-
-Automatically trap any new user whose email domain matches that of a robo-trapped user.
-
+    docs/public_html
+    
+of with Advanced Help module.
 
 ## Contact
 * **In the Loft Studios**

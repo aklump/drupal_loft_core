@@ -20,22 +20,28 @@
             "sort": 2
         },
         {
+            "id": "loft_core_users",
+            "title": "Loft Core: Users",
+            "file": "loft_core_users.md",
+            "sort": 3
+        },
+        {
             "id": "redirects",
             "title": "Redirects",
             "file": "redirects.md",
-            "sort": 3
+            "sort": 4
         },
         {
             "id": "settings",
             "title": "Two new constants",
             "file": "settings.md",
-            "sort": 4
+            "sort": 5
         },
         {
             "id": "trackjs",
             "title": "Add TrackJS.com to your website",
             "file": "trackjs.md",
-            "sort": 5
+            "sort": 6
         }
     ],
     "settings": {
