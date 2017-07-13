@@ -77,7 +77,7 @@ function loft_core_users_block_user($uid, $mail, $status = 0, $ip = null)
     if ($status > 1) {
         loft_core_users_set_user_status($uid, $mail, $status, $ip);
     }
-    $account = (object)[
+    $account = (object) [
         'uid' => $uid,
     ];
     user_block_user_action($account);
@@ -205,7 +205,7 @@ function loft_core_users_user_restrictions_alter(&$denied, &$error, &$context)
 
         // If trapped, leverage user_restrictions module to block by email address.
         if ($is_suspicious = $query->execute()->fetchAllAssoc('uid')) {
-            watchdog('loft_core', 'Suspicious Domain: Blocked new user @ %domain.', ['%domain' => $domain]);
+            watchdog('loft_core', 'Blocked user @%domain.', ['%domain' => $domain]);
             $context['mask'] = '*' . $domain;
             $denied = true;
             $error['field'] = 'mail';
