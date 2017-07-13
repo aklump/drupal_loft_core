@@ -28,12 +28,36 @@ define('LOFT_CORE_USERS_STATUS_HONEYBEAR_MADE_SPAMMY', 34);
 define('LOFT_CORE_USERS_STATUS_SPAMMY', 4);
 
 /**
- * @var LOFT_CORE_USERS_HONEYPOT_REJECT_DOMAINS_WHITELIST
+ * @var LOFT_CORE_USERS_DOMAIN_WHITELIST
  *
- * CSV list of domains to whitelist that cannot be considered SPAM when
- * honeypot rejects.
+ * CSV list of domains to whitelist that cannot will not be blocked, regardless
+ * of the spam levels associated with their users.
  */
-define('LOFT_CORE_USERS_HONEYPOT_REJECT_DOMAINS_WHITELIST', 'gmail.com,yahoo.com');
+define('LOFT_CORE_USERS_DOMAIN_WHITELIST', 'gmail.com,yahoo.com');
+
+/**
+ * Return all status codes that should block a user from the site.
+ *
+ * @return array
+ */
+function loft_core_users_get_blocking_statuses()
+{
+    return array(
+        LOFT_CORE_USERS_STATUS_ROBOT,
+        LOFT_CORE_USERS_STATUS_SPAMMY,
+        LOFT_CORE_USERS_STATUS_HONEYBEAR_MADE_SPAMMY,
+    );
+}
+
+/**
+ * Return an array of domains that should not be blocked.
+ *
+ * @return mixed|null
+ */
+function loft_core_users_get_domain_whitelist()
+{
+    return variable_get('loft_core_users_domain_whitelist', explode(',', LOFT_CORE_USERS_DOMAIN_WHITELIST));
+}
 
 /**
  * Implements hook_module_implements_alter().
@@ -251,13 +275,6 @@ function loft_core_users_robotrap_page_callback()
  */
 function loft_core_users_user_restrictions_alter(&$denied, &$error, &$context)
 {
-    // List all statuses which indicate a domain has been blocked.
-    $statuses_which_block_users = [
-        LOFT_CORE_USERS_STATUS_ROBOT,
-        LOFT_CORE_USERS_STATUS_SPAMMY,
-        LOFT_CORE_USERS_STATUS_HONEYBEAR_MADE_SPAMMY,
-    ];
-
     //
     //
     // Restrict any email address whose domain matches that of an already robo-trapped user.
@@ -266,32 +283,37 @@ function loft_core_users_user_restrictions_alter(&$denied, &$error, &$context)
 
         // Check if the domain has been trapped.
         $domain = _loft_core_users_get_email_domain($context['form_state']['values']['mail']);
-        $query = db_select('loft_core_users', 'lu')
-            ->fields('lu', ['uid', 'domain'])
-            ->condition('status', $statuses_which_block_users, 'IN')
-            ->condition('domain', $domain);
 
-        // If trapped, leverage user_restrictions module to block by email address.
-        if ($is_suspicious = $query->execute()->fetchAllAssoc('uid')) {
-            watchdog('loft_core_users', 'Denied user from @%domain.', ['%domain' => $domain]);
-            $context['mask'] = '*' . $domain;
-            $denied = true;
-            $error['field'] = 'mail';
-            $contact = 'contact us';
+        // Check if this domain is whitelisted.
+        if (!in_array($domain, loft_core_users_get_domain_whitelist())) {
 
-            // With the contact module enabled we give an easy way for mistakes to get corrected.
-            if (module_exists('contact')) {
-                unset($_GET['destination']);
-                $options = [];
-                $path = 'contact';
-                $contact = '<a href="!url">contact us</a>';
-                $context['parent'] = __FUNCTION__;
-                drupal_alter('loft_core_users_robotrap_goto', $path, $options, $context);
+            $query = db_select('loft_core_users', 'lu')
+                ->fields('lu', ['uid', 'domain'])
+                ->condition('status', loft_core_users_get_blocking_statuses(), 'IN')
+                ->condition('domain', $domain);
+
+            // If trapped, leverage user_restrictions module to block by email address.
+            if ($is_suspicious = $query->execute()->fetchAllAssoc('uid')) {
+                watchdog('loft_core_users', 'Denied user from @%domain.', ['%domain' => $domain]);
+                $context['mask'] = '*' . $domain;
+                $denied = true;
+                $error['field'] = 'mail';
+                $contact = 'contact us';
+
+                // With the contact module enabled we give an easy way for mistakes to get corrected.
+                if (module_exists('contact')) {
+                    unset($_GET['destination']);
+                    $options = [];
+                    $path = 'contact';
+                    $contact = '<a href="!url">contact us</a>';
+                    $context['parent'] = __FUNCTION__;
+                    drupal_alter('loft_core_users_robotrap_goto', $path, $options, $context);
+                }
+                $error['message'] = t('Your email address is associated with a suspicious domain (%domain); please ' . $contact . ' if this is in error.', [
+                    '%domain' => $domain,
+                    '!url' => url($path, $options),
+                ]);
             }
-            $error['message'] = t('Your email address is associated with a suspicious domain (%domain); please ' . $contact . ' if this is in error.', [
-                '%domain' => $domain,
-                '!url' => url($path, $options),
-            ]);
         }
     }
 }
@@ -306,8 +328,8 @@ function loft_core_users_honeypot_reject($form_id, $uid, $type)
     $g = data_api();
     if (($mail = $g->get($_POST, 'mail'))) {
         $domain = _loft_core_users_get_email_domain($mail);
-        $default = explode(',', LOFT_CORE_USERS_HONEYPOT_REJECT_DOMAINS_WHITELIST);
-        $may_block = !in_array($domain, variable_get('loft_core_users_honeypot_reject_domains_whitelist', $default));
+        $default = explode(',', LOFT_CORE_USERS_DOMAIN_WHITELIST);
+        $may_block = !in_array($domain, variable_get('loft_core_users_domain_whitelist', $default));
         if ($may_block) {
             loft_core_users_set_user_status(LOFT_CORE_USERS_STATUS_HONEYBEAR, $uid, $mail, ip_address());
         }
