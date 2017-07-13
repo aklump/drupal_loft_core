@@ -168,7 +168,7 @@ function loft_core_users_robotrap_page_callback()
         unset($_GET['destination']);
         $options = [];
         $context['parent'] = __FUNCTION__;
-        drupal_alter('loft_core_robotrap_goto', $path, $options, $context);
+        drupal_alter('loft_core_users_robotrap_goto', $path, $options, $context);
         drupal_goto($path, $options);
 
         return false;
@@ -218,7 +218,7 @@ function loft_core_users_user_restrictions_alter(&$denied, &$error, &$context)
                 $path = 'contact';
                 $contact = '<a href="!url">contact us</a>';
                 $context['parent'] = __FUNCTION__;
-                drupal_alter('loft_core_robotrap_goto', $path, $options, $context);
+                drupal_alter('loft_core_users_robotrap_goto', $path, $options, $context);
             }
             $error['message'] = t('Your email address is associated with a suspicious domain (%domain); please ' . $contact . ' if this is in error.', [
                 '%domain' => $domain,
