@@ -1,30 +1,8 @@
 <?php
-
 /**
- * Describes data tables (or the equivalent) to Views.
- *
- * This hook should be placed in MODULENAME.views.inc and it will be
- * auto-loaded. MODULENAME.views.inc must be in the directory specified by the
- * 'path' key returned by MODULENAME_views_api(), or the same directory as the
- * .module file, if 'path' is unspecified.
- *
- * @return
- *   An associative array describing the data structure. Primary key is the
- *   name used internally by Views for the table(s) – usually the actual table
- *   name. The values for the key entries are described in detail below.
+ * Implements hook_views_data().
  */
 function loft_core_users_views_data() {
-    // This example describes how to write hook_views_data() for the following
-    // table:
-    //
-    // CREATE TABLE loft_core_users (
-    //   uid INT(11) NOT NULL         COMMENT 'Primary key; refers to {users}.uid.',
-    //   plain_text_field VARCHAR(32) COMMENT 'Just a plain text field.',
-    //   numeric_field INT(11)        COMMENT 'Just a numeric field.',
-    //   boolean_field INT(1)         COMMENT 'Just an on/off field.',
-    //   timestamp_field INT(8)       COMMENT 'Just a timestamp field.',
-    //   PRIMARY KEY(uid)
-    // );
 
     // First, the entry $data['loft_core_users']['table'] describes properties of
     // the actual table – not its content.
@@ -32,16 +10,16 @@ function loft_core_users_views_data() {
     // The 'group' index will be used as a prefix in the UI for any of this
     // table's fields, sort criteria, etc. so it's easy to tell where they came
     // from.
-    $data['loft_core_users']['table']['group'] = t('Loft Core Users');
+    $data['loft_core_users']['table']['group'] = t('Loft Core: Users');
 
     // Define this as a base table – a table that can be described in itself by
     // views (and not just being brought in as a relationship). In reality this
     // is not very useful for this table, as it isn't really a distinct object of
     // its own, but it makes a good example.
     $data['loft_core_users']['table']['base'] = array(
-        'field' => 'uid', // This is the identifier field for the view.
+        'field' => 'id', // This is the identifier field for the view.
         'title' => t('Loft Core: Users'),
-        'help' => t('Example table contains example content and can be related to users.'),
+        'help' => t('Augmented user data'),
         'weight' => -10,
     );
 
@@ -74,7 +52,21 @@ function loft_core_users_views_data() {
     //
     // The handler descriptions are described with examples below.
 
-    // Node ID table field.
+    $data['loft_core_users']['id'] = array(
+        'title' => t('Record Id'),
+        'help' => t('Record identifier.'),
+        'field' => array(
+            'handler' => 'views_handler_field_numeric',
+            'click sortable' => TRUE,
+        ),
+        'filter' => array(
+            'handler' => 'views_handler_filter_numeric',
+        ),
+        'sort' => array(
+            'handler' => 'views_handler_sort',
+        ),
+    );
+
     $data['loft_core_users']['uid'] = array(
         'title' => t('UID'),
         'help' => t('User ID or 0'),
@@ -93,7 +85,40 @@ function loft_core_users_views_data() {
         ),
     );
 
-    // Example plain text field.
+    $data['loft_core_users']['uid_init'] = array(
+        'title' => t('Original UID'),
+        'help' => t('The UID of the original user, if deleted.'),
+        // Define a relationship to the {users} table, so loft_core_users views can
+        // add a relationship to users. If you want to define a relationship the
+        // other direction, use hook_views_data_alter(), or use the 'implicit' join
+        // method described above.
+        'relationship' => array(
+            'base' => 'users', // The name of the table to join with.
+            'base field' => 'uid', // The name of the field on the joined table.
+            // 'field' => 'uid' -- see hook_views_data_alter(); not needed here.
+            'handler' => 'views_handler_relationship',
+            'label' => t('User'),
+            'title' => t('Title shown when adding the relationship'),
+            'help' => t('Linked to the users table.'),
+        ),
+    );
+
+    // TODO Can we make the handler user human values instead of codes?
+    $data['loft_core_users']['status'] = array(
+        'title' => t('Status'),
+        'help' => t('Augmented status value'),
+        'field' => array(
+            'handler' => 'views_handler_field_numeric',
+            'click sortable' => TRUE,
+        ),
+        'filter' => array(
+            'handler' => 'views_handler_filter_numeric',
+        ),
+        'sort' => array(
+            'handler' => 'views_handler_sort',
+        ),
+    );
+
     $data['loft_core_users']['ip'] = array(
         'title' => t('IP'),
         'help' => t('Last IP address associated with this account.'),
@@ -112,8 +137,6 @@ function loft_core_users_views_data() {
         ),
     );
 
-
-    // Example plain text field.
     $data['loft_core_users']['domain'] = array(
         'title' => t('Domain'),
         'help' => t('Last associated email domain.'),
@@ -129,22 +152,6 @@ function loft_core_users_views_data() {
         ),
         'argument' => array(
             'handler' => 'views_handler_argument_string',
-        ),
-    );
-
-    // Example numeric text field.
-    $data['loft_core_users']['status'] = array(
-        'title' => t('Status'),
-        'help' => t('Augmented status value'),
-        'field' => array(
-            'handler' => 'views_handler_field_numeric',
-            'click sortable' => TRUE,
-        ),
-        'filter' => array(
-            'handler' => 'views_handler_filter_numeric',
-        ),
-        'sort' => array(
-            'handler' => 'views_handler_sort',
         ),
     );
 

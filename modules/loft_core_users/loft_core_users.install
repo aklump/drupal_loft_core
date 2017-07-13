@@ -9,11 +9,24 @@ function loft_core_users_schema()
     $schema['loft_core_users'] = [
         'description' => 'Stores user loft_core-based user data.',
         'fields' => [
+            'id' => array(
+                'type' => 'serial',
+                'unsigned' => true,
+                'not null' => true,
+                'description' => 'The primary identifier for this record.',
+            ),
             'uid' => [
                 'type' => 'int',
                 'unsigned' => true,
                 'not null' => true,
                 'description' => 'User ID or 0',
+                'default' => 0,
+            ],
+            'uid_init' => [
+                'type' => 'int',
+                'unsigned' => true,
+                'not null' => true,
+                'description' => 'Original UID, does not change if user is deleted.',
                 'default' => 0,
             ],
             'status' => [
@@ -36,9 +49,8 @@ function loft_core_users_schema()
                 'description' => 'Last IP address associated with this account.',
             ),
         ],
-        'unique keys' => array(
-            'uid_domain' => array('uid', 'domain'),
-        ),
+        'primary key' => array('id'),
+        'unique keys' => array('uid_domain_ip' => array('uid', 'domain', 'ip')),
         'indexes' => array(
             'mail' => array('domain'),
         ),
@@ -52,29 +64,3 @@ function loft_core_users_schema()
 
     return $schema;
 }
-
-
-/**
- * Install the loft_core_users table.
- */
-function loft_core_users_update_7100(&$sandbox)
-{
-    $output = [];
-    try {
-        if (!db_table_exists('loft_core_users')) {
-            $schema = drupal_get_schema_unprocessed('loft_core', 'loft_core_users');
-            db_create_table('loft_core_users', $schema);
-            $output[] = t('New table created: loft_core_users');
-        }
-
-    } catch (Exception $e) {
-        throw new DrupalUpdateException('FAILED: Install the loft_core_users table.: ' . $e->getMessage());
-    }
-
-    if (empty($output)) {
-        $output[] = t('Nothing to update.');
-    }
-
-    return implode(PHP_EOL, $output);
-}
-
