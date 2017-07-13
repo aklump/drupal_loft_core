@@ -6,13 +6,19 @@ class LoftCoreTest extends PHPUnit_Framework_TestCase {
     /**
      * Provides data for test_loft_core_users_get_email_domain.
      */
-    function DataForTest_loft_core_users_get_email_domainProvider() {
-      $tests = array();
-      $tests[] = array(
-          'brainboostingsupplements.org', 'heath@e.brainboostingsupplements.org'
-      );
+    function DataForTest_loft_core_users_get_email_domainProvider()
+    {
+        $tests = array();
+        $tests[] = array(
+            'brainboostingsupplements.org',
+            'heath@e.brainboostingsupplements.org',
+        );
+        $tests[] = array(
+            'brainboostingsupplements.org',
+            'brainboostingsupplements.org',
+        );
 
-      return $tests;
+        return $tests;
     }
 
     /**
@@ -25,8 +31,6 @@ class LoftCoreTest extends PHPUnit_Framework_TestCase {
 
     public function testLoftCoreTestClass()
     {
-        $this->assertEmpty(loft_core_test_class('golden'));
-        define('DRUPAL_ENV_ROLE', 'staging');
         $this->assertSame('t-golden', loft_core_test_class('golden'));
     }
 
