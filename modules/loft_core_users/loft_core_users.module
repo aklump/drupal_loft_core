@@ -33,7 +33,7 @@ define('LOFT_CORE_USERS_STATUS_SPAMMY', 4);
  * CSV list of domains to whitelist that cannot be considered SPAM when
  * honeypot rejects.
  */
-define('LOFT_CORE_USERS_HONEYPOT_REJECT_DOMAINS_WHITELIST', 'gmail.com');
+define('LOFT_CORE_USERS_HONEYPOT_REJECT_DOMAINS_WHITELIST', 'gmail.com,yahoo.com');
 
 /**
  * Implements hook_module_implements_alter().
