@@ -40,3 +40,8 @@ Honeypot rejections will be tracked as "honey bears" and can later be converted 
 ### [User Restrictions](https://www.drupal.org/project/user_restrictions)
 
 Blocks users with an email address containing any domains that have been found as "spammy".  The list of domains are found in `loft_core_users`.  Check the status because honeybear domains do not block new users.
+
+## Todos
+
+- [] batch process to mark all users that match domains or ips in our loft_users_core.
+- [] automatically add to `blocked_ips` table.
