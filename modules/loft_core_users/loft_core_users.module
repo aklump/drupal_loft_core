@@ -246,6 +246,22 @@ function loft_core_users_honeypot_reject($form_id, $uid, $type)
     }
 }
 
+/**
+ * Implements hook_action_info().
+ */
+function loft_core_action_info()
+{
+    return array(
+        'loft_core_users_block_spammy_user_action' => array(
+            'label' => t('Block SPAMMY user'),
+            'type' => 'user',
+            'configurable' => false,
+            'triggers' => array('any'),
+        ),
+    );
+}
+
+
 function loft_core_users_block_spammy_user_action(&$entity, $context = array())
 {
     // First priority: If there is a $entity->uid, block that user.

@@ -758,15 +758,3 @@ function loft_core_exit()
     }
 }
 
-function loft_core_action_info()
-{
-    return array(
-        'loft_core_users_block_spammy_user_action' => array(
-            'label' => t('Block SPAMMY user'),
-            'type' => 'user',
-            'configurable' => false,
-            'triggers' => array('any'),
-        ),
-    );
-}
-
