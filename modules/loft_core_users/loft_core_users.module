@@ -159,7 +159,7 @@ function loft_core_users_robotrap_page_callback()
     $access = module_invoke_all('loft_core_users_robotrap_access', $context);
     $access = end($access);
     if (!$access) {
-        watchdog('loft_core', 'Robotrap: Blocked user %name.', ['%name' => $user->name]);
+        watchdog('loft_core_users', 'Robotrapped user %name.', ['%name' => $user->name]);
         loft_core_users_block_user($user->uid, $user->mail, LOFT_CORE_USERS_STATUS_ROBOT, ip_address());
         module_load_include('inc', 'user', 'user.pages');
         user_logout_current_user();
@@ -205,7 +205,7 @@ function loft_core_users_user_restrictions_alter(&$denied, &$error, &$context)
 
         // If trapped, leverage user_restrictions module to block by email address.
         if ($is_suspicious = $query->execute()->fetchAllAssoc('uid')) {
-            watchdog('loft_core', 'Blocked user @%domain.', ['%domain' => $domain]);
+            watchdog('loft_core_users', 'Denied user from @%domain.', ['%domain' => $domain]);
             $context['mask'] = '*' . $domain;
             $denied = true;
             $error['field'] = 'mail';
