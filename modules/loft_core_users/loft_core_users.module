@@ -325,3 +325,14 @@ function loft_core_users_permission()
         ),
     );
 }
+
+/**
+ * Implements hook_views_api().
+ */
+function loft_core_users_views_api()
+{
+    return array(
+        'api' => 3,
+        'path' => drupal_get_path('module', 'loft_core_users') . '/includes/views',
+    );
+}
