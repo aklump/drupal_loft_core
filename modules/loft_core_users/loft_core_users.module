@@ -18,6 +18,11 @@ define('LOFT_CORE_USERS_STATUS_ROBOT', 2);
 define('LOFT_CORE_USERS_STATUS_HONEYBEAR', 3);
 
 /**
+ * This account was trapped by the honepot module then converted to SPAMMY
+ */
+define('LOFT_CORE_USERS_STATUS_HONEYBEAR_MADE_SPAMMY', 34);
+
+/**
  * For one reason or another this account appears spammy.
  */
 define('LOFT_CORE_USERS_STATUS_SPAMMY', 4);
@@ -182,6 +187,7 @@ function loft_core_users_user_restrictions_alter(&$denied, &$error, &$context)
     $statuses_which_block_users = [
         LOFT_CORE_USERS_STATUS_ROBOT,
         LOFT_CORE_USERS_STATUS_SPAMMY,
+        LOFT_CORE_USERS_STATUS_HONEYBEAR_MADE_SPAMMY,
     ];
 
     //
