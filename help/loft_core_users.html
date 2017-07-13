@@ -1,4 +1,36 @@
 
+<p>Authenticated users are tracked by their uid; no surprise here.</p>
+
+<h2>About anonymous users</h2>
+
+<p>Anonymous users are unique by the domain of their email address + their ip.  That is to say that for these three users, only one record will be created (tracked):</p>
+
+<p>| uid | mail | ip |
+|----------|----------|----------|
+0 | a@spammy.com | 172.1.1.1
+0 | b@spammy.com | 172.1.1.1
+0 | c@spammy.com | 172.1.1.1</p>
+
+<p>This is because all email address share the same domain and the ip is the same from all three.</p>
+
+<p>But in this next set, three entries would be made because the ip is different for two and non-existent for one, despite having the same base domain.</p>
+
+<p>| uid | mail | ip |
+|----------|----------|----------|
+0 | a@spammy.com | 172.1.1.1
+0 | b@spammy.com | 172.1.1.2
+0 | c@spammy.com | null</p>
+
+<p>Also take note that if the ip is the same but the domain differs, then three records will be tracked:</p>
+
+<p>| uid | mail | ip |
+|----------|----------|----------|
+0 | trouble@spammy.com | 172.1.1.1
+0 | trouble@morespam.com | 172.1.1.1
+0 | trouble@totalspam.com | 172.1.1.1</p>
+
+<p><strong>To save database, we don't track anonymous users by email address, but by email domain, as this is the most likely reason to track them: <em>to block their entire domain.</em></strong></p>
+
 <h2>Suggested modules to use:</h2>
 
 <h3><a href="https://www.drupal.org/project/honeypot">Honeypot</a></h3>
