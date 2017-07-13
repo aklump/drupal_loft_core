@@ -10,7 +10,7 @@ function loft_core_users_views_data() {
     // The 'group' index will be used as a prefix in the UI for any of this
     // table's fields, sort criteria, etc. so it's easy to tell where they came
     // from.
-    $data['loft_core_users']['table']['group'] = t('Loft Core: Users');
+    $data['loft_core_users']['table']['group'] = t('Loft users');
 
     // Define this as a base table – a table that can be described in itself by
     // views (and not just being brought in as a relationship). In reality this
@@ -18,8 +18,8 @@ function loft_core_users_views_data() {
     // its own, but it makes a good example.
     $data['loft_core_users']['table']['base'] = array(
         'field' => 'id', // This is the identifier field for the view.
-        'title' => t('Loft Core: Users'),
-        'help' => t('Augmented user data'),
+        'title' => t('Loft users'),
+        'help' => t('Augmented user data.'),
         'weight' => -10,
     );
 
@@ -54,7 +54,7 @@ function loft_core_users_views_data() {
 
     $data['loft_core_users']['id'] = array(
         'title' => t('Record Id'),
-        'help' => t('Record identifier.'),
+        'help' => t('DB record identifier.'),
         'field' => array(
             'handler' => 'views_handler_field_numeric',
             'click sortable' => TRUE,
@@ -69,7 +69,7 @@ function loft_core_users_views_data() {
 
     $data['loft_core_users']['uid'] = array(
         'title' => t('UID'),
-        'help' => t('User ID or 0'),
+        'help' => t('User ID or 0.'),
         // Define a relationship to the {users} table, so loft_core_users views can
         // add a relationship to users. If you want to define a relationship the
         // other direction, use hook_views_data_alter(), or use the 'implicit' join
@@ -106,7 +106,7 @@ function loft_core_users_views_data() {
     // TODO Can we make the handler user human values instead of codes?
     $data['loft_core_users']['status'] = array(
         'title' => t('Status'),
-        'help' => t('Augmented status value'),
+        'help' => t('Augmented user status code.'),
         'field' => array(
             'handler' => 'views_handler_field_numeric',
             'click sortable' => TRUE,
@@ -121,7 +121,7 @@ function loft_core_users_views_data() {
 
     $data['loft_core_users']['ip'] = array(
         'title' => t('IP'),
-        'help' => t('Last IP address associated with this account.'),
+        'help' => t('IP address associated with this account.'),
         'field' => array(
             'handler' => 'views_handler_field',
             'click sortable' => TRUE, // This is use by the table display plugin.
@@ -139,7 +139,7 @@ function loft_core_users_views_data() {
 
     $data['loft_core_users']['domain'] = array(
         'title' => t('Domain'),
-        'help' => t('Last associated email domain.'),
+        'help' => t('Associated email domain.'),
         'field' => array(
             'handler' => 'views_handler_field',
             'click sortable' => TRUE, // This is use by the table display plugin.
