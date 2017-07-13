@@ -769,3 +769,4 @@ function loft_core_action_info()
         ),
     );
 }
+

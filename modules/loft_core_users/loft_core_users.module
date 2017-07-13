@@ -272,3 +272,34 @@ function loft_core_users_user_register_form_submit($form, $form_state)
     $account = $form_state['user'];
     loft_core_users_users_set_user_status($account->uid, $account->init, null, ip_address());
 }
+
+/**
+ * Implements hook_menu().
+ */
+function loft_core_users_menu()
+{
+    $items['admin/config/people/loft-core-users'] = array(
+        'title' => 'Loft Core',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('loft_core_users_settings_form'),
+        'access arguments' => array('loft_core_users:administer'),
+        'type' => MENU_NORMAL_ITEM,
+        'file' => 'loft_core.admin.inc',
+    );
+
+    return $items;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function loft_core_users_permission()
+{
+    return array(
+        'loft_core_users:administer' => array(
+            'title' => t('Administer Loft Core Users'),
+            'description' => t('Perform administration tasks for Loft Core Users.'),
+            'restrict access' => true,
+        ),
+    );
+}
