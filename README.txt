@@ -6,6 +6,11 @@ docs/public_html
 
    of with Advanced Help module.
 
+Features
+
+     * May configure the registration from emails separate from site
+       email.
+
 Contact
 
      * In the Loft Studios
