@@ -452,6 +452,7 @@ function loft_core_users_user_delete($account)
     db_update('loft_core_users')
         ->fields(array(
                 'uid' => 0,
+                'uid_init' => $account->uid,
             )
         )
         ->condition('uid', $account->uid)
