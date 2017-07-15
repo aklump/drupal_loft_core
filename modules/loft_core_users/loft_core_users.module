@@ -204,12 +204,11 @@ function loft_core_users_set_user_status($status, $uid, $mail, $ip = null)
     }
     if ($exists) {
         unset($meta['uid_init']);
+        drupal_write_record('loft_core_users', $meta, $primary_key);
     }
     else {
-        $primary_key = null;
+        drupal_write_record('loft_core_users', $meta);
     }
-
-    drupal_write_record('loft_core_users', $meta, $primary_key);
 }
 
 /**
@@ -397,7 +396,7 @@ function loft_core_users_user_register_form_submit($form, $form_state)
 {
     // When a new account is submitted, capture the IP.
     $account = $form_state['user'];
-    loft_core_users_set_user_status($account->uid, $account->init, null, ip_address());
+    loft_core_users_set_user_status($account->status, $account->uid, $account->init, ip_address());
 }
 
 /**
