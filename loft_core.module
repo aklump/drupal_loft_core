@@ -771,6 +771,9 @@ function loft_core_mail_alter(&$message)
             case 'register_no_approval_required':
             case 'register_pending_approval':
                 $message['from'] = $from;
+                foreach (['Return-Path', 'Sender', 'From'] as $key) {
+                    $message['headers'][$key] = $from;
+                }
                 break;
         }
     }
