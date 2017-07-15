@@ -124,5 +124,5 @@ function loft_core_users_settings_form_validate($form, &$form_state)
     $array = array_filter($array, function (&$value) {
         return empty($value);
     });
-    form_set_value($form['loft_core_users_domain_whitelist'], array_keys($array), $form_state);
+    form_set_value($form['domains']['loft_core_users_domain_whitelist'], array_keys($array), $form_state);
 }
