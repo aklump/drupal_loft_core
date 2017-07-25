@@ -118,3 +118,20 @@ function HOOK_loft_core_trackjs_alter(&$config)
     // Add some metadata
     $config['metadata']['do'] = 're';
 }
+
+/**
+ * Implements HOOK_loft_core_suppress_messages().
+ *
+ * Allow modules to suppress system messages based on regex expressions.
+ *
+ * @return array
+ *   Keyed by message status, e.g. status, error.
+ *   Each value is an array of regex expressions, that when matched causes the message to never display.
+ */
+function HOOK_loft_core_suppress_messages() {
+    return [
+        'status' => [
+            '/^You are now logged in as/',
+        ],
+    ];
+}

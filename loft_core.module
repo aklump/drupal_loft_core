@@ -6,6 +6,7 @@
  * @defgroup loft_core Loft Core
  * @{
  */
+
 use Drupal\loft_core\Attribute;
 use Drupal\loft_core\Redirect;
 
@@ -756,6 +757,21 @@ function loft_core_exit()
     if ($_loft_core_user_stash) {
         loft_core_user_stash();
     }
+
+    // Remove some messages by hook.
+    if (!empty($_SESSION['messages']) && ($masks = module_invoke_all('loft_core_suppress_messages'))) {
+        foreach (array_keys($masks) as $level) {
+            if (isset($_SESSION['messages'][$level])) {
+                foreach ($_SESSION['messages'][$level] as $key => $message) {
+                    foreach ($masks[$level] as $mask) {
+                        if (preg_match($mask, $message)) {
+                            unset($_SESSION['messages'][$level][$key]);
+                        }
+                    }
+                }
+            }
+        };
+    }
 }
 
 /**
@@ -794,4 +810,3 @@ function loft_core_form_user_admin_settings_alter(&$form, &$form_state, $form_id
         '#default_value' => variable_get('loft_core_mail_registration_from', variable_get('site_mail')),
     );
 }
-
