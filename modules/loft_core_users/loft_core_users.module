@@ -13,7 +13,7 @@
 define('LOFT_CORE_USERS_STATUS_ROBOT', 2);
 
 /**
- * This account was trapped by the honepot module.
+ * This account was trapped by the honeypot module.
  */
 define('LOFT_CORE_USERS_STATUS_HONEYBEAR', 3);
 
@@ -33,7 +33,7 @@ define('LOFT_CORE_USERS_STATUS_SPAMMY', 4);
  * CSV list of domains to whitelist that cannot will not be blocked, regardless
  * of the spam levels associated with their users.
  */
-define('LOFT_CORE_USERS_DOMAIN_WHITELIST', 'gmail.com,yahoo.com');
+define('LOFT_CORE_USERS_DOMAIN_WHITELIST', 'gmail.com,yahoo.com,mail.com');
 
 /**
  * Return all status codes that should block a user from the site.
@@ -56,7 +56,12 @@ function loft_core_users_get_blocking_statuses()
  */
 function loft_core_users_get_domain_whitelist()
 {
-    return variable_get('loft_core_users_domain_whitelist', explode(',', LOFT_CORE_USERS_DOMAIN_WHITELIST));
+    $whitelist = variable_get('loft_core_users_domain_whitelist', explode(',', LOFT_CORE_USERS_DOMAIN_WHITELIST));
+
+    // This variable is not exposed in the UI and is meant to protect the basic domains like gmail and yahoo; if you really want to alter this then add something to settings.php like $conf['loft_core_users_absolute_domain_whitelist'] = 'do.com,re.com';
+    $whitelist = array_unique(array_merge($whitelist, variable_get('loft_core_users_absolute_domain_whitelist', explode(',', LOFT_CORE_USERS_DOMAIN_WHITELIST))));
+
+    return $whitelist;
 }
 
 /**
