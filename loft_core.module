@@ -813,12 +813,16 @@ function loft_core_form_user_admin_settings_alter(&$form, &$form_state, $form_id
 
 
 /**
- * Wrap an element with a div with a class.
+ * Return a build array for a div, optionally wrapping another build array.
  *
- * @return
- *   The wrapped element.
+ * @param string|array $class   One or more classes to add to the div.
+ * @param array        $element Optional, the build array which you will wrap
+ *                              with the div.
+ *
+ * @return array The wrapped element.
+ * The wrapped element.
  */
-function div($class, $element)
+function div($class, $element = null)
 {
     $attr = '';
     if ($class) {
@@ -826,9 +830,14 @@ function div($class, $element)
         $attr = drupal_attributes(array('class' => $class));
     }
 
-    return array(
+    $div = array(
         '#prefix' => '<div' . $attr . '>',
         '#suffix' => "</div>",
         0 => $element,
     );
+    if ($element) {
+        $div[0] = $element;
+    }
+
+    return $div;
 }
