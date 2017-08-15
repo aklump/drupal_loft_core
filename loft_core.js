@@ -33,6 +33,26 @@ var trackJS = trackJS || null;
     Drupal.ajax.prototype.commands.loftCoreAjaxBbqPushState = function (ajax, response, status) {
       $.bbq && $.bbq.pushState(response.data.hash);
     };
+
+    /**
+     * Ajax command for messages that fade out.
+     *
+     * @param ajax
+     * @param response
+     *   - selector
+     *   - content
+     *   - timeout int How long should it fade out.
+     *   - delay int How long before fade out.
+     * @param status
+     */
+    Drupal.ajax.prototype.commands.loftCoreAjaxHtmlAndFade = function (ajax, response, status) {
+      $(response.data.selector).html(response.data.content).show();
+      if (response.data.timeout) {
+        $(response.data.selector).fadeOut(response.data.timeout, function () {
+          $(response.data.selector).html('').show();
+        });
+      }
+    };
   }
 
   /**
