@@ -233,7 +233,7 @@ class Grammar {
         // Some letters get doubled.
         if (in_array($lastChar, ['t', 'g'])) {
 
-            switch ($baseVerb) {
+            switch (strtolower($baseVerb)) {
                 case 'create':
                 case 'delete':
                     break;
