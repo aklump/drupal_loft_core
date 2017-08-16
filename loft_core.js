@@ -47,7 +47,8 @@ var trackJS = trackJS || null;
      */
     Drupal.ajax.prototype.commands.loftCoreAjaxHtmlAndFade = function (ajax, response, status) {
       var $el = $(response.data.selector),
-          prev = $el.data('loftCoreAjaxHtmlAndFade') || {};
+          prev = $el.data('loftCoreAjaxHtmlAndFade') || {},
+          pre = response.data.cssPrefix || '';
 
       // Remove any delay timeouts currently underway.
       if (prev.timeout) {
@@ -59,12 +60,17 @@ var trackJS = trackJS || null;
 
       // Stops any fading animations currently underway
       .stop(false, true)
-      .css('visibility', 'visible');
+      .show()
+      .addClass(pre + 'is-not-faded')
+      .removeClass(pre + 'is-faded');
 
       if (response.data.duration) {
         var timeout = setTimeout(function () {
           $el.fadeOut(response.data.duration, function () {
-            $(response.data.selector).css('visibility', 'hidden').show();
+            $(response.data.selector)
+            .removeClass(pre + 'is-not-faded')
+            .addClass(pre + 'is-faded')
+            .show();
           });
         }, response.data.delay);
         $el.data('loftCoreAjaxHtmlAndFade', {

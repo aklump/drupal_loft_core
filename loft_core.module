@@ -656,10 +656,11 @@ function loft_core_ajax_command_bbq_push_state($hash_string)
  * @param string $content
  * @param int    $duration Milliseconds for the fade to last.
  * @param int    $delay    Milliseconds before fade out commences.
+ * @param string $css_prefix  A means to custom or remove the css class prefix on the fade classes.
  *
  * @return array
  */
-function loft_core_ajax_command_html_and_fade($selector, $content, $duration = 800, $delay = 2200)
+function loft_core_ajax_command_html_and_fade($selector, $content, $duration = 800, $delay = 2200, $css_prefix = 'lc-')
 {
     return [
         'command' => 'loftCoreAjaxHtmlAndFade',
@@ -668,6 +669,7 @@ function loft_core_ajax_command_html_and_fade($selector, $content, $duration = 8
             'content' => $content,
             'duration' => $duration,
             'delay' => $delay,
+            'cssPrefix' => $css_prefix,
         ],
     ];
 }
