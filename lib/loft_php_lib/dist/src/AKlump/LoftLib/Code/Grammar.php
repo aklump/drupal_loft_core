@@ -234,6 +234,7 @@ class Grammar {
         if (in_array($lastChar, ['t', 'g'])) {
 
             switch (strtolower($baseVerb)) {
+                case 'start':
                 case 'create':
                 case 'delete':
                     break;

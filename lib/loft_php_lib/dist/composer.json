@@ -8,7 +8,7 @@
             "role": "Developer"
         }
     ],
-    "version": "0.6.23",
+    "version": "0.6.24",
     "autoload": {
         "files": [
             "src\/AKlump\/LoftLib\/Xml\/LoftXmlElement.php"
