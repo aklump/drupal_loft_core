@@ -9,6 +9,7 @@ namespace AKlump\LoftLib\Code;
 class Grammar {
 
     const VOWEL = 1;
+
     const CONSONANT = 2;
 
     /**
@@ -148,7 +149,7 @@ class Grammar {
         $base = array_shift($words);
         $return = static::prepVerbEnding($base) . $ending;
 
-        return trim (count($base) ? $return . ' ' . implode(' ', $words) : $return);
+        return trim(count($base) ? $return . ' ' . implode(' ', $words) : $return);
     }
 
     protected static function _singular($noun)
@@ -226,15 +227,23 @@ class Grammar {
 
     protected static function prepVerbEnding($baseVerb)
     {
-        $baseVerb = rtrim($baseVerb, 'e');
-        $lastChar = substr($baseVerb, -1);
+        $modifiedVerb = rtrim($baseVerb, 'e');
+        $lastChar = substr($modifiedVerb, -1);
 
         // Some letters get doubled.
         if (in_array($lastChar, ['t', 'g'])) {
-            $baseVerb .= $lastChar;
+
+            switch ($baseVerb) {
+                case 'create':
+                case 'delete':
+                    break;
+                default:
+                $modifiedVerb .= $lastChar;
+                    break;
+            }
         }
 
-        return $baseVerb;
+        return $modifiedVerb;
     }
 
 }
