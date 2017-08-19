@@ -104,6 +104,55 @@ EOD;
 }
 
 /**
+ * Implements hook_menu().
+ */
+function loft_core_menu()
+{
+    $items['loft-core/testing/enable/%'] = array(
+        'type' => MENU_CALLBACK,
+        'title' => 'Enable test mode',
+        'page callback' => 'loft_core_test_mode',
+        'page arguments' => array(true),
+        'access callback' => 'loft_core_test_mode_access',
+        'access arguments' => array(3),
+    );
+
+    return $items;
+}
+
+function loft_core_test_mode_access($token)
+{
+    if (!($control = variable_get('loft_core_testing_key', null))) {
+        throw new \RuntimeException("You must set a value for \$conf['loft_core_testing_key'] in your settings.php file.");
+    }
+
+    return $token === $control;
+}
+
+/**
+ * Page callback to
+ *
+ * @param $state
+ */
+function loft_core_test_mode($state)
+{
+    if ($state) {
+        $min = 15;
+        setrawcookie('loft_core_testing', ip_address(), REQUEST_TIME + $min * 60, '/');
+        $message = 'Test most enabled for @minutes.';
+    }
+    else {
+        setrawcookie('loft_core_testing', '', REQUEST_TIME - 3600, '/');
+        $message = 'Test most disabled.';
+    }
+    drupal_set_message(t($message, [
+        '@minutes' => format_plural($min, '1 minute', '@count minutes'),
+    ]), 'status', false);
+
+    drupal_goto();
+}
+
+/**
  * Implements hook_menu_alter().
  */
 function loft_core_menu_alter(&$items)
@@ -579,9 +628,11 @@ function is_live($feature)
  */
 function loft_core_test_class($class)
 {
-    if (defined('DRUPAL_ENV_ROLE') && strpos(DRUPAL_ENV_ROLE,
-            'prod') !== 0
-    ) {
+    static $testing;
+    if ($testing || (defined('DRUPAL_ENV_ROLE') && strpos(DRUPAL_ENV_ROLE,
+                'prod') !== 0) || (!empty($_COOKIE['loft_core_testing']) && $_COOKIE['loft_core_testing'] === ip_address())) {
+        $testing = true;
+
         return 't-' . $class;
     }
 }
@@ -652,11 +703,12 @@ function loft_core_ajax_command_bbq_push_state($hash_string)
 }
 
 /**
- * @param string $selector jQuery selector of the element to replace
+ * @param string $selector   jQuery selector of the element to replace
  * @param string $content
- * @param int    $duration Milliseconds for the fade to last.
- * @param int    $delay    Milliseconds before fade out commences.
- * @param string $css_prefix  A means to custom or remove the css class prefix on the fade classes.
+ * @param int    $duration   Milliseconds for the fade to last.
+ * @param int    $delay      Milliseconds before fade out commences.
+ * @param string $css_prefix A means to custom or remove the css class prefix
+ *                           on the fade classes.
  *
  * @return array
  */
