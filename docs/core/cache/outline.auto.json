@@ -44,16 +44,22 @@
             "sort": 6
         },
         {
+            "id": "testing",
+            "title": "Testing",
+            "file": "testing.md",
+            "sort": 7
+        },
+        {
             "id": "trackjs",
             "title": "Add TrackJS.com to your website",
             "file": "trackjs.md",
-            "sort": 7
+            "sort": 8
         },
         {
             "id": "_tasklist",
             "title": " Tasklist",
             "file": "_tasklist.md",
-            "sort": 8
+            "sort": 9
         }
     ],
     "settings": {
