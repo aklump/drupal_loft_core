@@ -19,6 +19,6 @@ function HOOK_loft_core_users_robotrap_access($context)
 function HOOK_loft_core_users_robotrap_goto_alter(&$path, &$options, $context)
 {
     if ($path === 'contact') {
-        $options = ['query' => ['cid' => 6]];
+        $options = array('query' => array('cid' => 6));
     }
 }

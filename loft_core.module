@@ -32,16 +32,16 @@ function loft_core_boot()
  */
 function loft_core_init()
 {
-    drupal_add_js([
+    drupal_add_js(array(
         'DRUPAL_ENV' => DRUPAL_ENV,
         'DRUPAL_ENV_ROLE' => DRUPAL_ENV_ROLE,
-    ], 'setting');
+    ), 'setting');
     drupal_add_js(drupal_get_path('module',
             'loft_core') . '/loft_core.js',
-        [
+        array(
             'scope' => 'header',
             'group' => JS_DEFAULT,
-        ],
+        ),
         'file');
 }
 
@@ -55,10 +55,10 @@ function loft_core_preprocess_html(&$vars)
     if (DRUPAL_ENV_ROLE === 'prod' && ($token = variable_get('loft_core_trackjs_token', null))) {
 
         // @link http://docs.trackjs.com/tracker/configuration
-        $trackjs = [
+        $trackjs = array(
             'config' => '',
-            'metadata' => [],
-        ];
+            'metadata' => array(),
+        );
 
         $trackjs['config']['token'] = $token;
 
@@ -86,7 +86,7 @@ function loft_core_preprocess_html(&$vars)
 
         $config = json_encode(array_filter($trackjs['config']));
 
-        $meta = [];
+        $meta = array();
         foreach (array_filter($trackjs['metadata']) as $key => $value) {
             $meta[] = 'trackJs.addMetadata("' . $key . '",
             "' . $value . '");';
@@ -145,9 +145,9 @@ function loft_core_test_mode($state)
         setrawcookie('loft_core_testing', '', REQUEST_TIME - 3600, '/');
         $message = 'Test most disabled.';
     }
-    drupal_set_message(t($message, [
+    drupal_set_message(t($message, array(
         '@minutes' => format_plural($min, '1 minute', '@count minutes'),
-    ]), 'status', false);
+    )), 'status', false);
 
     drupal_goto();
 }
@@ -271,9 +271,8 @@ function loft_core_form_node_form_alter(&$form, &$form_state)
  * @param $form
  * @param $form_state
  */
-function loft_core_node_form_submit_redirect_handler($form,
-                                                     &$form_state
-) {
+function loft_core_node_form_submit_redirect_handler($form, &$form_state)
+{
     if (!empty($form_state['redirect']) && $form_state['nid']) {
         $form_state['redirect'] = node_access('update',
             $form_state['nid']) ? 'node/' . $form_state['nid'] . '/edit' : '<front>';
@@ -301,7 +300,7 @@ function loft_core_node_form_submit_redirect_handler($form,
 function loft_core_form_tabindex(array &$element, &$index, $key = '#attributes'
 ) {
     $g = data_api();
-    $g->ensure($element, $key, []);
+    $g->ensure($element, $key, array());
     if ($element[$key] instanceof Attribute) {
         $element[$key]->setAttribute('tabindex', $index++);
     }
@@ -338,7 +337,7 @@ function loft_core_form_disable_elements(&$form,
     if (is_null($message)) {
         $module_name = empty($module_name) ? 'Loft Core' : $module_name;
         $message = t('This field is controlled by the %module module and cannot be modified in the UI.',
-            ['%module' => $module_name]);
+            array('%module' => $module_name));
     }
     foreach ($paths as $path) {
         if ($g->get($form,
@@ -391,18 +390,18 @@ function loft_core_form_hide_elements(&$form,
  */
 function loft_core_element_info()
 {
-    $types = [];
-    $types['form_help'] = [
+    $types = array();
+    $types['form_help'] = array(
         '#weight' => -99,
         // string|array If array,
         //elements are separate paragraphs,
         //without <p> tag wrappers.
-        '#message' => [],
-        '#theme_wrappers' => [
+        '#message' => array(),
+        '#theme_wrappers' => array(
             'form_help',
             'form_element',
-        ],
-    ];
+        ),
+    );
 
     return $types;
 }
@@ -456,11 +455,11 @@ function loft_core_theme($existing,
                          $theme,
                          $path
 ) {
-    return [
-        'form_help' => [
+    return array(
+        'form_help' => array(
             'render element' => 'element',
-        ],
-    ];
+        ),
+    );
 }
 
 /**
@@ -529,11 +528,11 @@ function theme_form_help($vars)
 function loft_core_image_src_itok_cache_buster($html, $build)
 {
     global $user;
-    $buster = [
+    $buster = array(
         0 => variable_get('loft_core_cache_bust_token',
             'cb'),
         1 => null,
-    ];
+    );
     if ((!empty($build['#object']->changed))) {
         $buster[1] = $build['#object']->changed;
     }
@@ -648,7 +647,7 @@ function loft_core_test_class($class)
 function loft_core_get_form_during_ajaxing($form_id)
 {
     $stash = $_POST;
-    $_POST = [];
+    $_POST = array();
     $form = drupal_get_form($form_id);
     $_POST = $stash;
 
@@ -675,31 +674,31 @@ function loft_core_get_form_during_ajaxing($form_id)
 function loft_core_ajax_command_trackjs_console($severity,
                                                 $message
 ) {
-    $valid = ['log', 'debug', 'info', 'warn', 'error'];
+    $valid = array('log', 'debug', 'info', 'warn', 'error');
     if (!in_array($severity, $valid)
     ) {
         throw new \InvalidArgumentException("$severity must be one of: " . implode(',',
                 $valid));
     }
 
-    return [
+    return array(
         'command' => 'loftCoreTrackJsConsole',
-        'data' => [
+        'data' => array(
             'severity' => $severity,
             'message' => $message,
-        ],
-    ];
+        ),
+    );
 }
 
 
 function loft_core_ajax_command_bbq_push_state($hash_string)
 {
-    return [
+    return array(
         'command' => 'loftCoreAjaxBbqPushState',
-        'data' => [
+        'data' => array(
             'hash' => '#' . ltrim($hash_string, '#'),
-        ],
-    ];
+        ),
+    );
 }
 
 /**
@@ -714,16 +713,16 @@ function loft_core_ajax_command_bbq_push_state($hash_string)
  */
 function loft_core_ajax_command_html_and_fade($selector, $content, $duration = 800, $delay = 2200, $css_prefix = 'lc-')
 {
-    return [
+    return array(
         'command' => 'loftCoreAjaxHtmlAndFade',
-        'data' => [
+        'data' => array(
             'selector' => $selector,
             'content' => $content,
             'duration' => $duration,
             'delay' => $delay,
             'cssPrefix' => $css_prefix,
-        ],
-    ];
+        ),
+    );
 }
 
 /**
@@ -738,10 +737,10 @@ function loft_core_ajax_command_html_and_fade($selector, $content, $duration = 8
  *
  * @see _loft_core_trackjs_get_severities().
  */
-function loft_core_trackjs_echo_drupal_messages(array &$commands, array $severities = [
+function loft_core_trackjs_echo_drupal_messages(array &$commands, array $severities = array(
     'warning',
     'error',
-]
+)
 ) {
     $groups = drupal_get_messages(null,
         false);
@@ -786,9 +785,9 @@ function loft_core_cl($base)
     $base = preg_replace('/[_ ]/', '-', $base);
 
     return function ($name = '', $isComponent = true) use ($base) {
-        $names = is_array($name) ? $name : [$name];
+        $names = is_array($name) ? $name : array($name);
         $glue = $isComponent ? '_' : '-';
-        $classes = [];
+        $classes = array();
         foreach ($names as $name) {
             $classes[] = $base . ($name ? str_repeat($glue, 2) . $name : '');
         }
@@ -797,7 +796,7 @@ function loft_core_cl($base)
     };
 }
 
-function loft_core_user_stash($stunt_double = null, $callback = null, $callback_args = [])
+function loft_core_user_stash($stunt_double = null, $callback = null, $callback_args = array())
 {
     global $user, $_loft_core_user_stash;
 
@@ -862,7 +861,7 @@ function loft_core_mail_alter(&$message)
             case 'register_no_approval_required':
             case 'register_pending_approval':
                 $message['from'] = $from;
-                foreach (['Return-Path', 'Sender', 'From'] as $key) {
+                foreach (array('Return-Path', 'Sender', 'From') as $key) {
                     $message['headers'][$key] = $from;
                 }
                 break;

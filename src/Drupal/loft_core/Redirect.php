@@ -27,7 +27,7 @@ class Redirect {
 
         // Then look at the modules implemented our hooks, at the node type.
         // This will be used when nodes are creating, before their id is set.
-        return boolval(static::getImplementingModuleName($node->type, $op));
+        return (bool) static::getImplementingModuleName($node->type, $op);
     }
 
     /**
@@ -80,7 +80,7 @@ class Redirect {
      */
     public static function getNodeRedirect(\stdClass $node, $op = 'view')
     {
-        $redirects = &drupal_static(__CLASS__ . '::' . __FUNCTION__, []);
+        $redirects = &drupal_static(__CLASS__ . '::' . __FUNCTION__, array());
         $static_key = $node->nid;
         if (!array_key_exists($static_key, $redirects)) {
             $bundle = $node->type;
@@ -89,16 +89,16 @@ class Redirect {
                 return $item;
             }
             $function = $module . '_' . static::getHook($bundle, $op);
-            $item = ['page callback' => 'drupal_goto'];
+            $item = array('page callback' => 'drupal_goto');
             $result = $function($node);
             switch ($result) {
                 case MENU_ACCESS_DENIED:
                     $item['page callback'] = 'drupal_access_denied';
-                    $item['page arguments'] = [];
+                    $item['page arguments'] = array();
                     break;
                 case MENU_NOT_FOUND:
                     $item['page callback'] = 'drupal_not_found';
-                    $item['page arguments'] = [];
+                    $item['page arguments'] = array();
                     break;
                 case false:
                     $item = $result;

@@ -22,10 +22,10 @@
  */
 function HOOK_loft_core_redirect_node_BUNDLE_TYPE_view($node)
 {
-    return [
+    return array(
         'node/' . BLOG_PAGE_NID,
-        ['fragment' => 'm[]=modal,blog_entry__' . $node->nid],
-    ];
+        array('fragment' => 'm[]=modal,blog_entry__' . $node->nid),
+    );
 }
 
 function HOOK_loft_core_redirect_node_BUNDLE_TYPE_edit($node)
@@ -66,42 +66,42 @@ function HOOK_loft_core_node_BUNDLE_TYPE_page($node)
  */
 function hook_loft_core_code_release_info()
 {
-    return [
-        'photoshare' => [
+    return array(
+        'photoshare' => array(
             'is_ready' => false,
             'is_live' => false,
             'description' => 'Ability to share individual photo essay photos.',
-        ],
-        'passhelp' => [
+        ),
+        'passhelp' => array(
             'is_ready' => false,
             'is_live' => false,
             'description' => 'Link during login proess to open a modal where user can request a new password',
-        ],
-        'facebook' => [
+        ),
+        'facebook' => array(
             'is_ready' => false,
             'is_live' => false,
-        ],
-        'comments' => [
+        ),
+        'comments' => array(
             'is_ready' => false,
             'is_live' => false,
-        ],
-        'avatars' => [
+        ),
+        'avatars' => array(
             'is_ready' => false,
             'is_live' => false,
-        ],
-        'blog' => [
+        ),
+        'blog' => array(
             'is_ready' => false,
             'is_live' => false,
-        ],
-        'wysiwyg' => [
+        ),
+        'wysiwyg' => array(
             'is_ready' => false,
             'is_live' => false,
-        ],
-        'tour' => [
+        ),
+        'tour' => array(
             'is_ready' => true,
             'is_live' => false,
-        ],
-    ];
+        ),
+    );
 }
 
 /**
@@ -129,9 +129,9 @@ function HOOK_loft_core_trackjs_alter(&$config)
  *   Each value is an array of regex expressions, that when matched causes the message to never display.
  */
 function HOOK_loft_core_suppress_messages() {
-    return [
-        'status' => [
+    return array(
+        'status' => array(
             '/^You are now logged in as/',
-        ],
-    ];
+        ),
+    );
 }

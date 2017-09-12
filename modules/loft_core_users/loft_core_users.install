@@ -6,35 +6,35 @@ function loft_core_users_schema()
 {
     // The table name here is plural, despite Drupal table naming standards,
     // because "user" is a reserved word in many databases.
-    $schema['loft_core_users'] = [
+    $schema['loft_core_users'] = array(
         'description' => 'Stores user loft_core-based user data.',
-        'fields' => [
+        'fields' => array(
             'id' => array(
                 'type' => 'serial',
                 'unsigned' => true,
                 'not null' => true,
                 'description' => 'The primary identifier for this record.',
             ),
-            'uid' => [
+            'uid' => array(
                 'type' => 'int',
                 'unsigned' => true,
                 'not null' => true,
                 'description' => 'User ID or 0',
                 'default' => 0,
-            ],
-            'uid_init' => [
+            ),
+            'uid_init' => array(
                 'type' => 'int',
                 'unsigned' => true,
                 'not null' => true,
                 'description' => 'Original UID, does not change if user is deleted.',
                 'default' => 0,
-            ],
-            'status' => [
+            ),
+            'status' => array(
                 'type' => 'int',
                 'not null' => false,
                 'size' => 'tiny',
                 'description' => 'Extra status flag, e.g. LOFT_CORE_USER_STATUS_*.',
-            ],
+            ),
             'domain' => array(
                 'type' => 'varchar',
                 'length' => 254,
@@ -48,19 +48,19 @@ function loft_core_users_schema()
                 'not null' => false,
                 'description' => 'Last IP address associated with this account.',
             ),
-        ],
+        ),
         'primary key' => array('id'),
         'unique keys' => array('uid_init_domain_ip' => array('uid_init', 'domain', 'ip')),
         'indexes' => array(
             'mail' => array('domain'),
         ),
-        'foreign keys' => [
-            'user' => [
+        'foreign keys' => array(
+            'user' => array(
                 'table' => 'user',
-                'columns' => ['uid' => 'uid'],
-            ],
-        ],
-    ];
+                'columns' => array('uid' => 'uid'),
+            ),
+        ),
+    );
 
     return $schema;
 }

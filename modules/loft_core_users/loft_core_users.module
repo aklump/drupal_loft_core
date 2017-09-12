@@ -105,9 +105,9 @@ function loft_core_users_block_user($status, $uid)
     if ($status > 1) {
         loft_core_users_set_user_status($status, $uid);
     }
-    $account = (object) [
+    $account = (object) array(
         'uid' => $uid,
-    ];
+    );
     if ($status != 1) {
         user_block_user_action($account);
     }
@@ -172,13 +172,13 @@ function loft_core_users_get_user_status($uid = null, $domain = null, $ip = null
  */
 function loft_core_users_set_user_status($status, $uid, $mail, $ip = null)
 {
-    $meta = [
+    $meta = array(
         'uid' => $uid,
         'uid_init' => $uid,
         'status' => $status,
         'domain' => _loft_core_users_get_email_domain($mail),
         'ip' => $ip,
-    ];
+    );
     $meta = array_filter($meta, function ($value) {
         return !is_null($value);
     });
@@ -189,7 +189,7 @@ function loft_core_users_set_user_status($status, $uid, $mail, $ip = null)
     //
     if ($uid) {
         $query = db_select('loft_core_users', 'lu')
-            ->fields('lu', ['uid'])
+            ->fields('lu', array('uid'))
             ->condition('uid', $uid);
         $exists = $query->execute()->fetchField();
         $primary_key = 'uid';
@@ -205,7 +205,7 @@ function loft_core_users_set_user_status($status, $uid, $mail, $ip = null)
             ->condition('domain', $meta['domain'])
             ->condition('ip', $meta['ip'])
             ->countQuery()->execute()->fetchField();
-        $primary_key = ['uid', 'domain', 'ip'];
+        $primary_key = array('uid', 'domain', 'ip');
     }
     if ($exists) {
         unset($meta['uid_init']);
@@ -245,24 +245,24 @@ function loft_core_users_robotrap_page_callback()
     global $user;
     $args = func_get_args();
     $callback = array_shift($args);
-    $context = [
+    $context = array(
         'parent' => __FUNCTION__,
         'account' => $user,
         'page callback' => $callback,
         'page arguments' => $args,
-    ];
+    );
     $access = module_invoke_all('loft_core_users_robotrap_access', $context);
     $access = end($access);
     if (!$access) {
-        watchdog('loft_core_users', 'Robotrapped user %name.', ['%name' => $user->name]);
+        watchdog('loft_core_users', 'Robotrapped user %name.', array('%name' => $user->name));
         loft_core_users_block_user(LOFT_CORE_USERS_STATUS_ROBOT, $user->uid);
         //        loft_core_users_block_user(LOFT_CORE_USERS_STATUS_ROBOT, $user->uid, $user->mail, ip_address());
         module_load_include('inc', 'user', 'user.pages');
         user_logout_current_user();
-        drupal_set_message(t('You have visited a forbidden url; your account has been locked for review.  Please contact us using the form below to unlock your account.', ['!url' => url('contact', ['query' => ['cid' => 6]])]), 'warning', false);
+        drupal_set_message(t('You have visited a forbidden url; your account has been locked for review.  Please contact us using the form below to unlock your account.', array('!url' => url('contact', array('query' => array('cid' => 6))))), 'warning', false);
         $path = module_exists('contact') ? 'contact' : '<front>';
         unset($_GET['destination']);
-        $options = [];
+        $options = array();
         $context['parent'] = __FUNCTION__;
         drupal_alter('loft_core_users_robotrap_goto', $path, $options, $context);
         drupal_goto($path, $options);
@@ -292,13 +292,13 @@ function loft_core_users_user_restrictions_alter(&$denied, &$error, &$context)
         if (!in_array($domain, loft_core_users_get_domain_whitelist())) {
 
             $query = db_select('loft_core_users', 'lu')
-                ->fields('lu', ['uid', 'domain'])
+                ->fields('lu', array('uid', 'domain'))
                 ->condition('status', loft_core_users_get_blocking_statuses(), 'IN')
                 ->condition('domain', $domain);
 
             // If trapped, leverage user_restrictions module to block by email address.
             if ($is_suspicious = $query->execute()->fetchAllAssoc('uid')) {
-                watchdog('loft_core_users', 'Denied user from @%domain.', ['%domain' => $domain]);
+                watchdog('loft_core_users', 'Denied user from @%domain.', array('%domain' => $domain));
                 $context['mask'] = '*' . $domain;
                 $denied = true;
                 $error['field'] = 'mail';
@@ -307,16 +307,16 @@ function loft_core_users_user_restrictions_alter(&$denied, &$error, &$context)
                 // With the contact module enabled we give an easy way for mistakes to get corrected.
                 if (module_exists('contact')) {
                     unset($_GET['destination']);
-                    $options = [];
+                    $options = array();
                     $path = 'contact';
                     $contact = '<a href="!url">contact us</a>';
                     $context['parent'] = __FUNCTION__;
                     drupal_alter('loft_core_users_robotrap_goto', $path, $options, $context);
                 }
-                $error['message'] = t('Your email address is associated with a suspicious domain (%domain); please ' . $contact . ' if this is in error.', [
+                $error['message'] = t('Your email address is associated with a suspicious domain (%domain); please ' . $contact . ' if this is in error.', array(
                     '%domain' => $domain,
                     '!url' => url($path, $options),
-                ]);
+                ));
             }
         }
     }

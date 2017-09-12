@@ -70,8 +70,8 @@ class LoftCoreTest extends PHPUnit_Framework_TestCase {
     public function testLoftCoreTabIndexWithObject()
     {
         $tabindex = $ti_control = 100;
-        $el = ['#attributes' => new Attribute()];
-        $control = ['tabindex' => 100];
+        $el = array('#attributes' => new Attribute());
+        $control = array('tabindex' => 100);
         loft_core_form_tabindex($el, $tabindex);
         $this->assertSame($control, $el['#attributes']->toArray());
         $this->assertSame($ti_control + 1, $tabindex);
@@ -80,10 +80,10 @@ class LoftCoreTest extends PHPUnit_Framework_TestCase {
     public function testLoftCoreTabIndexWithArray()
     {
         $tabindex = $ti_control = 100;
-        $el = [];
-        $control = [
-            '#attributes' => ['tabindex' => 100],
-        ];
+        $el = array();
+        $control = array(
+            '#attributes' => array('tabindex' => 100),
+        );
         loft_core_form_tabindex($el, $tabindex);
         $this->assertSame($control, $el);
         $this->assertSame($ti_control + 1, $tabindex);
@@ -91,7 +91,7 @@ class LoftCoreTest extends PHPUnit_Framework_TestCase {
 
     public function testRemovePartOfStyle()
     {
-        $attributes = new Attribute(['style' => 'background-repeat:repeat;color:red;']);
+        $attributes = new Attribute(array('style' => 'background-repeat:repeat;color:red;'));
         $attributes->removeStyle('background-repeat');
         $this->assertSame(' style="color:red"', strval($attributes));
         $this->assertTrue($attributes->hasStyle('color'));
@@ -101,7 +101,7 @@ class LoftCoreTest extends PHPUnit_Framework_TestCase {
 
     public function testRemoveStyle()
     {
-        $attributes = new Attribute(['style' => 'background-repeat:repeat']);
+        $attributes = new Attribute(array('style' => 'background-repeat:repeat'));
         $return = $attributes->removeStyle('background-repeat');
         $this->assertEmpty(strval($attributes));
         $this->assertSame($attributes, $return);
@@ -109,7 +109,7 @@ class LoftCoreTest extends PHPUnit_Framework_TestCase {
 
     public function testAddStyleReplace()
     {
-        $attributes = new Attribute(['style' => 'background-repeat:repeat']);
+        $attributes = new Attribute(array('style' => 'background-repeat:repeat'));
         $attributes->addStyle('background-repeat', 'no-repeat');
         $this->assertSame(' style="background-repeat:no-repeat"', strval($attributes));
     }
