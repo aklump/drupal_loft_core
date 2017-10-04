@@ -38,28 +38,34 @@
             "sort": 5
         },
         {
+            "id": "remember_users",
+            "title": "Remember Usernames in Login Form",
+            "file": "remember_users.md",
+            "sort": 6
+        },
+        {
             "id": "settings",
             "title": "Two new constants",
             "file": "settings.md",
-            "sort": 6
+            "sort": 7
         },
         {
             "id": "testing",
             "title": "Testing",
             "file": "testing.md",
-            "sort": 7
+            "sort": 8
         },
         {
             "id": "trackjs",
             "title": "Add TrackJS.com to your website",
             "file": "trackjs.md",
-            "sort": 8
+            "sort": 9
         },
         {
             "id": "_tasklist",
             "title": " Tasklist",
             "file": "_tasklist.md",
-            "sort": 9
+            "sort": 10
         }
     ],
     "settings": {

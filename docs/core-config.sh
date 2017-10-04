@@ -7,7 +7,7 @@
 # An array of output formats to disable, if any
 #
 #disabled = "website drupal html text mediawiki"
-#disabled = "drupal html text mediawiki"
+disabled = "html text mediawiki"
 
 ##
 # File path to the php you want to use for compiling
@@ -29,13 +29,13 @@ lynx = $(which lynx)
 # The name of the drupal module to build advanced help output for, if
 # applicable
 #
-#drupal_module = 'my_module';
+drupal_module = 'loft_core';
 
 ##
 # The location of the advanced help output; this location is used in place of
 # the default, if enabled.  It is relative to the directory containing core-config.sh.
 #
-#drupal_dir = '../help'
+drupal_dir = '../help'
 
 ##
 # The file path to an extra README.txt file; when README.md is compiled and
@@ -43,7 +43,7 @@ lynx = $(which lynx)
 #
 # This MUST be a directory relative to the directory containing core-config.sh
 #
-#README = '../README.txt ../README.md'
+README = '../README.txt ../README.md'
 
 ##
  # The file path to an extra CHANGELOG.txt file; when CHANGELOG.md is compiled and
@@ -62,7 +62,7 @@ lynx = $(which lynx)
 #
 # The path to a .info file or a .json file containing 'version' as a first level key, whose value indicates the documentation version.
 # This can be relative to the directory containing core-config.sh or absolute if it begins with a /
-#version_file = "web_package.info"
+version_file = "../loft_core.info"
 
 #
 # These paths are relative to the directory containing core-config.sh.

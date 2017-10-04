@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>Remember Usernames in Login Form</title>
+  <link href="search/tipuesearch.css" rel="stylesheet">
+  <link href="style.css" rel="stylesheet">
+</head>
+
+<body class="page--remember_users">
+<header>
+  <div class="pager">
+  <a href="redirects.html" class="prev redirects">&laquo;Redirects</a>
+  <a href="index.html" class="index">Index</a>
+  <a href="settings.html" class="next settings">Two new constants&raquo;</a>
+</div>
+</header>
+
+  <div class="search__wrapper">
+  <form action="search--results.html">
+    <input type="text" class="search-input" name="q" id="tipue_search_input" autocomplete="off" required>
+  </form>
+</div>
+
+  <h1>Remember Usernames in Login Form</h1>
+  <div class="breadcrumb"><a href="index.html">Index</a></div>
+
+<section>
+
+<blockquote>
+  <p>If you want a persistent login you should install the <a href="https://www.drupal.org/project/persistent_login">Persistent Login module</a>.  This means that the user will have the option of checking a box that keeps them logged in via a cookie across sessions, that is when they close their browser.  But if they don't check the box they are logged out.</p>
+  
+  <p>This is different from core Drupal, which keeps them logged in across sessions always; with no way to opt out.  So the persistent login module adds security for users who are sharing a computer.</p>
+  
+  <p>Be sure to follow install instructions as <em>settings.php</em> needs to be modified.</p>
+</blockquote>
+
+<p>This module has a means to remember the username so that it appears in the login form next time they try to log in.  Which is different from the above, but compilments it well.  In fact this module integrates with the Persistent Login module to leverage it's checkbox.</p>
+
+<p>To enable this feature add the following to <em>settings.php</em>:</p>
+
+<pre><code>$conf['loft_core_remember_usernames'] = true;
+</code></pre>
+
+<p>If you enable this feature and you are not going to use Persistent Login, you can leverage a different switch by setting this variable in a hook_form_alter:</p>
+
+<pre><code>$form['#loft_core_remember_key'] = 'some_form_value_that_is_toggled';
+</code></pre>
+
+<p>By default, all usernames will be remembered if you enalbe this feature.</p>
+
+<p>And to control the number of days the username is stored in the cookie you can add this to <em>settings.php</em>.</p>
+
+<pre><code>$conf['loft_core_remember_user_for_days'] = 30;
+</code></pre>
+</section>
+
+<div class="search__results">
+  <div id="tipue_search_content"></div>
+</div>
+
+<footer>
+  <div class="pager">
+  <a href="redirects.html" class="prev redirects">&laquo;Redirects</a>
+  <a href="index.html" class="index">Index</a>
+  <a href="settings.html" class="next settings">Two new constants&raquo;</a>
+</div>
+  
+  <div id="footer-legaleeze">
+    <p class="legaleeze center">Version: 7.x-0.3-rc18 &bull; Last Updated: Tue, 03 Oct 2017 17:03:17 -0700</p>
+  </div>
+</footer>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script src="search/tipuesearch_content.js"></script>
+  <script src="search/tipuesearch_set.js"></script>
+  <script src="search/tipuesearch.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      $('#tipue_search_input').tipuesearch();
+    });
+  </script>
+<script src="js/core.js"></script>
+</body>
+</html>
+

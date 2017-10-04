@@ -8,6 +8,13 @@
  */
 
 /**
+ * @var LOFT_CORE_REMEMBER_USER_FOR_DAYS
+ *
+ * How many seconds to remember the user as a cookie.
+ */
+define('LOFT_CORE_REMEMBER_USER_FOR_DAYS', 90);
+
+/**
  * This account was trapped as a robot.
  */
 define('LOFT_CORE_USERS_STATUS_ROBOT', 2);
@@ -378,6 +385,54 @@ function loft_core_users_block_spammy_user_action(&$entity, $context = array())
     $current_status = loft_core_users_get_user_status($uid);
     $new_status = $current_status === LOFT_CORE_USERS_STATUS_HONEYBEAR ? LOFT_CORE_USERS_STATUS_HONEYBEAR_MADE_SPAMMY : LOFT_CORE_USERS_STATUS_SPAMMY;
     loft_core_users_block_user($new_status, $uid);
+}
+
+function loft_core_form_user_login_alter(&$form, $form_state, $form_id)
+{
+    if (!variable_get('loft_core_remember_usernames', false)) {
+        return;
+    }
+
+    $g = data_api();
+    $form['#loft_core_remember_key'] = 'loft_core_remember_username';
+    $form['loft_core_remember_username'] = [
+        '#type' => 'value',
+        '#value' => true,
+    ];
+
+    if (module_exists('persistent_login')) {
+        $form['#loft_core_remember_key'] = 'persistent_login';
+        unset($form['loft_core_remember_username']);
+    }
+
+    // If we have the name as a cookie then retrieve it.
+    if (($name = $g->get($_COOKIE, 'loft_core_remember_me'))) {
+        $form['name']['#default_value'] = $name;
+    }
+
+    $form['#submit'][] = 'loft_core_form_user_login_submit';
+}
+
+/**
+ * Form submission handler
+ */
+function loft_core_form_user_login_submit($form, &$form_state)
+{
+    $g = data_api();;
+    $params = session_get_cookie_params();
+    $cookie_name = 'loft_core_remember_me';
+
+    if (($value_key = $g->get($form, '#loft_core_remember_key'))
+        && $g->get($form_state, ['values', $value_key])
+        && ($cookie_value = $g->get($form_state, 'values.name'))) {
+        $expire = time() + (86400 * variable_get('loft_core_remember_user_for_days', LOFT_CORE_REMEMBER_USER_FOR_DAYS));
+    }
+    else {
+        $cookie_value = '';
+        $expire = REQUEST_TIME - 3600;
+    }
+    setcookie($cookie_name, $cookie_value, $expire, $params['path'], $params['domain'], $params['secure'], $params['httponly']);
+
 }
 
 /**
