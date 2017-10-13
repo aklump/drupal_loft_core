@@ -234,9 +234,11 @@ class Grammar {
         if (in_array($lastChar, ['t', 'g'])) {
 
             switch (strtolower($baseVerb)) {
+                // These verbs should NOT double their last consonant.
                 case 'start':
                 case 'create':
                 case 'delete':
+                case 'update':
                     break;
                 default:
                 $modifiedVerb .= $lastChar;
