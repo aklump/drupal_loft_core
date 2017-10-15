@@ -1,4 +1,4 @@
-# Two new constants
+# settings.php
 
 ## Files used
 
@@ -9,7 +9,7 @@
     
 ## Changes to `settings.php`
     
-1. Add the following lines to `settings.php`:
+1. Add the following lines to `settings.php` at the very end:
     
         require dirname(__FILE__) . '/settings.env.php';
         require dirname(__FILE__) . '/settings.' . DRUPAL_ENV . '.php';
@@ -28,6 +28,7 @@
          */
         define('DRUPAL_ENV', 'dev');
         
+        
 1. Create `settings.dev.php` and `settings.prod.php` and put in the environment settings specific to environment, e.g. cache settings.
 1. Move the database declaration into `settings.local.php`.  Also include the following lines:
 
@@ -38,6 +39,11 @@
         // The role may be different than the environment, for example a staging server should have a production environment, but it is serving a staging role.  Production would have the same 'prod' for both DRUPAL_ENV_ROLE and DRUPAL_ENV.
         //
         define('DRUPAL_ENV_ROLE', 'dev');
+
+1. If you're using loft_deploy module you must add a `$conf` var right below the `DRUPAL_ENV_ROLE` definition. 
+
+        define('DRUPAL_ENV_ROLE', 'dev');
+        $conf['loft_deploy_site_role'] = DRUPAL_ENV_ROLE;
 
 ## Available in PHP as
 

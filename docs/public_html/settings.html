@@ -2,7 +2,7 @@
 
 <html>
 <head>
-  <title>Two new constants</title>
+  <title>settings.php</title>
   <link href="search/tipuesearch.css" rel="stylesheet">
   <link href="style.css" rel="stylesheet">
 </head>
@@ -22,7 +22,7 @@
   </form>
 </div>
 
-  <h1>Two new constants</h1>
+  <h1>settings.php</h1>
   <div class="breadcrumb"><a href="index.html">Index</a></div>
 
 <section>
@@ -38,7 +38,7 @@ settings.local.php
 <h2>Changes to <code>settings.php</code></h2>
 
 <ol>
-<li><p>Add the following lines to <code>settings.php</code>:</p>
+<li><p>Add the following lines to <code>settings.php</code> at the very end:</p>
 
 <pre><code>require dirname(__FILE__) . '/settings.env.php';
 require dirname(__FILE__) . '/settings.' . DRUPAL_ENV . '.php';
@@ -68,6 +68,11 @@ define('DRUPAL_ENV', 'dev');
 //
 define('DRUPAL_ENV_ROLE', 'dev');
 </code></pre></li>
+<li><p>If you're using loft_deploy module you must add a <code>$conf</code> var right below the <code>DRUPAL_ENV_ROLE</code> definition.</p>
+
+<pre><code>define('DRUPAL_ENV_ROLE', 'dev');
+$conf['loft_deploy_site_role'] = DRUPAL_ENV_ROLE;
+</code></pre></li>
 </ol>
 
 <h2>Available in PHP as</h2>
@@ -95,7 +100,7 @@ Drupal.settings.DRUPAL_ENV_ROLE
 </div>
   
   <div id="footer-legaleeze">
-    <p class="legaleeze center">Version: 7.x-0.3-rc20 &bull; Last Updated: Thu, 12 Oct 2017 18:18:05 -0700</p>
+    <p class="legaleeze center">Version: 7.x-0.3-rc20 &bull; Last Updated: Sat, 14 Oct 2017 17:15:36 -0700</p>
   </div>
 </footer>
 

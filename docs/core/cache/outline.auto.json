@@ -45,7 +45,7 @@
         },
         {
             "id": "settings",
-            "title": "Two new constants",
+            "title": "settings.php",
             "file": "settings.md",
             "sort": 7
         },
