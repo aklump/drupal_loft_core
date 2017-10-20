@@ -21,7 +21,7 @@
         },
         {
             "id": "html_parsing",
-            "title": "Parsing HTML\/DOM in Php",
+            "title": "Parsing HTML\/DOM in PHP",
             "file": "html_parsing.md",
             "sort": 3
         },
