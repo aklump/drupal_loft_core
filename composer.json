@@ -9,7 +9,9 @@
             "email": "sourcecode@intheloftstudios.com"
         }
     ],
-    "require": {},
+    "require": {
+        "sunra/php-simple-html-dom-parser": "^1.5"
+    },
     "autoload": {
         "psr-4": {
             "Drupal\\loft_core\\": "src/Drupal/loft_core/",
