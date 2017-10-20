@@ -2,7 +2,7 @@
 
 <html>
 <head>
-  <title>Parsing HTML/DOM in Php</title>
+  <title>Parsing HTML/DOM in PHP</title>
   <link href="search/tipuesearch.css" rel="stylesheet">
   <link href="style.css" rel="stylesheet">
 </head>
@@ -22,7 +22,7 @@
   </form>
 </div>
 
-  <h1>Parsing HTML/DOM in Php</h1>
+  <h1>Parsing HTML/DOM in PHP</h1>
   <div class="breadcrumb"><a href="index.html">Index</a></div>
 
 <section>
@@ -30,7 +30,7 @@
 <p>This module provides the <a href="http://simplehtmldom.sourceforge.net/manual_api.htm">Php Simple Html DOM Parser</a></p>
 
 <ul>
-<li>https://packagist.org/packages/sunra/php-simple-html-dom-parser</li>
+<li><a href="https://packagist.org/packages/sunra/php-simple-html-dom-parser">https://packagist.org/packages/sunra/php-simple-html-dom-parser</a></li>
 </ul>
 
 <p>Here is example code that appends a class and replaces a child node's text with other.</p>
@@ -41,15 +41,20 @@
 
 // Replace the description with the error and add error class.
 $dom = HtmlDomParser::str_get_html($vars['element']['#children']);
+
+// Here we will append a class to already existing classes.
 $item = $dom-&gt;find('.form-item')[0];
 $class = $item-&gt;class . ' form-item--error';
 $item-&gt;class = $class;
 
+// Look for the description and append if not found
 if (!$dom-&gt;find('.form-item__description')) {
     $inner = $item-&gt;innertext;
     $inner .= '&lt;span class="form-item__description"&gt;' . $error . '&lt;/span&gt;';
     $item-&gt;innertext = $inner;
 }
+
+// Otherwise replaces it's innerHtml with the error
 else {
     $dom-&gt;find('.form-item__description')[0]-&gt;innertext = $error;
 }
@@ -69,7 +74,7 @@ $output = (string) $dom;
 </div>
   
   <div id="footer-legaleeze">
-    <p class="legaleeze center">Version: 7.x-0.3-rc22 &bull; Last Updated: Thu, 19 Oct 2017 17:59:04 -0700</p>
+    <p class="legaleeze center">Version: 7.x-0.3-rc23 &bull; Last Updated: Thu, 19 Oct 2017 18:01:07 -0700</p>
   </div>
 </footer>
 

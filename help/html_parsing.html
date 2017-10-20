@@ -2,7 +2,7 @@
 <p>This module provides the <a href="http://simplehtmldom.sourceforge.net/manual_api.htm">Php Simple Html DOM Parser</a></p>
 
 <ul>
-<li>https://packagist.org/packages/sunra/php-simple-html-dom-parser</li>
+<li><a href="https://packagist.org/packages/sunra/php-simple-html-dom-parser">https://packagist.org/packages/sunra/php-simple-html-dom-parser</a></li>
 </ul>
 
 <p>Here is example code that appends a class and replaces a child node's text with other.</p>
@@ -13,15 +13,20 @@
 
 // Replace the description with the error and add error class.
 $dom = HtmlDomParser::str_get_html($vars['element']['#children']);
+
+// Here we will append a class to already existing classes.
 $item = $dom-&gt;find('.form-item')[0];
 $class = $item-&gt;class . ' form-item--error';
 $item-&gt;class = $class;
 
+// Look for the description and append if not found
 if (!$dom-&gt;find('.form-item__description')) {
     $inner = $item-&gt;innertext;
     $inner .= '&lt;span class="form-item__description"&gt;' . $error . '&lt;/span&gt;';
     $item-&gt;innertext = $inner;
 }
+
+// Otherwise replaces it's innerHtml with the error
 else {
     $dom-&gt;find('.form-item__description')[0]-&gt;innertext = $error;
 }
