@@ -9,6 +9,8 @@ var trackJS = trackJS || null;
 (function ($, Drupal, trackJS) {
   "use strict";
 
+  Drupal.loft = {};
+
   if (Drupal.ajax) {
     /**
      * Receive an ajax command to fire off trackjs.console.
@@ -18,6 +20,7 @@ var trackJS = trackJS || null;
      * @param status
      *
      * @see loft_core_ajax_command_trackjs_console().
+     * @link http://docs.trackjs.com/tracker/top-level-api#trackjsconsole
      */
     Drupal.ajax.prototype.commands.loftCoreTrackJsConsole = function (ajax, response, status) {
       trackJS && trackJS.console[response.data.severity](response.data.message);
@@ -46,9 +49,9 @@ var trackJS = trackJS || null;
      * @param status
      */
     Drupal.ajax.prototype.commands.loftCoreAjaxHtmlAndFade = function (ajax, response, status) {
-      var $el = $(response.data.selector),
+      var $el  = $(response.data.selector),
           prev = $el.data('loftCoreAjaxHtmlAndFade') || {},
-          pre = response.data.cssPrefix || '';
+          pre  = response.data.cssPrefix || '';
 
       // Remove any delay timeouts currently underway.
       if (prev.timeout) {
@@ -99,5 +102,75 @@ var trackJS = trackJS || null;
       }
     }
   };
+
+  if (Drupal.theme) {
+
+    /**
+     * Client-side theming using server-side templates.
+     *
+     * @param string theme
+     * @param object vars
+     *
+     * The DOM must contain a template element provided by the server, containing twig-style dynamic vars.  See code
+     * example below.  Notice the id must begin with 'js-tpl--' followed by the theme name as it will be called by.  It
+     * must have the class 'js-tpl' and the variable {{ message }} will be replaced by var.message.
+     *
+     * @code
+     *   <div id="js-tpl--message" class="js-tpl">{{ message }}</div>
+     * @endcode
+     *
+     * Markup should be added to the page_bottom in hook_preprocess_html() like so.
+     * @code
+     *   $vars['page']['page_bottom']['js_tpl__form_item_description'] = [
+     *     #prefix' => '<span id="js-tpl--form_item__description" class="js-tpl form-item__description {{ className
+     *   }}">',
+     *     #suffix' => '</span>',
+     *     #markup' => '{{ message }}',
+     *   ];
+     * @endcode
+     *
+     * The JS in your theme needs to define a theme method like this, this is how you register your theme.
+     * @code
+     *   Drupal.theme.prototype.formItemDescription = function (vars) {
+     *     vars = $.extend({
+     *       className: '',
+     *       message: ''
+     *     }, vars);
+     *     return Drupal.loft.theme('form_item__description', vars);
+     *   };
+     * @endcode
+     *
+     * Finally, where you want the theme to output an instance do this:
+     * @code
+     *   var message = Drupal.theme('formItemDescription', {
+     *     message: 'Tell me something neat.'
+     *   }));
+     * @endcode
+     */
+    Drupal.loft.theme = function (theme, vars) {
+      var $tpl = $('#js-tpl--' + theme);
+      if (!$tpl.length) {
+        trackJS && trackJS.console.error('Missing template #js-tpl--" + theme');
+        return '';
+      }
+      var regex,
+          html = $tpl
+          .clone()
+          .removeAttr('id')
+          .removeClass('js-tpl')
+          .wrap($('<div/>'))
+          .parent()
+          .html();
+
+      for (var i in vars) {
+        regex = new RegExp('{{ ' + i + ' }}', 'g');
+        html = html.replace(regex, vars[i]);
+        regex = new RegExp('%7B%7B%20' + i + '%20%7D%7D', 'g');
+        html = html.replace(regex, vars[i]);
+      }
+
+      return html;
+    };
+  }
 
 })(jQuery, Drupal, trackJS);
