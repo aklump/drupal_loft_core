@@ -7,6 +7,7 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'AKlump\\LoftLib\\Code\\Arrays' => $baseDir . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Code/Arrays.php',
+    'AKlump\\LoftLib\\Code\\Dates' => $baseDir . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Code/Dates.php',
     'AKlump\\LoftLib\\Code\\Exposer' => $baseDir . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Code/Exposer.php',
     'AKlump\\LoftLib\\Code\\Grammar' => $baseDir . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Code/Grammar.php',
     'AKlump\\LoftLib\\Code\\PhpDocBlock' => $baseDir . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Code/PhpDocBlock.php',
@@ -56,6 +57,7 @@ return array(
     'AKlump\\LoftLib\\Messenger\\MessengerHtml' => $baseDir . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Messenger/MessengerHtml.php',
     'AKlump\\LoftLib\\Messenger\\MessengerInterface' => $baseDir . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Messenger/MessengerInterface.php',
     'AKlump\\LoftLib\\Messenger\\MessengerShell' => $baseDir . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Messenger/MessengerShell.php',
+    'AKlump\\LoftLib\\Testing\\Mockable' => $baseDir . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Testing/PhpUnitTestCase.php',
     'AKlump\\LoftLib\\Testing\\PhpUnitTestCase' => $baseDir . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Testing/PhpUnitTestCase.php',
     'AKlump\\LoftLib\\Utils\\Blocking' => $baseDir . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Utils/Blocking.php',
     'Drupal\\loft_core\\Attribute' => $baseDir . '/src/Drupal/loft_core/Attribute.php',
