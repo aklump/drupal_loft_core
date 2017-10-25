@@ -40,6 +40,7 @@ class ComposerStaticInita53fe36df132dd600a8787a349a9d1f5
 
     public static $classMap = array (
         'AKlump\\LoftLib\\Code\\Arrays' => __DIR__ . '/../..' . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Code/Arrays.php',
+        'AKlump\\LoftLib\\Code\\Dates' => __DIR__ . '/../..' . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Code/Dates.php',
         'AKlump\\LoftLib\\Code\\Exposer' => __DIR__ . '/../..' . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Code/Exposer.php',
         'AKlump\\LoftLib\\Code\\Grammar' => __DIR__ . '/../..' . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Code/Grammar.php',
         'AKlump\\LoftLib\\Code\\PhpDocBlock' => __DIR__ . '/../..' . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Code/PhpDocBlock.php',
@@ -89,6 +90,7 @@ class ComposerStaticInita53fe36df132dd600a8787a349a9d1f5
         'AKlump\\LoftLib\\Messenger\\MessengerHtml' => __DIR__ . '/../..' . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Messenger/MessengerHtml.php',
         'AKlump\\LoftLib\\Messenger\\MessengerInterface' => __DIR__ . '/../..' . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Messenger/MessengerInterface.php',
         'AKlump\\LoftLib\\Messenger\\MessengerShell' => __DIR__ . '/../..' . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Messenger/MessengerShell.php',
+        'AKlump\\LoftLib\\Testing\\Mockable' => __DIR__ . '/../..' . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Testing/PhpUnitTestCase.php',
         'AKlump\\LoftLib\\Testing\\PhpUnitTestCase' => __DIR__ . '/../..' . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Testing/PhpUnitTestCase.php',
         'AKlump\\LoftLib\\Utils\\Blocking' => __DIR__ . '/../..' . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Utils/Blocking.php',
         'Drupal\\loft_core\\Attribute' => __DIR__ . '/../..' . '/src/Drupal/loft_core/Attribute.php',
