@@ -1,6 +1,6 @@
 # Testing
 
-Test mode is enabled by default when `DRUPAL_ENV` does not equal 'prod'.  This means that test classes will be appened to elements whenever the function `loft_core_test_class()` is used.
+Test mode is enabled by default when `DRUPAL_ENV` does not equal `DRUPAL_ENV_PROD`.  This means that test classes will be appened to elements whenever the function `loft_core_test_class()` is used.
 
 When not in test mode, test classes will not be added.
 
