@@ -915,3 +915,42 @@ function div($class, $element = null)
 
     return $div;
 }
+
+/**
+ * Implements hook_preprocess_status_report().
+ */
+function loft_core_preprocess_status_report(&$vars)
+{
+    $unset = null;
+    array_walk($vars['requirements'], function (&$item, $key) use (&$unset) {
+        if ($item['title'] !== 'Update notifications') {
+            return;
+        }
+
+        //
+        //
+        // ITLS wants updates module disabled on prod since I monitor client updates using another system. And we don't
+        // want clients to think there is a problem so we hide the default warning when update is disabled.
+        //
+        $allows_ftp_updates = variable_get('allow_authorize_operations', true);
+        if ($allows_ftp_updates) {
+            $item = [
+                'title' => '$allow_authorize_operations',
+                'description' => t('If you are using GIT you should add this line to <em>settings.php</em>: <code>$conf[\'allow_authorize_operations\'] = FALSE;</code>'),
+                'value' => 'true',
+                'severity' => REQUIREMENT_ERROR,
+            ];
+        }
+        else if (DRUPAL_ENV_ROLE === 'prod' && $item['value'] === t('Enabled')) {
+            $item['severity'] = REQUIREMENT_WARNING;
+            $item['description'] = t('Update module should not be enabled on production as updates are handled by ITLS.');
+        }
+        elseif (isset($item['severity']) && $item['severity'] === REQUIREMENT_WARNING) {
+            $unset = $key;
+        }
+    });
+
+    if ($unset) {
+        unset($vars['requirements'][$unset]);
+    }
+}
