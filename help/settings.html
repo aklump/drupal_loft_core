@@ -12,7 +12,10 @@ settings.local.php
 <ol>
 <li><p>Add the following lines to <code>settings.php</code> at the very end:</p>
 
-<pre><code>require dirname(__FILE__) . '/settings.env.php';
+<pre><code>define('DRUPAL_ENV_PROD', 'prod');
+define('DRUPAL_ENV_STAGING', 'staging');
+define('DRUPAL_ENV_DEV', 'dev');
+require dirname(__FILE__) . '/settings.env.php';
 require dirname(__FILE__) . '/settings.' . DRUPAL_ENV . '.php';
 require dirname(__FILE__) . '/settings.local.php';
 </code></pre></li>
@@ -21,28 +24,28 @@ require dirname(__FILE__) . '/settings.local.php';
 <pre><code>&lt;?php
 /**
  * @var $settings_presets
- * Define the environment: dev or prod
+ * Define the environment: DRUPAL_ENV_DEV or DRUPAL_ENV_PROD
  *
  * prod:
  * - will server minified js
  * - will enable the prod settings presets file
  */
-define('DRUPAL_ENV', 'dev');
+define('DRUPAL_ENV', DRUPAL_ENV_DEV);
 </code></pre></li>
 <li><p>Create <code>settings.dev.php</code> and <code>settings.prod.php</code> and put in the environment settings specific to environment, e.g. cache settings.</p></li>
 <li><p>Move the database declaration into <code>settings.local.php</code>.  Also include the following lines:</p>
 
 <pre><code>//
 //
-// Define the server environment's role, one of: prod, staging, dev
+// Define the server environment's role, one of: DRUPAL_ENV_PROD, DRUPAL_ENV_STAGING, DRUPAL_ENV_DEV
 //
-// The role may be different than the environment, for example a staging server should have a production environment, but it is serving a staging role.  Production would have the same 'prod' for both DRUPAL_ENV_ROLE and DRUPAL_ENV.
+// The role may be different than the environment, for example a staging server should have a production environment, but it is serving a staging role.  Production would have the same DRUPAL_ENV_PROD for both DRUPAL_ENV_ROLE and DRUPAL_ENV.
 //
-define('DRUPAL_ENV_ROLE', 'dev');
+define('DRUPAL_ENV_ROLE', DRUPAL_ENV_DEV);
 </code></pre></li>
 <li><p>If you're using loft_deploy module you must add a <code>$conf</code> var right below the <code>DRUPAL_ENV_ROLE</code> definition.</p>
 
-<pre><code>define('DRUPAL_ENV_ROLE', 'dev');
+<pre><code>define('DRUPAL_ENV_ROLE', DRUPAL_ENV_DEV);
 $conf['loft_deploy_site_role'] = DRUPAL_ENV_ROLE;
 </code></pre></li>
 </ol>
@@ -51,10 +54,18 @@ $conf['loft_deploy_site_role'] = DRUPAL_ENV_ROLE;
 
 <pre><code>DRUPAL_ENV
 DRUPAL_ENV_ROLE
+
+DRUPAL_ENV_PROD
+DRUPAL_ENV_STAGING
+DRUPAL_ENV_DEV
 </code></pre>
 
 <h2>Available in JS as</h2>
 
-<pre><code>Drupal.settings.DRUPAL_ENV
-Drupal.settings.DRUPAL_ENV_ROLE
+<pre><code>Drupal.settings.DrupalEnv
+Drupal.settings.DrupalEnvRole
+
+Drupal.settings.DrupalEnvProd
+Drupal.settings.DrupalEnvStaging
+Drupal.settings.DrupalEnvDev
 </code></pre>
