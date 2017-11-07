@@ -159,11 +159,11 @@ function loft_core_test_mode($state)
     if ($state) {
         $min = 15;
         setrawcookie('loft_core_testing', ip_address(), REQUEST_TIME + $min * 60, '/');
-        $message = 'Test most enabled for @minutes.';
+        $message = 'Test mode enabled for @minutes.';
     }
     else {
         setrawcookie('loft_core_testing', '', REQUEST_TIME - 3600, '/');
-        $message = 'Test most disabled.';
+        $message = 'Test mode disabled.';
     }
     drupal_set_message(t($message, array(
         '@minutes' => format_plural($min, '1 minute', '@count minutes'),
