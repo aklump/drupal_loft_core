@@ -218,10 +218,14 @@ class Dates {
     {
         $months = range(1, 12);
         if (!is_numeric($month)) {
-            $month_map = array_map(function ($month) {
+            $month_map = array_map(function ($m) {
+
+                $mm = static::setMonth(date_create(), $m);
+                $mm = static::setDay($mm, 1);
+
                 return [
-                    $month,
-                    strtolower(static::setMonth(date_create(), $month)->format('F')),
+                    $m,
+                    strtolower($mm->format('F')),
                 ];
             }, $months);
             $month_map = array_map(function ($item) use ($month) {
@@ -241,7 +245,10 @@ class Dates {
         $y = $date->format('Y') * 1;
         $m = $date->format('n') * 1;
         $d = $date->format('j') * 1;
+
+        // ymd === 20171031 and we're setting the month as 9, then we have to drop the day down to the highest in the month or the month shifts.  This is awkward.
         $$key = $value * 1;
+        $d = min($d, $date->setDate($y, $m, 1)->format('t'));
 
         return $date->setDate($y, $m, $d);
     }
@@ -375,7 +382,7 @@ class Dates {
                     if ($month === 'monthly') {
                         $period = new \DatePeriod($this->bounds[0], new \DateInterval('P1M'), $this->bounds[1]);
                         foreach ($period as $item) {
-                            $m[] = $item->format('m');
+                            $m[] = $item->format('M');
                         }
                     }
                     else {
