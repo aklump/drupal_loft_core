@@ -24,9 +24,11 @@ interface PdfConverterInterface
     public function getResultCode();
 
     /**
-     * Return pass/fail if the converstion system is functioning.
+     * Tests if the conversion system is functioning.
      *
-     * @return bool
+     * @return true
+     *
+     * @throws \RuntimeException if the test fails, with possible failure reason.
      */
     public function testConvert();
 }

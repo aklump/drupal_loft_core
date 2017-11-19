@@ -3,7 +3,11 @@
 
 namespace AKlump\LoftLib\Component\Storage;
 
-
+/**
+ * Manage a collection of items without inherent ids.
+ *
+ * @package AKlump\LoftLib\Component\Storage
+ */
 class Records {
 
     protected $list, $idGetter, $idSetter;

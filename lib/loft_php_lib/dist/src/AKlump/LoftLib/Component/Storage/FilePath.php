@@ -2,6 +2,8 @@
 
 namespace AKlump\LoftLib\Component\Storage;
 
+use AKlump\LoftLib\Code\ObjectCacheTrait;
+use AKlump\LoftLib\Code\ThrowableErrorsTrait;
 use LoftXmlElement;
 
 /**
@@ -14,35 +16,35 @@ use LoftXmlElement;
  * In this first example we are using the object as a "directory" object.
  *
  * @code
- *          $files = new FilePath('/to/my/files');
+ *   $dir = new FilePath('/to/my/files');
  *
  *   //
  *   //
  *   // Create a new json file in the directory.
  *   //
- *   $files->put('{"json":true}')
+ *   $file = $dir->put('{"json":true}')
  *         ->to('test.json')
  *         ->save();
  *
  *   // ... or you can put an array as a JSON string like this:
- *   $files->putJson(['json' => true])
+ *   $file = $dir->putJson(['json' => true])
  *         ->to('test.json')
  *         ->save();
  *
  *   // You can then get the contents...
- *   $json = $files->get();
+ *   $json = $file->get();
  *   $json === '{"json":true}';
  *   true === file_exists('/to/my/files/test.json');
  *
  *   // .. or get then as an object, since we know they are json encoded.
- *   $data = $files->getJson();
+ *   $data = $file->getJson();
  *   $data == (object) ['json' => true];
  *
  *   //
  *   //
  *   // Load another file called records.txt from the directory
  *   //
- *   $contents = $files->from('records.txt')
+ *   $contents = $dir->from('records.txt')
  *                     ->load()
  *                     ->get();
  *
@@ -50,7 +52,7 @@ use LoftXmlElement;
  *   //
  *   // Load a json file to a data array
  *   //
- *   $data = $files->from('records.txt')->loadJson()->get();
+ *   $data = $dir->from('records.txt')->loadJson()->get();
  * @endcode
  *
  * In this next example we are using the object as as "file" object so the
@@ -70,18 +72,23 @@ use LoftXmlElement;
  *   //
  *   // ...later on load the json from the file;
  *   //
- *   $data = $file->loadJson()->get();
+ *   $data = $file->load()->getJson();
  * @endcode
  *
  * @package AKlump\LoftLib\Component\Storage
  */
 class FilePath implements PersistentInterface {
 
+    use ObjectCacheTrait;
+    use ThrowableErrorsTrait;
+
     const TYPE_DIR = 1;
+
     const TYPE_FILE = 2;
 
     protected $dir, $basename, $contents, $type, $alias;
-    protected $cache = array();
+
+    private $intention = [];
 
     /**
      * FilePath constructor.
@@ -90,28 +97,20 @@ class FilePath implements PersistentInterface {
      *                          directories will be created, unless permissions
      *                          prevent it.
      * @param null   $extension To leverage the tempName method, pass an
-     *                          extension, and a filepath to a temp-named file
+     *                          extension, and a filePath to a temp-named file
      *                          will be created inside of $path--note: $path
      *                          must be a directory.
+     * @param array  $options   Configuration options for the instance:
+     *                          - install bool Defaults true.  Set this to false an no files or folders will be created
+     *                          until you call install().
      */
-    public function __construct($path, $extension = null)
+    public function __construct($path, $extension = null, $options = [])
     {
-        if ($extension) {
-
-            // Try to make sure $path references a directory, not a file.
-            if (pathinfo($path, PATHINFO_EXTENSION)) {
-                throw new \InvalidArgumentException("When providing an extension, \$path must reference a directory.");
-            }
-
-            // Make sure the extension is not a filename or a path.
-            $test = explode('.', trim($extension, '.'));
-            if (count($test) > 1 || strpos($extension, '/') !== false) {
-                throw new \InvalidArgumentException("\$extension appears to be a filename; it must only contain the extension, e.g. 'pdf', and no leading dot");
-            }
-            $path .= '/' . static::tempName($extension);
+        $options += ['install' => true];
+        $this->intention = func_get_args() + [null, null, []];
+        if ($options['install']) {
+            $this->install();
         }
-        list($this->dir, $this->basename) = static::ensureDir($path);
-        $this->type = empty($this->basename) ? static::TYPE_DIR : static::TYPE_FILE;
     }
 
     /**
@@ -132,14 +131,16 @@ class FilePath implements PersistentInterface {
      * Ensure all directories in $path exist, if possible.
      *
      * @param     $path string Expecting a directory, but file works if it has
-     *                  an extension as dirname() will be used.  However, if
+     *                  an extension as dirName() will be used.  However, if
      *                  the file does not have an extension, it will be assumed
-     *                  it is a dirname, and that may be unexpected.  It is
+     *                  it is a dirName, and that may be unexpected.  It is
      *                  most consistent to always pass a path to a directory
      *                  and avoid including the file component of the path.
      * @param int $mode
      *
      * @return array
+     *  - 0 The directory with trailing / removed
+     *  - 1 The basename if exists.
      */
     public static function ensureDir($path, $mode = 0777)
     {
@@ -150,9 +151,20 @@ class FilePath implements PersistentInterface {
             $basename = $info['basename'];
         }
 
-        file_exists($path) || mkdir($path, $mode, true);
+        if (!file_exists($path)) {
+            $status = null;
+            try {
+                static::throwErrors(function () use (&$status, $path, $mode) {
+                    mkdir($path, $mode, true);
+                });
+            } catch (\Exception $exception) {
+                static::rethrow($exception, function ($message) use ($path) {
+                    return "$message: trying to ensure $path";
+                });
+            }
+        }
 
-        return array($path, $basename);
+        return array(rtrim($path, '/'), trim($basename));
     }
 
     /**
@@ -255,9 +267,9 @@ class FilePath implements PersistentInterface {
      */
     public function getPath()
     {
-        $path = rtrim($this->dir, '/');
+        $path = $this->dir;
         if ($this->basename) {
-            $path .= '/' . rtrim($this->basename);
+            $path .= '/' . $this->basename;
         }
 
         return $path;
@@ -266,7 +278,7 @@ class FilePath implements PersistentInterface {
     /**
      * For files return parent dir, for directories return self.
      */
-    public function getDirname()
+    public function getDirName()
     {
         return $this->dir;
     }
@@ -276,7 +288,7 @@ class FilePath implements PersistentInterface {
      *
      * @return string|null
      */
-    public function getFilename()
+    public function getFileName()
     {
         return $this->basename ? pathinfo($this->basename, PATHINFO_FILENAME) : null;
     }
@@ -304,6 +316,12 @@ class FilePath implements PersistentInterface {
             throw new \RuntimeException("Could not save to " . $this->getPath());
         }
 
+        // When doing this: $dir->put('do')->to('file.txt')->save(); this useage should not change $dir from a $dir.
+        if ($dir = $this->getCached('parent_dir')) {
+            $this->dir = $dir;
+            $this->basename = null;
+        }
+
         return $this;
     }
 
@@ -321,14 +339,19 @@ class FilePath implements PersistentInterface {
         return $this;
     }
 
-    public function to($id)
+    public function to($basename)
     {
-        return $this->setBasename($id);
+        $return = clone $this;
+
+        return $return->setBasename($basename);
     }
 
-    public function from($id)
+    public function from($basename)
     {
-        return $this->setBasename($id);
+        $this->validateIsDir(__METHOD__);
+        $return = $this->getType() === static::TYPE_DIR ? clone $this : $this;
+
+        return $return->setBasename($basename);
     }
 
     public function getId()
@@ -349,14 +372,46 @@ class FilePath implements PersistentInterface {
         return $this->contents;
     }
 
+    /**
+     * An arguments will be passed to json_decode.
+     *
+     * @return mixed
+     */
     public function getJson()
     {
+        if (($args = func_get_args())) {
+            array_unshift($args, $this->contents);
+
+            return call_user_func_array('json_decode', $args);
+        }
+
         return json_decode($this->contents);
     }
 
     public function putXml(\SimpleXMLElement $data)
     {
         $this->contents = $data->asXml();
+
+        return $this;
+    }
+
+    /**
+     * Writes an array of bash code as a bash script with header.
+     *
+     * @param array  $data
+     * @param string $header Defaults to '#!/usr/bin/env bash'
+     *
+     * @return $this
+     */
+    public function putBash(array $data, $header = '#!/usr/bin/env bash')
+    {
+        $this->contents = implode(PHP_EOL, $data);
+        if (!preg_match('/' . PHP_EOL . '$/', $this->contents)) {
+            $this->contents .= PHP_EOL;
+        }
+        if (strpos($this->contents, $header) === false) {
+            $this->contents = $header . PHP_EOL . $this->contents;
+        }
 
         return $this;
     }
@@ -458,13 +513,111 @@ class FilePath implements PersistentInterface {
      */
     public function getMimeType()
     {
-        if (!isset($this->cache['mime'])) {
+        $mime = $this->getCached('mime');
+        if (!$mime) {
             // I've found this to be more reliable than both: mime_content_type and finfo class. 2017-03-25T09:11, aklump
             $test = new \Mimey\MimeTypes;
-            $this->cache['mime'] = $test->getMimeType($this->getExtension());
+            $mime = $test->getMimeType($this->getExtension());
+            $this->setCached('mime', $mime);
         }
 
-        return $this->cache['mime'];
+        return $mime;
+    }
+
+    /**
+     * Return a flat array of all children files of directory as FilePath objects.
+     *
+     * @param string $matchRegEx
+     * @param string $excludeRegEx
+     *
+     * @return array
+     */
+    public function children($matchRegEx = '', $excludeRegEx = '')
+    {
+        return $this->descendents($matchRegEx, $excludeRegEx, 1);
+    }
+
+    /**
+     * Recursively list files and folders.
+     *
+     * Limit the recursion level by passing a numeric argument > 0. The order of the level is not important, since it
+     * is the only numeric argument passed. Pass one non-numeric regex string and it will match. Pass a second
+     * non-numeric string and it will exclude.
+     *
+     *
+     * @code
+     *
+     *  // Limit to 1 level deep
+     *  descendents(1, '/\.pdf$/);
+     *
+     *  // Include only pdfs
+     *  descendents('/\.pdf$/);
+     *
+     *  // Exclude all pdfs
+     *  descendents(''. '/\.pdf$/);
+     * @endcode
+     *
+     * @return \AKlump\LoftLib\Component\Storage\FilePathCollection|null|static
+     */
+    public function descendents()
+    {
+        $options = [];
+        $assign = function ($key, $value) use (&$options) {
+            if (!array_key_exists($key, $options)) {
+                $options[$key] = $value;
+
+                return true;
+            }
+
+            return false;
+        };
+        foreach (func_get_args() as $value) {
+            if (is_numeric($value)) {
+                $assign(0, $value * 1);
+            }
+            elseif (!$assign(1, strval($value))) {
+                $assign(2, strval($value));
+            }
+        }
+        $options += [0 => 0, 1 => '', 2 => ''];
+        $this->validateIsDir(__METHOD__);
+
+        return $this->_getFilesRecursively($this->getPath(), $options);
+    }
+
+    public function install()
+    {
+        list($path, $extension) = $this->intention;
+        if ($extension) {
+
+            // Try to make sure $path references a directory, not a file.
+            if (pathinfo($path, PATHINFO_EXTENSION)) {
+                throw new \InvalidArgumentException("When providing an extension, \$path must reference a directory.");
+            }
+
+            // Make sure the extension is not a filename or a path.
+            $test = explode('.', trim($extension, '.'));
+            if (count($test) > 1 || strpos($extension, '/') !== false) {
+                throw new \InvalidArgumentException("\$extension appears to be a filename; it must only contain the extension, e.g. 'pdf', and no leading dot");
+            }
+            $path .= '/' . static::tempName($extension);
+        }
+        list($this->dir, $this->basename) = static::ensureDir($path);
+        $this->type = empty($this->basename) ? static::TYPE_DIR : static::TYPE_FILE;
+    }
+
+    protected function validateIsDir($method)
+    {
+        if ($this->getType() !== static::TYPE_DIR) {
+            throw new \RuntimeException("$method() allowed only on directories.");
+        }
+    }
+
+    protected function validateIsFile($method)
+    {
+        if ($this->getType() !== static::TYPE_FILE) {
+            throw new \RuntimeException("$method() allowed only on files.");
+        }
     }
 
     protected function validateBasename()
@@ -474,13 +627,23 @@ class FilePath implements PersistentInterface {
         }
     }
 
-    protected function setBasename($id)
+    /**
+     * To change this publically, you need to use to()
+     *
+     * @param $basename
+     *
+     * @return $this
+     */
+    protected function setBasename($basename)
     {
-        $this->cache = array();
-        if (strpos($id, '/') !== false) {
-            throw new \InvalidArgumentException("\"$id\" cannot be a path, only a filename.");
+        if (empty($basename)) {
+            throw new \InvalidArgumentException("\$basename cannot be empty.");
         }
-        $this->basename = $id;
+        if (strpos($basename, '/') !== false) {
+            throw new \InvalidArgumentException("\"$basename\" cannot be a path, only a filename.");
+        }
+        $this->clearCached();
+        $this->basename = trim($basename);
 
         return $this;
     }
@@ -500,5 +663,50 @@ class FilePath implements PersistentInterface {
         }
 
         return $this;
+    }
+
+    /**
+     * Helper function
+     *
+     * @see FilePath::getFilesRecursively()
+     */
+    private function _getFilesRecursively($path, $options, &$files = null, &$level = 0)
+    {
+        if (is_null($files)) {
+            $files = new FilePathCollection();
+        }
+        $obj = function ($path) {
+            $class = get_class($this);
+
+            return new $class($path);
+        };
+        ++$level;
+        $dir = opendir($path . "/.");
+        list($levels) = $options;
+        while ($item = readdir($dir)) {
+            $fullPath = $path . "/" . $item;
+
+            if (is_file($fullPath)) {
+                $files->push($obj($fullPath));
+            }
+            else if ($item != "." and $item != ".." && (empty($levels) || $level < $levels)) {
+                $files->push($obj($fullPath));
+                $this->_getFilesRecursively($fullPath, $options, $files, $level);
+            }
+        }
+        --$level;
+        if ($level === 0) {
+            $files = $files->filter(function ($value) use ($options) {
+                list(, $match, $omit) = $options;
+                $fullPath = $value->getPath();
+                $doesMatch = !$match || preg_match($match, $fullPath);
+
+                return $doesMatch && (!$omit || !preg_match($omit, $fullPath));
+            })->sort(function ($a, $b) {
+                return $a->getPath() > $b->getPath();
+            })->values();
+        }
+
+        return $files;
     }
 }

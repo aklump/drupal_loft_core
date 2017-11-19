@@ -62,13 +62,14 @@ interface PersistentInterface
     public function save();
 
     /**
-     * Indicate a name for the contents when saving.
+     * Returns a cloned FilePath with basename set to $path
      *
-     * @param $id
+     * @param $basename This may not contain directories, only basenames, e.g. data.xml
      *
      * @return {object}
+     * @throws \InvalidArgumentException If $basename contains directories.
      */
-    public function to($id);
+    public function to($basename);
 
     /**
      * Indicate a persistent name

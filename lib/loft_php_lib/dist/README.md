@@ -6,6 +6,17 @@ A collection of Php Classes by In the Loft Studios.
 
 Include this in your module like this:
 
+
+## Sample `.gitignore` to include everything but the encryption
+
+By default you should add this to your project using Loft Php Lib
+    
+    */loft_php_lib/*
+    !*/loft_php_lib/dist
+    */loft_php_lib/dist/src/AKlump/LoftLib/Code/Encryption*
+
+
+
 ## Sample `.gitignore` to just use the Xml library
 
     lib/loft_php_lib/*

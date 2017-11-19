@@ -196,6 +196,47 @@ class PhpUnitTestCase extends \PHPUnit_Framework_TestCase {
         return $mock;
     }
 
+    /**
+     * Destroy then create anew a sandbox directory for temporary file test operations.
+     *
+     * Put this in your setUp() method usually and use $this->sb as directory to the sandbox.
+     *
+     * @return $this
+     */
+    protected function createSandbox()
+    {
+        $this->sb = sys_get_temp_dir() . '/' . str_replace('\\', '_', get_class($this)) . '/sb/';
+        $this->sb = rtrim($this->sb, '/') . '/';
+        $this->destroySandbox();
+        $this->assertNotSame(false, mkdir($this->sb, 0700, true));
+
+        return $this;
+    }
+
+    /**
+     * Place this in tearDown();
+     */
+    protected function destroySandbox()
+    {
+        if ($this->sb) {
+            $this->assertNotSame(false, system("test -e $this->sb && chmod -R u=rwx $this->sb && rm -r $this->sb"));
+        }
+    }
+
+    /**
+     * Empty the sandbox if it exists, otherwise do nothing.
+     *
+     * @return $this
+     */
+    protected function emptySandbox()
+    {
+        if (isset($this->sb)) {
+            $this->createSandbox($this->sb);
+        }
+
+        return $this;
+    }
+
     private function wrapReturnValueAsNecessary($return)
     {
         if (is_callable($return)) {

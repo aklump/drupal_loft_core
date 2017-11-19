@@ -6,6 +6,7 @@
  * @ingroup bash
  * @{
  */
+
 namespace AKlump\LoftLib\Component\Bash;
 
 /**
@@ -27,8 +28,7 @@ namespace AKlump\LoftLib\Component\Bash;
  *
  * THESE ELEMENTS CAN APPEAR IN ANY ORDER.
  */
-class Bash
-{
+class Bash {
 
     /**
      * Use this to cache expensive calculations in the object.
@@ -83,6 +83,46 @@ class Bash
         }
 
         $this->cache->Bash->args = array_values($args);
+    }
+
+    /**
+     * Locate a shell program file in the user's path.
+     *
+     * @param string $name
+     *
+     * @return null|string
+     * @throws \AKlump\LoftLib\Component\Bash\FailedExecException
+     */
+    public static function which($name)
+    {
+        $path = static::exec("type $name >/dev/null &2>&1 && which $name");
+
+        return $path ? $path : null;
+    }
+
+    /**
+     * Use this for executing bash commands instead of exec().
+     *
+     * This handles redirecting the error and capturing it as an exception.
+     *
+     * @param  string|array $command Arrays will be imploded with ' '.
+     *
+     * @return string  The output from the $command.
+     * @throws AKlump\LoftLib\Component\Bash\FailedExecException if the command returns a non 0 status.  The exception
+     *                                                           code holds the return status.
+     */
+    public static function exec($command)
+    {
+        $command = is_array($command) ? implode(' ', $command) : $command;
+        if (!strpos($command, ' 2>&1')) {
+            $command .= ' 2>&1';
+        }
+        exec($command, $result, $status);
+        if ($status !== 0) {
+            throw new FailedExecException(implode(PHP_EOL, $result), $status);
+        }
+
+        return implode(PHP_EOL, $result);
     }
 
     public function getArgs()

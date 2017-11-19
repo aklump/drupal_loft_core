@@ -9,7 +9,7 @@ class Strings
 
     /**
      * Convert a hyphenated, underscored or camel-cased string to lower
-     * CamelCase.
+     * camelCase.
      *
      * @param  string $phrase
      *

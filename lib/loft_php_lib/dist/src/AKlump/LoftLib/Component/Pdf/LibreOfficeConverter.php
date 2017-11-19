@@ -1,6 +1,8 @@
 <?php
+
 namespace AKlump\LoftLib\Component\Pdf;
 
+use AKlump\LoftLib\Component\Bash\Bash;
 use AKlump\LoftLib\Component\Storage\FilePath;
 
 /**
@@ -15,7 +17,9 @@ use AKlump\LoftLib\Component\Storage\FilePath;
 abstract class LibreOfficeConverter extends PdfConverter {
 
     protected $soffice;
+
     protected $tempDir;
+
     protected $options;
 
     /**
@@ -43,23 +47,18 @@ abstract class LibreOfficeConverter extends PdfConverter {
 
     public function testConvert()
     {
-        $result = false;
-        try {
-            $temp = new FilePath($this->tempDir, 'txt');
-            $temp->put('Hellow World!')->save();
+        $temp = new FilePath($this->tempDir, 'txt');
+        $temp->put('Hello World!')->save();
 
-            $this->process($temp->getPath());
+        $this->process($temp->getPath());
 
-            // Test the conversion process, that a file comes out.
-            $converted = preg_replace('/\.txt$/', '.pdf', $temp->getPath());
-            $converted = new FilePath($converted);
-            $result = $converted->exists();
-        } catch (\Exception $exception) {
-        }
+        // Test the conversion process, that a file comes out.
+        $converted = preg_replace('/\.txt$/', '.pdf', $temp->getPath());
+        $converted = new FilePath($converted);
 
         // Cleanup the temp files.
-        $temp && $temp->destroy();
-        $converted && $converted->destroy();
+        $temp->exists() && $temp->destroy();
+        ($result = $converted->exists()) && $converted->destroy();
 
         return $result;
     }
@@ -72,11 +71,10 @@ abstract class LibreOfficeConverter extends PdfConverter {
         $command = array();
         $command[] = 'export HOME="' . $this->tempDir . '" && ' . $this->soffice . ' --headless --convert-to pdf --outdir "' . $this->tempDir . '" "' . $filename . '"';
         $command[] = '2>&1';
-        $command = implode(' ', $command);
 
         // Send off to LibreOffice (soffice) to convert.
         $output = array();
-        exec($command, $output);
+        Bash::exec($command, $output);
 
         return array($command, $output);
     }
