@@ -35,7 +35,9 @@ class Dates {
      *                                              you would set this to 'P1Y' and set the $periodStart to the
      *                                              earliest month of the year, and probably January first.
      * @param array              $defaultTime       A three element indexed array with hour, minute, second for the
-     *                                              default time when using the normalize() method.
+     *                                              default UTC time when using the normalize() method.  Be careful
+     *                                              here because if you're local timezone is not UTC then you will not
+     *                                              be getting the numbers you use here as you might expect.
      */
     public function __construct(
         $localTimeZoneName,
@@ -46,7 +48,7 @@ class Dates {
     ) {
         $this->timezone = new \DateTimeZone($localTimeZoneName);
         $this->nowString = empty($nowString) ? 'now' : $nowString;
-        $this->setPeriod($periodStart, $periodInterval);
+        $this->setNormalizationPeriod($periodStart, $periodInterval);
         $this->defaultTime = $defaultTime + [12, 0, 0];
     }
 
@@ -89,7 +91,6 @@ class Dates {
 
         return is_string($date) ? date_create($date, $timezone) : $date;
     }
-
 
     /**
      * Return an array of first/last seconds in the quarter of $date; no timezone conversion.
@@ -183,7 +184,6 @@ class Dates {
         return $format;
     }
 
-
     public static function setYear(\DateTime $date, $year)
     {
         return static::setDate($date, 'y', $year);
@@ -261,6 +261,39 @@ class Dates {
         $$key = $value * 1;
 
         return $date->setTime($h, $m, $s);
+    }
+
+    /**
+     * Checks to see if now (in local tz) is between 00:00:00 and 23:59:59 on $day1.
+     *
+     * @param $day1
+     *
+     * @return bool
+     *
+     * @see isTodayInDays().
+     */
+    public function isToday($day1)
+    {
+        return $this->isTodayInDays($day1, $day1);
+    }
+
+    /**
+     * Checks to see if today (in local timezone) is between two days (normalized to local tz).
+     *
+     * If you pass no argument for $day2, then the $day2 will assume end of the day of $day1.
+     *
+     * @param string $day1 Passed through normalizeToOne().  After normalizing the time is set to 0,0,0 local.
+     * @param string $day2 Passed through normalizeToOne().  After normalizing the time is set to 23,59,59 local.
+     *
+     * @return bool
+     */
+    public function isTodayInDays($day1, $day2)
+    {
+        $day1 = $this->l($this->normalizeToOne($day1))->setTime(0, 0, 0);
+        $day2 = $this->l($this->normalizeToOne($day2))->setTime(23, 59, 59);
+        $now = $this->l('now');
+
+        return $day1 <= $now && $now <= $day2;
     }
 
     /**
@@ -358,11 +391,10 @@ class Dates {
     /**
      * Convert a string representing a date into an array of UTC DateTime objects.
      *
-     * @param        $date_string
+     * @param string $date_string
      * @param string $format Omit to return objects, include and the array will contain formatted dates using $format.
      *
-     * @return array
-     * @internal param string $date
+     * @return array An array of dates as normalized in this function
      *
      */
     public function normalize($date_string, $format = DATE_ISO8601_SHORT)
@@ -438,14 +470,34 @@ class Dates {
     }
 
     /**
-     * The bounds affect how things like "monthly" plays out.
+     * Normalize a date string when you require exactly one value.
+     *
+     * @param string $date_string
+     * @param string $format
+     *
+     * @return \DateTime Normalized object in UTC.
+     *
+     * @throws \InvalidArgumentException When normalize returns other than exactly one value.
+     */
+    public function normalizeToOne($date_string, $format = DATE_ISO8601_SHORT)
+    {
+        $result = $this->normalize($date_string, $format);
+        if (count($result) !== 1) {
+            throw new \InvalidArgumentException("\"$date_string\" must only normalize to a single date.");
+        }
+
+        return $result[0];
+    }
+
+    /**
+     * These bounds affect how things like "monthly" plays out.
      *
      * @param \DateTime|null     $start
      * @param \DateInterval|null $period
      *
      * @return $this
      */
-    private function setPeriod(\DateTime $start = null, \DateInterval $period = null)
+    private function setNormalizationPeriod(\DateTime $start = null, \DateInterval $period = null)
     {
         $start = is_null($start) ? $this->setDay($this->now(), 1)->setTime(0, 0, 0) : $start;
         $period = is_null($period) ? new \DateInterval('P1M') : $period;
