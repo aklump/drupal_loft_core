@@ -20,22 +20,19 @@
  *                            Finally, if you return FALSE, no redirect will
  *                            take place.
  */
-function HOOK_loft_core_redirect_node_BUNDLE_TYPE_view($node)
-{
-    return array(
-        'node/' . BLOG_PAGE_NID,
-        array('fragment' => 'm[]=modal,blog_entry__' . $node->nid),
-    );
+function HOOK_loft_core_redirect_node_BUNDLE_TYPE_view($node) {
+  return array(
+    'node/' . BLOG_PAGE_NID,
+    array('fragment' => 'm[]=modal,blog_entry__' . $node->nid),
+  );
 }
 
-function HOOK_loft_core_redirect_node_BUNDLE_TYPE_edit($node)
-{
-    // Only allow admins to edit, otherwise deny access.  This overrides the normal access check of node_access('update'...
-    return user_is_admin() ? false : MENU_ACCESS_DENIED;
+function HOOK_loft_core_redirect_node_BUNDLE_TYPE_edit($node) {
+  // Only allow admins to edit, otherwise deny access.  This overrides the normal access check of node_access('update'...
+  return user_is_admin() ? FALSE : MENU_ACCESS_DENIED;
 }
 
-function HOOK_loft_core_redirect_node_BUNDLE_TYPE_delete($node)
-{
+function HOOK_loft_core_redirect_node_BUNDLE_TYPE_delete($node) {
 
 }
 
@@ -51,9 +48,8 @@ function HOOK_loft_core_redirect_node_BUNDLE_TYPE_delete($node)
  *
  * @return array
  */
-function HOOK_loft_core_node_BUNDLE_TYPE_page($node)
-{
-    return node_page_view($node);
+function HOOK_loft_core_node_BUNDLE_TYPE_page($node) {
+  return node_page_view($node);
 }
 
 /**
@@ -64,44 +60,43 @@ function HOOK_loft_core_node_BUNDLE_TYPE_page($node)
  *   with:
  *     - is_live bool False to disable the feature.
  */
-function hook_loft_core_code_release_info()
-{
-    return array(
-        'photoshare' => array(
-            'is_ready' => false,
-            'is_live' => false,
-            'description' => 'Ability to share individual photo essay photos.',
-        ),
-        'passhelp' => array(
-            'is_ready' => false,
-            'is_live' => false,
-            'description' => 'Link during login proess to open a modal where user can request a new password',
-        ),
-        'facebook' => array(
-            'is_ready' => false,
-            'is_live' => false,
-        ),
-        'comments' => array(
-            'is_ready' => false,
-            'is_live' => false,
-        ),
-        'avatars' => array(
-            'is_ready' => false,
-            'is_live' => false,
-        ),
-        'blog' => array(
-            'is_ready' => false,
-            'is_live' => false,
-        ),
-        'wysiwyg' => array(
-            'is_ready' => false,
-            'is_live' => false,
-        ),
-        'tour' => array(
-            'is_ready' => true,
-            'is_live' => false,
-        ),
-    );
+function hook_loft_core_code_release_info() {
+  return array(
+    'photoshare' => array(
+      'is_ready' => FALSE,
+      'is_live' => FALSE,
+      'description' => 'Ability to share individual photo essay photos.',
+    ),
+    'passhelp' => array(
+      'is_ready' => FALSE,
+      'is_live' => FALSE,
+      'description' => 'Link during login proess to open a modal where user can request a new password',
+    ),
+    'facebook' => array(
+      'is_ready' => FALSE,
+      'is_live' => FALSE,
+    ),
+    'comments' => array(
+      'is_ready' => FALSE,
+      'is_live' => FALSE,
+    ),
+    'avatars' => array(
+      'is_ready' => FALSE,
+      'is_live' => FALSE,
+    ),
+    'blog' => array(
+      'is_ready' => FALSE,
+      'is_live' => FALSE,
+    ),
+    'wysiwyg' => array(
+      'is_ready' => FALSE,
+      'is_live' => FALSE,
+    ),
+    'tour' => array(
+      'is_ready' => TRUE,
+      'is_live' => FALSE,
+    ),
+  );
 }
 
 /**
@@ -110,13 +105,12 @@ function hook_loft_core_code_release_info()
  * @link http://docs.trackjs.com/tracker/configuration
  * @link http://docs.trackjs.com/tracker/top-level-api
  */
-function HOOK_loft_core_trackjs_alter(&$config)
-{
-    // Set the application.
-    $config['config']['application'] = 'my_first_app';
+function HOOK_loft_core_trackjs_alter(&$config) {
+  // Set the application.
+  $config['config']['application'] = 'my_first_app';
 
-    // Add some metadata
-    $config['metadata']['do'] = 're';
+  // Add some metadata
+  $config['metadata']['do'] = 're';
 }
 
 /**
@@ -129,9 +123,9 @@ function HOOK_loft_core_trackjs_alter(&$config)
  *   Each value is an array of regex expressions, that when matched causes the message to never display.
  */
 function HOOK_loft_core_suppress_messages() {
-    return array(
-        'status' => array(
-            '/^You are now logged in as/',
-        ),
-    );
+  return array(
+    'status' => array(
+      '/^You are now logged in as/',
+    ),
+  );
 }

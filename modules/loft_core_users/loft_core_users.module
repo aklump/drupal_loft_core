@@ -47,13 +47,12 @@ define('LOFT_CORE_USERS_DOMAIN_WHITELIST', 'gmail.com,yahoo.com,mail.com');
  *
  * @return array
  */
-function loft_core_users_get_blocking_statuses()
-{
-    return array(
-        LOFT_CORE_USERS_STATUS_ROBOT,
-        LOFT_CORE_USERS_STATUS_SPAMMY,
-        LOFT_CORE_USERS_STATUS_HONEYBEAR_MADE_SPAMMY,
-    );
+function loft_core_users_get_blocking_statuses() {
+  return array(
+    LOFT_CORE_USERS_STATUS_ROBOT,
+    LOFT_CORE_USERS_STATUS_SPAMMY,
+    LOFT_CORE_USERS_STATUS_HONEYBEAR_MADE_SPAMMY,
+  );
 }
 
 /**
@@ -61,27 +60,25 @@ function loft_core_users_get_blocking_statuses()
  *
  * @return mixed|null
  */
-function loft_core_users_get_domain_whitelist()
-{
-    $whitelist = variable_get('loft_core_users_domain_whitelist', explode(',', LOFT_CORE_USERS_DOMAIN_WHITELIST));
+function loft_core_users_get_domain_whitelist() {
+  $whitelist = variable_get('loft_core_users_domain_whitelist', explode(',', LOFT_CORE_USERS_DOMAIN_WHITELIST));
 
-    // This variable is not exposed in the UI and is meant to protect the basic domains like gmail and yahoo; if you really want to alter this then add something to settings.php like $conf['loft_core_users_absolute_domain_whitelist'] = 'do.com,re.com';
-    $whitelist = array_unique(array_merge($whitelist, variable_get('loft_core_users_absolute_domain_whitelist', explode(',', LOFT_CORE_USERS_DOMAIN_WHITELIST))));
+  // This variable is not exposed in the UI and is meant to protect the basic domains like gmail and yahoo; if you really want to alter this then add something to settings.php like $conf['loft_core_users_absolute_domain_whitelist'] = 'do.com,re.com';
+  $whitelist = array_unique(array_merge($whitelist, variable_get('loft_core_users_absolute_domain_whitelist', explode(',', LOFT_CORE_USERS_DOMAIN_WHITELIST))));
 
-    return $whitelist;
+  return $whitelist;
 }
 
 /**
  * Implements hook_module_implements_alter().
  */
-function loft_core_users_module_implements_alter(&$implementations, $hook)
-{
-    if ($hook == 'user_restrictions_alter') {
-        // user_restrictions module overwrites our $error unless we call it first.
-        $group = $implementations['loft_core_users'];
-        unset($implementations['loft_core_users']);
-        $implementations['loft_core_users'] = $group;
-    }
+function loft_core_users_module_implements_alter(&$implementations, $hook) {
+  if ($hook == 'user_restrictions_alter') {
+    // user_restrictions module overwrites our $error unless we call it first.
+    $group = $implementations['loft_core_users'];
+    unset($implementations['loft_core_users']);
+    $implementations['loft_core_users'] = $group;
+  }
 }
 
 /**
@@ -91,12 +88,11 @@ function loft_core_users_module_implements_alter(&$implementations, $hook)
  *
  * @return string
  */
-function _loft_core_users_get_email_domain($email)
-{
-    $domain = preg_replace('/^.+@/', '', $email);
-    $domain = explode('.', $domain);
+function _loft_core_users_get_email_domain($email) {
+  $domain = preg_replace('/^.+@/', '', $email);
+  $domain = explode('.', $domain);
 
-    return implode('.', array_slice($domain, -2));
+  return implode('.', array_slice($domain, -2));
 }
 
 /**
@@ -107,17 +103,16 @@ function _loft_core_users_get_email_domain($email)
  *
  * @see LOFT_CORE_USERS_STATUS_*
  */
-function loft_core_users_block_user($status, $uid)
-{
-    if ($status > 1) {
-        loft_core_users_set_user_status($status, $uid);
-    }
-    $account = (object) array(
-        'uid' => $uid,
-    );
-    if ($status != 1) {
-        user_block_user_action($account);
-    }
+function loft_core_users_block_user($status, $uid) {
+  if ($status > 1) {
+    loft_core_users_set_user_status($status, $uid);
+  }
+  $account = (object) array(
+    'uid' => $uid,
+  );
+  if ($status != 1) {
+    user_block_user_action($account);
+  }
 }
 
 /**
@@ -133,35 +128,34 @@ function loft_core_users_block_user($status, $uid)
  *
  * @return int|null
  */
-function loft_core_users_get_user_status($uid = null, $domain = null, $ip = null)
-{
-    $status = null;
-    if ($uid !== null || $domain !== null || $ip !== null) {
-        $query = db_select('loft_core_users', 'lu')
-            ->fields('lu', array('status'));
-        if ($uid) {
-            $query->condition('uid', $uid);
-        }
-        else {
-            $query->condition('uid', $uid);
-            if (!is_null($domain)) {
-                $domain = _loft_core_users_get_email_domain($domain);
-                $query->condition('domain', $domain);
-            }
-            if (!is_null($ip)) {
-                $query->condition('ip', $ip);
-            }
-        }
-
-        try {
-            $result = $query->execute();
-            $status = $result->fetchField();
-        } catch (Exception $e) {
-            watchdog_exception('loft_core_users', $e);
-        }
+function loft_core_users_get_user_status($uid = NULL, $domain = NULL, $ip = NULL) {
+  $status = NULL;
+  if ($uid !== NULL || $domain !== NULL || $ip !== NULL) {
+    $query = db_select('loft_core_users', 'lu')
+      ->fields('lu', array('status'));
+    if ($uid) {
+      $query->condition('uid', $uid);
+    }
+    else {
+      $query->condition('uid', $uid);
+      if (!is_null($domain)) {
+        $domain = _loft_core_users_get_email_domain($domain);
+        $query->condition('domain', $domain);
+      }
+      if (!is_null($ip)) {
+        $query->condition('ip', $ip);
+      }
     }
 
-    return is_numeric($status) ? intval($status) : null;
+    try {
+      $result = $query->execute();
+      $status = $result->fetchField();
+    } catch (Exception $e) {
+      watchdog_exception('loft_core_users', $e);
+    }
+  }
+
+  return is_numeric($status) ? intval($status) : NULL;
 }
 
 /**
@@ -177,50 +171,49 @@ function loft_core_users_get_user_status($uid = null, $domain = null, $ip = null
  * @internal param $account
  * @see      loft_core_users_block_user().
  */
-function loft_core_users_set_user_status($status, $uid, $mail, $ip = null)
-{
-    $meta = array(
-        'uid' => $uid,
-        'uid_init' => $uid,
-        'status' => $status,
-        'domain' => _loft_core_users_get_email_domain($mail),
-        'ip' => $ip,
-    );
-    $meta = array_filter($meta, function ($value) {
-        return !is_null($value);
-    });
+function loft_core_users_set_user_status($status, $uid, $mail, $ip = NULL) {
+  $meta = array(
+    'uid' => $uid,
+    'uid_init' => $uid,
+    'status' => $status,
+    'domain' => _loft_core_users_get_email_domain($mail),
+    'ip' => $ip,
+  );
+  $meta = array_filter($meta, function ($value) {
+    return !is_null($value);
+  });
 
-    //
-    //
-    // Authenticated users
-    //
-    if ($uid) {
-        $query = db_select('loft_core_users', 'lu')
-            ->fields('lu', array('uid'))
-            ->condition('uid', $uid);
-        $exists = $query->execute()->fetchField();
-        $primary_key = 'uid';
-    }
+  //
+  //
+  // Authenticated users
+  //
+  if ($uid) {
+    $query = db_select('loft_core_users', 'lu')
+      ->fields('lu', array('uid'))
+      ->condition('uid', $uid);
+    $exists = $query->execute()->fetchField();
+    $primary_key = 'uid';
+  }
 
-    //
-    //
-    // Anonymous users
-    //
-    else {
-        $exists = db_select('loft_core_users', 'lu')
-            ->condition('uid', 0)
-            ->condition('domain', $meta['domain'])
-            ->condition('ip', $meta['ip'])
-            ->countQuery()->execute()->fetchField();
-        $primary_key = array('uid', 'domain', 'ip');
-    }
-    if ($exists) {
-        unset($meta['uid_init']);
-        drupal_write_record('loft_core_users', $meta, $primary_key);
-    }
-    else {
-        drupal_write_record('loft_core_users', $meta);
-    }
+  //
+  //
+  // Anonymous users
+  //
+  else {
+    $exists = db_select('loft_core_users', 'lu')
+      ->condition('uid', 0)
+      ->condition('domain', $meta['domain'])
+      ->condition('ip', $meta['ip'])
+      ->countQuery()->execute()->fetchField();
+    $primary_key = array('uid', 'domain', 'ip');
+  }
+  if ($exists) {
+    unset($meta['uid_init']);
+    drupal_write_record('loft_core_users', $meta, $primary_key);
+  }
+  else {
+    drupal_write_record('loft_core_users', $meta);
+  }
 }
 
 /**
@@ -247,86 +240,84 @@ function loft_core_users_set_user_status($status, $uid, $mail, $ip = null)
  * You MUST implement hook_loft_core_users_robotrap_access().
  * You MAY implement hook_loft_core_users_robotrap_goto_alter().
  */
-function loft_core_users_robotrap_page_callback()
-{
-    global $user;
-    $args = func_get_args();
-    $callback = array_shift($args);
-    $context = array(
-        'parent' => __FUNCTION__,
-        'account' => $user,
-        'page callback' => $callback,
-        'page arguments' => $args,
-    );
-    $access = module_invoke_all('loft_core_users_robotrap_access', $context);
-    $access = end($access);
-    if (!$access) {
-        watchdog('loft_core_users', 'Robotrapped user %name.', array('%name' => $user->name));
-        loft_core_users_block_user(LOFT_CORE_USERS_STATUS_ROBOT, $user->uid);
-        //        loft_core_users_block_user(LOFT_CORE_USERS_STATUS_ROBOT, $user->uid, $user->mail, ip_address());
-        module_load_include('inc', 'user', 'user.pages');
-        user_logout_current_user();
-        drupal_set_message(t('You have visited a forbidden url; your account has been locked for review.  Please contact us using the form below to unlock your account.', array('!url' => url('contact', array('query' => array('cid' => 6))))), 'warning', false);
-        $path = module_exists('contact') ? 'contact' : '<front>';
-        unset($_GET['destination']);
-        $options = array();
-        $context['parent'] = __FUNCTION__;
-        drupal_alter('loft_core_users_robotrap_goto', $path, $options, $context);
-        drupal_goto($path, $options);
+function loft_core_users_robotrap_page_callback() {
+  global $user;
+  $args = func_get_args();
+  $callback = array_shift($args);
+  $context = array(
+    'parent' => __FUNCTION__,
+    'account' => $user,
+    'page callback' => $callback,
+    'page arguments' => $args,
+  );
+  $access = module_invoke_all('loft_core_users_robotrap_access', $context);
+  $access = end($access);
+  if (!$access) {
+    watchdog('loft_core_users', 'Robotrapped user %name.', array('%name' => $user->name));
+    loft_core_users_block_user(LOFT_CORE_USERS_STATUS_ROBOT, $user->uid);
+    //        loft_core_users_block_user(LOFT_CORE_USERS_STATUS_ROBOT, $user->uid, $user->mail, ip_address());
+    module_load_include('inc', 'user', 'user.pages');
+    user_logout_current_user();
+    drupal_set_message(t('You have visited a forbidden url; your account has been locked for review.  Please contact us using the form below to unlock your account.', array('!url' => url('contact', array('query' => array('cid' => 6))))), 'warning', FALSE);
+    $path = module_exists('contact') ? 'contact' : '<front>';
+    unset($_GET['destination']);
+    $options = array();
+    $context['parent'] = __FUNCTION__;
+    drupal_alter('loft_core_users_robotrap_goto', $path, $options, $context);
+    drupal_goto($path, $options);
 
-        return false;
-    }
-    else {
-        return call_user_func_array($callback, $args);
-    }
+    return FALSE;
+  }
+  else {
+    return call_user_func_array($callback, $args);
+  }
 }
 
 /**
  * Implements hook_user_restrictions_alter().
  */
-function loft_core_users_user_restrictions_alter(&$denied, &$error, &$context)
-{
-    //
-    //
-    // Restrict any email address whose domain matches that of an already robo-trapped user.
-    //
-    if ($context['type'] === 'mail') {
+function loft_core_users_user_restrictions_alter(&$denied, &$error, &$context) {
+  //
+  //
+  // Restrict any email address whose domain matches that of an already robo-trapped user.
+  //
+  if ($context['type'] === 'mail') {
 
-        // Check if the domain has been trapped.
-        $domain = _loft_core_users_get_email_domain($context['form_state']['values']['mail']);
+    // Check if the domain has been trapped.
+    $domain = _loft_core_users_get_email_domain($context['form_state']['values']['mail']);
 
-        // Check if this domain is whitelisted.
-        if (!in_array($domain, loft_core_users_get_domain_whitelist())) {
+    // Check if this domain is whitelisted.
+    if (!in_array($domain, loft_core_users_get_domain_whitelist())) {
 
-            $query = db_select('loft_core_users', 'lu')
-                ->fields('lu', array('uid', 'domain'))
-                ->condition('status', loft_core_users_get_blocking_statuses(), 'IN')
-                ->condition('domain', $domain);
+      $query = db_select('loft_core_users', 'lu')
+        ->fields('lu', array('uid', 'domain'))
+        ->condition('status', loft_core_users_get_blocking_statuses(), 'IN')
+        ->condition('domain', $domain);
 
-            // If trapped, leverage user_restrictions module to block by email address.
-            if ($is_suspicious = $query->execute()->fetchAllAssoc('uid')) {
-                watchdog('loft_core_users', 'Denied user from @%domain.', array('%domain' => $domain));
-                $context['mask'] = '*' . $domain;
-                $denied = true;
-                $error['field'] = 'mail';
-                $contact = 'contact us';
+      // If trapped, leverage user_restrictions module to block by email address.
+      if ($is_suspicious = $query->execute()->fetchAllAssoc('uid')) {
+        watchdog('loft_core_users', 'Denied user from @%domain.', array('%domain' => $domain));
+        $context['mask'] = '*' . $domain;
+        $denied = TRUE;
+        $error['field'] = 'mail';
+        $contact = 'contact us';
 
-                // With the contact module enabled we give an easy way for mistakes to get corrected.
-                if (module_exists('contact')) {
-                    unset($_GET['destination']);
-                    $options = array();
-                    $path = 'contact';
-                    $contact = '<a href="!url">contact us</a>';
-                    $context['parent'] = __FUNCTION__;
-                    drupal_alter('loft_core_users_robotrap_goto', $path, $options, $context);
-                }
-                $error['message'] = t('Your email address is associated with a suspicious domain (%domain); please ' . $contact . ' if this is in error.', array(
-                    '%domain' => $domain,
-                    '!url' => url($path, $options),
-                ));
-            }
+        // With the contact module enabled we give an easy way for mistakes to get corrected.
+        if (module_exists('contact')) {
+          unset($_GET['destination']);
+          $options = array();
+          $path = 'contact';
+          $contact = '<a href="!url">contact us</a>';
+          $context['parent'] = __FUNCTION__;
+          drupal_alter('loft_core_users_robotrap_goto', $path, $options, $context);
         }
+        $error['message'] = t('Your email address is associated with a suspicious domain (%domain); please ' . $contact . ' if this is in error.', array(
+          '%domain' => $domain,
+          '!url' => url($path, $options),
+        ));
+      }
     }
+  }
 }
 
 /**
@@ -334,32 +325,30 @@ function loft_core_users_user_restrictions_alter(&$denied, &$error, &$context)
  *
  * Make a note of this email address/user as a honeybear.
  */
-function loft_core_users_honeypot_reject($form_id, $uid, $type)
-{
-    $g = data_api();
-    if (($mail = $g->get($_POST, 'mail'))) {
-        $domain = _loft_core_users_get_email_domain($mail);
-        $default = explode(',', LOFT_CORE_USERS_DOMAIN_WHITELIST);
-        $may_block = !in_array($domain, variable_get('loft_core_users_domain_whitelist', $default));
-        if ($may_block) {
-            loft_core_users_set_user_status(LOFT_CORE_USERS_STATUS_HONEYBEAR, $uid, $mail, ip_address());
-        }
+function loft_core_users_honeypot_reject($form_id, $uid, $type) {
+  $g = data_api();
+  if (($mail = $g->get($_POST, 'mail'))) {
+    $domain = _loft_core_users_get_email_domain($mail);
+    $default = explode(',', LOFT_CORE_USERS_DOMAIN_WHITELIST);
+    $may_block = !in_array($domain, variable_get('loft_core_users_domain_whitelist', $default));
+    if ($may_block) {
+      loft_core_users_set_user_status(LOFT_CORE_USERS_STATUS_HONEYBEAR, $uid, $mail, ip_address());
     }
+  }
 }
 
 /**
  * Implements hook_action_info().
  */
-function loft_core_action_info()
-{
-    return array(
-        'loft_core_users_block_spammy_user_action' => array(
-            'label' => t('Block SPAMMY user'),
-            'type' => 'user',
-            'configurable' => false,
-            'triggers' => array('any'),
-        ),
-    );
+function loft_core_action_info() {
+  return array(
+    'loft_core_users_block_spammy_user_action' => array(
+      'label' => t('Block SPAMMY user'),
+      'type' => 'user',
+      'configurable' => FALSE,
+      'triggers' => array('any'),
+    ),
+  );
 }
 
 /**
@@ -368,82 +357,78 @@ function loft_core_action_info()
  * @param       $entity
  * @param array $context
  */
-function loft_core_users_block_spammy_user_action(&$entity, $context = array())
-{
-    // First priority: If there is a $entity->uid, block that user.
-    // This is most likely a user object or the author if a node or comment.
-    if (isset($entity->uid)) {
-        $uid = $entity->uid;
-    }
-    elseif (isset($context['uid'])) {
-        $uid = $context['uid'];
-    }
-    // If neither of those are valid, then block the current user.
-    else {
-        $uid = $GLOBALS['user']->uid;
-    }
-    $current_status = loft_core_users_get_user_status($uid);
-    $new_status = $current_status === LOFT_CORE_USERS_STATUS_HONEYBEAR ? LOFT_CORE_USERS_STATUS_HONEYBEAR_MADE_SPAMMY : LOFT_CORE_USERS_STATUS_SPAMMY;
-    loft_core_users_block_user($new_status, $uid);
+function loft_core_users_block_spammy_user_action(&$entity, $context = array()) {
+  // First priority: If there is a $entity->uid, block that user.
+  // This is most likely a user object or the author if a node or comment.
+  if (isset($entity->uid)) {
+    $uid = $entity->uid;
+  }
+  else if (isset($context['uid'])) {
+    $uid = $context['uid'];
+  }
+  // If neither of those are valid, then block the current user.
+  else {
+    $uid = $GLOBALS['user']->uid;
+  }
+  $current_status = loft_core_users_get_user_status($uid);
+  $new_status = $current_status === LOFT_CORE_USERS_STATUS_HONEYBEAR ? LOFT_CORE_USERS_STATUS_HONEYBEAR_MADE_SPAMMY : LOFT_CORE_USERS_STATUS_SPAMMY;
+  loft_core_users_block_user($new_status, $uid);
 }
 
-function loft_core_form_user_login_alter(&$form, $form_state, $form_id)
-{
-    if (!variable_get('loft_core_remember_usernames', false)) {
-        return;
-    }
+function loft_core_form_user_login_alter(&$form, $form_state, $form_id) {
+  if (!variable_get('loft_core_remember_usernames', FALSE)) {
+    return;
+  }
 
-    $g = data_api();
-    $form['#loft_core_remember_key'] = 'loft_core_remember_username';
-    $form['loft_core_remember_username'] = [
-        '#type' => 'value',
-        '#value' => true,
-    ];
+  $g = data_api();
+  $form['#loft_core_remember_key'] = 'loft_core_remember_username';
+  $form['loft_core_remember_username'] = [
+    '#type' => 'value',
+    '#value' => TRUE,
+  ];
 
-    if (module_exists('persistent_login')) {
-        $form['#loft_core_remember_key'] = 'persistent_login';
-        unset($form['loft_core_remember_username']);
-    }
+  if (module_exists('persistent_login')) {
+    $form['#loft_core_remember_key'] = 'persistent_login';
+    unset($form['loft_core_remember_username']);
+  }
 
-    // If we have the name as a cookie then retrieve it.
-    if (($name = $g->get($_COOKIE, 'loft_core_remember_me'))) {
-        $form['name']['#default_value'] = $name;
-    }
+  // If we have the name as a cookie then retrieve it.
+  if (($name = $g->get($_COOKIE, 'loft_core_remember_me'))) {
+    $form['name']['#default_value'] = $name;
+  }
 
-    $form['#submit'][] = 'loft_core_form_user_login_submit';
+  $form['#submit'][] = 'loft_core_form_user_login_submit';
 }
 
 /**
  * Form submission handler
  */
-function loft_core_form_user_login_submit($form, &$form_state)
-{
-    $g = data_api();;
-    $params = session_get_cookie_params();
-    $cookie_name = 'loft_core_remember_me';
+function loft_core_form_user_login_submit($form, &$form_state) {
+  $g = data_api();;
+  $params = session_get_cookie_params();
+  $cookie_name = 'loft_core_remember_me';
 
-    if (($value_key = $g->get($form, '#loft_core_remember_key'))
-        && $g->get($form_state, ['values', $value_key])
-        && ($cookie_value = $g->get($form_state, 'values.name'))) {
-        $expire = time() + (86400 * variable_get('loft_core_remember_user_for_days', LOFT_CORE_REMEMBER_USER_FOR_DAYS));
-    }
-    else {
-        $cookie_value = '';
-        $expire = REQUEST_TIME - 3600;
-    }
-    setcookie($cookie_name, $cookie_value, $expire, $params['path'], $params['domain'], $params['secure'], $params['httponly']);
+  if (($value_key = $g->get($form, '#loft_core_remember_key'))
+    && $g->get($form_state, ['values', $value_key])
+    && ($cookie_value = $g->get($form_state, 'values.name'))) {
+    $expire = time() + (86400 * variable_get('loft_core_remember_user_for_days', LOFT_CORE_REMEMBER_USER_FOR_DAYS));
+  }
+  else {
+    $cookie_value = '';
+    $expire = REQUEST_TIME - 3600;
+  }
+  setcookie($cookie_name, $cookie_value, $expire, $params['path'], $params['domain'], $params['secure'], $params['httponly']);
 
 }
 
 /**
  * Implements hook_form_user_registration_alter().
  */
-function loft_core_users_form_user_register_form_alter(&$form, &$form_state)
-{
-    // If an admin is creating the user, we would not want to capture the IP because the ip would not be tracking the user, but the admin.  Therefor we don't even capture anything... as there is really no point, and to save database.
-    if (!path_is_admin(current_path())) {
-        $form['#submit'][] = 'loft_core_users_user_register_form_submit';
-    }
+function loft_core_users_form_user_register_form_alter(&$form, &$form_state) {
+  // If an admin is creating the user, we would not want to capture the IP because the ip would not be tracking the user, but the admin.  Therefor we don't even capture anything... as there is really no point, and to save database.
+  if (!path_is_admin(current_path())) {
+    $form['#submit'][] = 'loft_core_users_user_register_form_submit';
+  }
 }
 
 /**
@@ -452,70 +437,65 @@ function loft_core_users_form_user_register_form_alter(&$form, &$form_state)
  * @param $form
  * @param $form_state
  */
-function loft_core_users_user_register_form_submit($form, $form_state)
-{
-    // When a new account is submitted, capture the IP.
-    $account = $form_state['user'];
-    loft_core_users_set_user_status($account->status, $account->uid, $account->init, ip_address());
+function loft_core_users_user_register_form_submit($form, $form_state) {
+  // When a new account is submitted, capture the IP.
+  $account = $form_state['user'];
+  loft_core_users_set_user_status($account->status, $account->uid, $account->init, ip_address());
 }
 
 /**
  * Implements hook_menu().
  */
-function loft_core_users_menu()
-{
-    $items['admin/config/people/loft-core-users'] = array(
-        'title' => 'Loft Core',
-        'page callback' => 'drupal_get_form',
-        'page arguments' => array('loft_core_users_settings_form'),
-        'access arguments' => array('loft_core_users:administer'),
-        'type' => MENU_NORMAL_ITEM,
-        'file' => 'loft_core.admin.inc',
-    );
+function loft_core_users_menu() {
+  $items['admin/config/people/loft-core-users'] = array(
+    'title' => 'Loft Core',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('loft_core_users_settings_form'),
+    'access arguments' => array('loft_core_users:administer'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'loft_core.admin.inc',
+  );
 
-    return $items;
+  return $items;
 }
 
 /**
  * Implements hook_permission().
  */
-function loft_core_users_permission()
-{
-    return array(
-        'loft_core_users:administer' => array(
-            'title' => t('Administer Loft Core Users'),
-            'description' => t('Perform administration tasks for Loft Core Users.'),
-            'restrict access' => true,
-        ),
-    );
+function loft_core_users_permission() {
+  return array(
+    'loft_core_users:administer' => array(
+      'title' => t('Administer Loft Core Users'),
+      'description' => t('Perform administration tasks for Loft Core Users.'),
+      'restrict access' => TRUE,
+    ),
+  );
 }
 
 /**
  * Implements hook_views_api().
  */
-function loft_core_users_views_api()
-{
-    return array(
-        'api' => 3,
-        'path' => drupal_get_path('module', 'loft_core_users') . '/includes/views',
-    );
+function loft_core_users_views_api() {
+  return array(
+    'api' => 3,
+    'path' => drupal_get_path('module', 'loft_core_users') . '/includes/views',
+  );
 }
 
 
 /**
  * Implements hook_user_delete().
  */
-function loft_core_users_user_delete($account)
-{
-    // When the user is deleted, change the UID to 0
-    db_update('loft_core_users')
-        ->fields(array(
-                'uid' => 0,
-                'uid_init' => $account->uid,
-            )
-        )
-        ->condition('uid', $account->uid)
-        ->execute();
+function loft_core_users_user_delete($account) {
+  // When the user is deleted, change the UID to 0
+  db_update('loft_core_users')
+    ->fields(array(
+        'uid' => 0,
+        'uid_init' => $account->uid,
+      )
+    )
+    ->condition('uid', $account->uid)
+    ->execute();
 }
 
 
