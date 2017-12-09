@@ -8,7 +8,7 @@
             "role": "Developer"
         }
     ],
-    "version": "0.6.35",
+    "version": "0.6.44",
     "autoload": {
         "files": [
             "src\/AKlump\/LoftLib\/Xml\/LoftXmlElement.php"
@@ -16,7 +16,7 @@
         "psr-4": {
             "": [
                 "src\/",
-                "tests"
+                "tests\/"
             ]
         }
     },
@@ -28,7 +28,8 @@
         "symfony\/yaml": "^2.7",
         "ralouphie\/mimey": "^1.0",
         "aklump\/loft_data_grids": "^0.4.28",
-        "illuminate\/support": "~4.2.17"
+        "illuminate\/support": "~4.2.17",
+        "aklump\/data": "^0.0.28"
     },
     "type": "library"
 }

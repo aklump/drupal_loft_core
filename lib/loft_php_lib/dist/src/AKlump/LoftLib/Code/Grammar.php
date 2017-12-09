@@ -103,6 +103,11 @@ class Grammar {
         return in_array($letter, static::consonants());
     }
 
+    public static function isVowel($letter)
+    {
+        return in_array($letter, static::vowels());
+    }
+
     public static function consonants()
     {
         return array_diff(static::letters(), static::vowels());

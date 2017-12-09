@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>Smart Urls</title>
+  <link href="search/tipuesearch.css" rel="stylesheet">
+  <link href="style.css" rel="stylesheet">
+</head>
+
+<body class="page--smart_url">
+<header>
+  <div class="pager">
+  <a href="settings.html" class="prev settings">&laquo;settings.php</a>
+  <a href="index.html" class="index">Index</a>
+  <a href="testing.html" class="next testing">Testing&raquo;</a>
+</div>
+</header>
+
+  <div class="search__wrapper">
+  <form action="search--results.html">
+    <input type="text" class="search-input" name="q" id="tipue_search_input" autocomplete="off" required>
+  </form>
+</div>
+
+  <h1>Smart Urls</h1>
+  <div class="breadcrumb"><a href="index.html">Index</a></div>
+
+<section>
+
+<p>Imagine an admin entering a link to the site.  As developer want the unaliased relative path, as the admin, they copy and past the absolute aliased path.  It's a pain to explain to theme that they have to convert it to the way you want it, so you give up.  But that's where <code>loft_core_smart_url()</code> comes in.  Hand it the url they entered, and it will give you the url you want.</p>
+
+<p>Add this to a presave hook after collection an url in a node form.</p>
+
+<p>Add this to a filter that can then convert the bad urls to good urls.</p>
+
+<p>Rock.</p>
+</section>
+
+<div class="search__results">
+  <div id="tipue_search_content"></div>
+</div>
+
+<footer>
+  <div class="pager">
+  <a href="settings.html" class="prev settings">&laquo;settings.php</a>
+  <a href="index.html" class="index">Index</a>
+  <a href="testing.html" class="next testing">Testing&raquo;</a>
+</div>
+  
+  <div id="footer-legaleeze">
+    <p class="legaleeze center">Version: 7.x-0.3-rc29 &bull; Last Updated: Fri, 08 Dec 2017 18:37:40 -0800</p>
+  </div>
+</footer>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script src="search/tipuesearch_content.js"></script>
+  <script src="search/tipuesearch_set.js"></script>
+  <script src="search/tipuesearch.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      $('#tipue_search_input').tipuesearch();
+    });
+  </script>
+<script src="js/core.js"></script>
+</body>
+</html>
+

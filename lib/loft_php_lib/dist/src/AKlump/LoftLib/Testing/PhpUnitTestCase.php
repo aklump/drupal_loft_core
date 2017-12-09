@@ -38,6 +38,9 @@ namespace AKlump\LoftLib\Testing;
  */
 class PhpUnitTestCase extends \PHPUnit_Framework_TestCase {
 
+    static $db;
+    static $dbInstaller;
+
     public function assertProtectedPropertySame($control, $instance, $property)
     {
         $reflection = new \ReflectionClass($instance);
@@ -247,6 +250,11 @@ class PhpUnitTestCase extends \PHPUnit_Framework_TestCase {
         }
 
         return $return;
+    }
+
+    public function useDatabase()
+    {
+        static::$dbInstaller->destroy()->install();
     }
 }
 

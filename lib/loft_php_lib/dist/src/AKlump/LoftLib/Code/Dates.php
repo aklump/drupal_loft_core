@@ -64,7 +64,7 @@ class Dates {
      *
      * @return static
      */
-    public static function z($date, $timezone = 'UTC')
+    public static function z($date = 'now', $timezone = 'UTC')
     {
         return static::o($date, $timezone)->setTimezone(static::utc());
     }
@@ -291,7 +291,7 @@ class Dates {
     {
         $day1 = $this->l($this->normalizeToOne($day1))->setTime(0, 0, 0);
         $day2 = $this->l($this->normalizeToOne($day2))->setTime(23, 59, 59);
-        $now = $this->l('now');
+        $now = $this->now();
 
         return $day1 <= $now && $now <= $day2;
     }

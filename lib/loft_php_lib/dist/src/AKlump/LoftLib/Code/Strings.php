@@ -1,11 +1,11 @@
 <?php
+
 namespace AKlump\LoftLib\Code;
 
 /**
  * @brief Utility methods for working with strings.
  */
-class Strings
-{
+class Strings {
 
     /**
      * Convert a hyphenated, underscored or camel-cased string to lower
@@ -109,6 +109,18 @@ class Strings
         $phrase = trim(preg_replace('/[A-Z]/', ' \0', $phrase));
 
         return self::rmRepeatedWhitespace($phrase);
+    }
+
+    /**
+     * Return a string in title case
+     *
+     * @param $phrase
+     *
+     * @return string
+     */
+    public static function title($phrase)
+    {
+        return ucwords(static::words($phrase));
     }
 
     /**

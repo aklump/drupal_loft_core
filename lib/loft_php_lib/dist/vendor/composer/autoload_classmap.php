@@ -6,6 +6,10 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'AKlump\\Data\\CallTestObject' => $vendorDir . '/aklump/data/Tests/DataTest.php',
+    'AKlump\\Data\\Data' => $vendorDir . '/aklump/data/Data.php',
+    'AKlump\\Data\\DataInterface' => $vendorDir . '/aklump/data/DataInterface.php',
+    'AKlump\\Data\\DataTest' => $vendorDir . '/aklump/data/Tests/DataTest.php',
     'AKlump\\LoftDataGrids\\ArrayExporter' => $vendorDir . '/aklump/loft_data_grids/src/AKlump/LoftDataGrids/ArrayExporter.php',
     'AKlump\\LoftDataGrids\\BootstrapHTMLExporter' => $vendorDir . '/aklump/loft_data_grids/src/AKlump/LoftDataGrids/BootstrapHTMLExporter.php',
     'AKlump\\LoftDataGrids\\CSVExporter' => $vendorDir . '/aklump/loft_data_grids/src/AKlump/LoftDataGrids/CSVExporter.php',
@@ -34,6 +38,12 @@ return array(
     'AKlump\\LoftDataGrids\\YAMLFrontMatterImporter' => $vendorDir . '/aklump/loft_data_grids/src/AKlump/LoftDataGrids/YAMLFrontMatterImporter.php',
     'AKlump\\LoftLib\\Code\\Arrays' => $baseDir . '/src/AKlump/LoftLib/Code/Arrays.php',
     'AKlump\\LoftLib\\Code\\ArraysTest' => $baseDir . '/tests/AKlump/LoftLib/Code/ArraysTest.php',
+    'AKlump\\LoftLib\\Code\\Dataset' => $baseDir . '/src/AKlump/LoftLib/Code/Dataset.php',
+    'AKlump\\LoftLib\\Code\\DatasetAlpha' => $baseDir . '/tests/AKlump/LoftLib/Code/DatasetAlpha.php',
+    'AKlump\\LoftLib\\Code\\DatasetAlphaTest' => $baseDir . '/tests/AKlump/LoftLib/Code/DatasetAlphaTest.php',
+    'AKlump\\LoftLib\\Code\\DatasetBravo' => $baseDir . '/tests/AKlump/LoftLib/Code/DatasetBravo.php',
+    'AKlump\\LoftLib\\Code\\DatasetBravoTest' => $baseDir . '/tests/AKlump/LoftLib/Code/DatasetBravoTest.php',
+    'AKlump\\LoftLib\\Code\\DatasetInterface' => $baseDir . '/src/AKlump/LoftLib/Code/DatasetInterface.php',
     'AKlump\\LoftLib\\Code\\Dates' => $baseDir . '/src/AKlump/LoftLib/Code/Dates.php',
     'AKlump\\LoftLib\\Code\\DatesTest' => $baseDir . '/tests/AKlump/LoftLib/Code/DatesTest.php',
     'AKlump\\LoftLib\\Code\\EncryptionInterface' => $baseDir . '/src/AKlump/LoftLib/Code/EncryptionInterface.obf.php',
@@ -45,6 +55,8 @@ return array(
     'AKlump\\LoftLib\\Code\\Grammar' => $baseDir . '/src/AKlump/LoftLib/Code/Grammar.php',
     'AKlump\\LoftLib\\Code\\GrammarTest' => $baseDir . '/tests/AKlump/LoftLib/Code/GrammarTest.php',
     'AKlump\\LoftLib\\Code\\Liar' => $baseDir . '/tests/AKlump/LoftLib/Code/ExposerTest.php',
+    'AKlump\\LoftLib\\Code\\Markdown' => $baseDir . '/src/AKlump/LoftLib/Code/Markdown.php',
+    'AKlump\\LoftLib\\Code\\MarkdownTest' => $baseDir . '/tests/AKlump/LoftLib/Code/MarkdownTest.php',
     'AKlump\\LoftLib\\Code\\ObjectCacheTrait' => $baseDir . '/src/AKlump/LoftLib/Code/ObjectCacheTrait.php',
     'AKlump\\LoftLib\\Code\\PhpDocBlock' => $baseDir . '/src/AKlump/LoftLib/Code/PhpDocBlock.php',
     'AKlump\\LoftLib\\Code\\PhpDocBlockTest' => $baseDir . '/tests/AKlump/LoftLib/Code/PhpDocBlockTest.php',
@@ -121,6 +133,7 @@ return array(
     'AKlump\\LoftLib\\Messenger\\MessengerInterface' => $baseDir . '/src/AKlump/LoftLib/Messenger/MessengerInterface.php',
     'AKlump\\LoftLib\\Messenger\\MessengerShell' => $baseDir . '/src/AKlump/LoftLib/Messenger/MessengerShell.php',
     'AKlump\\LoftLib\\Messenger\\MessengerShellTestTest' => $baseDir . '/tests/AKlump/LoftLib/Messenger/MessengerShellTest.php',
+    'AKlump\\LoftLib\\Testing\\DatasetTestBase' => $baseDir . '/src/AKlump/LoftLib/Testing/DatasetTestBase.php',
     'AKlump\\LoftLib\\Testing\\Mockable' => $baseDir . '/src/AKlump/LoftLib/Testing/PhpUnitTestCase.php',
     'AKlump\\LoftLib\\Testing\\PhpUnitTestCase' => $baseDir . '/src/AKlump/LoftLib/Testing/PhpUnitTestCase.php',
     'AKlump\\LoftLib\\Utils\\Blocking' => $baseDir . '/src/AKlump/LoftLib/Utils/Blocking.php',
@@ -392,4 +405,5 @@ return array(
     'Symfony\\Component\\Yaml\\Parser' => $vendorDir . '/symfony/yaml/Parser.php',
     'Symfony\\Component\\Yaml\\Unescaper' => $vendorDir . '/symfony/yaml/Unescaper.php',
     'Symfony\\Component\\Yaml\\Yaml' => $vendorDir . '/symfony/yaml/Yaml.php',
+    '__NAmespace\\__CLassNameTest' => $baseDir . '/src/AKlump/LoftLib/Testing/DatasetTestTemplate.php',
 );

@@ -44,6 +44,8 @@ interface PersistentInterface
     /**
      * Put data into temporary storage converting to a json string.
      *
+     * Additional arguments may influece how the json is encoded; see json_encode().
+     *
      * @param array $data
      *
      * @return  {object}

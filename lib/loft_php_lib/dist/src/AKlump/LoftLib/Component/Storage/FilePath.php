@@ -138,12 +138,18 @@ class FilePath implements PersistentInterface {
      *                  and avoid including the file component of the path.
      * @param int $mode
      *
-     * @return array
-     *  - 0 The directory with trailing / removed
-     *  - 1 The basename if exists.
+     * @return array - 0 The directory with trailing / removed
+     * - 0 The directory with trailing / removed
+     * - 1 The basename if exists.
+     *
+     * @throws \AKlump\LoftLib\Code\AKlump\LoftLib\Code\StandardPhpErrorException
+     * @throws \InvalidArgumentException When $path is empty.
      */
     public static function ensureDir($path, $mode = 0777)
     {
+        if (empty($path)) {
+            throw new \InvalidArgumentException("\$path cannot be empty.");
+        }
         $info = pathinfo($path);
         $basename = '';
         if (!empty($info['extension'])) {
@@ -334,7 +340,7 @@ class FilePath implements PersistentInterface {
 
     public function putJson(array $data)
     {
-        $this->contents = json_encode($data);
+        $this->contents = call_user_func_array('json_encode', func_get_args());
 
         return $this;
     }
@@ -530,7 +536,7 @@ class FilePath implements PersistentInterface {
      * @param string $matchRegEx
      * @param string $excludeRegEx
      *
-     * @return array
+     * @return \AKlump\LoftLib\Component\Storage\FilePath|\AKlump\LoftLib\Component\Storage\FilePathCollection|null
      */
     public function children($matchRegEx = '', $excludeRegEx = '')
     {
@@ -572,10 +578,13 @@ class FilePath implements PersistentInterface {
             return false;
         };
         foreach (func_get_args() as $value) {
-            if (is_numeric($value)) {
+            if (!in_array($type = gettype($value), ['integer', 'string'])) {
+                throw new \InvalidArgumentException("Arguments must be of type: integer or string. $type received.");
+            }
+            if (is_int($value)) {
                 $assign(0, $value * 1);
             }
-            elseif (!$assign(1, strval($value))) {
+            else if (!$assign(1, strval($value))) {
                 $assign(2, strval($value));
             }
         }
@@ -669,6 +678,16 @@ class FilePath implements PersistentInterface {
      * Helper function
      *
      * @see FilePath::getFilesRecursively()
+     *
+     * @param string $path
+     * @param array  $options
+     *  - 0 int Maximum levels down to recurse
+     *  - 1 string The match regex
+     *  - 2 string The omit regex
+     * @param null   $files
+     * @param int    $level
+     *
+     * @return \AKlump\LoftLib\Component\Storage\FilePathCollection|null
      */
     private function _getFilesRecursively($path, $options, &$files = null, &$level = 0)
     {

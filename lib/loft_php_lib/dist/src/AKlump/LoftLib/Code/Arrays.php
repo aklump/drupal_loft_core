@@ -60,43 +60,6 @@ class Arrays {
         return $out;
     }
 
-    protected static function _formFuzzyGet($a, $b, $default)
-    {
-        if (!is_array($b)) {
-            return $a;
-        }
-        else {
-            foreach (array_keys($b) as $key) {
-                if (!array_key_exists($key, $a)) {
-                    return $default;
-                }
-
-                if ($return = static::_formFuzzyGet($a[$key], $b[$key], $default)) {
-                    break;
-                }
-            }
-        }
-
-        return $return;
-    }
-
-    protected static function _formExpandItem(array &$build, array $parents, $value, $expansionKey)
-    {
-        $parent = array_shift($parents);
-        if (count($parents)) {
-            if (isset($build[$parent])) {
-                $build[$parent] = is_array($build[$parent]) ? $build[$parent] : array(0 => array($expansionKey => $build[$parent]));
-            }
-            else {
-                $build[$parent] = array();
-            }
-            static::_formExpandItem($build[$parent], $parents, $value, $expansionKey);
-        }
-        else {
-            $build[$parent] = $value;
-        }
-    }
-
     /**
      * Return a new array with all keys from $a, whose keys begin with any of
      * the keys in $b.
@@ -158,6 +121,46 @@ class Arrays {
         $parents = is_string($parents) ? static::expandParents($parents) : $parents;
 
         return static::_formExport($array, $null, $parents);
+    }
+
+    /**
+     * The opposite of flattenParents.
+     *
+     * @param $string , e.g. 'do[re][mi]'
+     *
+     * @return array
+     *
+     * @see flattenParents().
+     */
+    public static function expandParents($string)
+    {
+        $a = trim($string);
+        $a = $a ? explode('[', $string) : array();
+        array_walk($a, function (&$value) {
+            $value = trim($value, '[]');
+        });
+
+        return $a;
+    }
+
+    /**
+     * Given a single dimensional array, return the values as a string
+     * representing the parent structure of a form item.
+     *
+     * @param array $array E.g., ['do', 're', 'mi']
+     *
+     * @return mixed|string E.g. 'do[re][mi]'
+     *
+     * @see expandParents().
+     */
+    public static function flattenParents(array $array)
+    {
+        $tree = array_shift($array);
+        if ($array) {
+            $tree .= '[' . implode('][', $array) . ']';
+        }
+
+        return strval($tree);
     }
 
     //    /**
@@ -225,46 +228,37 @@ class Arrays {
     //        return $result;
     //    }
 
-    /**
-     * The opposite of flattenParents.
-     *
-     * @param $string , e.g. 'do[re][mi]'
-     *
-     * @return array
-     *
-     * @see flattenParents().
-     */
-    public static function expandParents($string)
+    public static function replaceKey($array, $oldKey, $newKey)
     {
-        $a = trim($string);
-        $a = $a ? explode('[', $string) : array();
-        array_walk($a, function (&$value) {
-            $value = trim($value, '[]');
-        });
+        $keys = array_keys($array);
+        $index = array_search($oldKey, $keys);
 
-        return $a;
+        if ($index !== false) {
+            $keys[$index] = $newKey;
+            $array = array_combine($keys, $array);
+        }
+
+        return $array;
     }
 
-    /**
-     * Recursive helper method.
-     *
-     * @see formExport().
-     */
-    protected static function _formExport($value, array &$export = array(), array &$parents = array())
+    protected static function _formFuzzyGet($a, $b, $default)
     {
-        if (is_array($value) && !empty($value)) {
-            foreach ($value as $key => $item) {
-                $parents[] = $key;
-                static::_formExport($item, $export, $parents);
-            }
-            array_pop($parents);
+        if (!is_array($b)) {
+            return $a;
         }
-        elseif ($parents) {
-            $export[static::flattenParents($parents)] = $value;
-            array_pop($parents);
+        else {
+            foreach (array_keys($b) as $key) {
+                if (!array_key_exists($key, $a)) {
+                    return $default;
+                }
+
+                if ($return = static::_formFuzzyGet($a[$key], $b[$key], $default)) {
+                    break;
+                }
+            }
         }
 
-        return $export;
+        return $return;
     }
     //
     //    protected static function __mergeSmart($schema, array $array, &$parents = [], &$merge = [])
@@ -289,23 +283,42 @@ class Arrays {
     //        return $merge;
     //    }
 
-    /**
-     * Given a single dimensional array, return the values as a string
-     * representing the parent structure of a form item.
-     *
-     * @param array $array E.g., ['do', 're', 'mi']
-     *
-     * @return mixed|string E.g. 'do[re][mi]'
-     *
-     * @see expandParents().
-     */
-    public static function flattenParents(array $array)
+    protected static function _formExpandItem(array &$build, array $parents, $value, $expansionKey)
     {
-        $tree = array_shift($array);
-        if ($array) {
-            $tree .= '[' . implode('][', $array) . ']';
+        $parent = array_shift($parents);
+        if (count($parents)) {
+            if (isset($build[$parent])) {
+                $build[$parent] = is_array($build[$parent]) ? $build[$parent] : array(0 => array($expansionKey => $build[$parent]));
+            }
+            else {
+                $build[$parent] = array();
+            }
+            static::_formExpandItem($build[$parent], $parents, $value, $expansionKey);
+        }
+        else {
+            $build[$parent] = $value;
+        }
+    }
+
+    /**
+     * Recursive helper method.
+     *
+     * @see formExport().
+     */
+    protected static function _formExport($value, array &$export = array(), array &$parents = array())
+    {
+        if (is_array($value) && !empty($value)) {
+            foreach ($value as $key => $item) {
+                $parents[] = $key;
+                static::_formExport($item, $export, $parents);
+            }
+            array_pop($parents);
+        }
+        elseif ($parents) {
+            $export[static::flattenParents($parents)] = $value;
+            array_pop($parents);
         }
 
-        return strval($tree);
+        return $export;
     }
 }

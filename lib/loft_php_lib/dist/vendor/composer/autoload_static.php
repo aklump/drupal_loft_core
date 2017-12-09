@@ -23,6 +23,7 @@ class ComposerStaticInit26a4b428a16b347e3e51c0053974b6a6
         'A' => 
         array (
             'AKlump\\LoftDataGrids\\' => 21,
+            'AKlump\\Data\\' => 12,
         ),
     );
 
@@ -38,6 +39,10 @@ class ComposerStaticInit26a4b428a16b347e3e51c0053974b6a6
         'AKlump\\LoftDataGrids\\' => 
         array (
             0 => __DIR__ . '/..' . '/aklump/loft_data_grids/src/AKlump/LoftDataGrids',
+        ),
+        'AKlump\\Data\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/aklump/data',
         ),
     );
 
@@ -64,6 +69,10 @@ class ComposerStaticInit26a4b428a16b347e3e51c0053974b6a6
     );
 
     public static $classMap = array (
+        'AKlump\\Data\\CallTestObject' => __DIR__ . '/..' . '/aklump/data/Tests/DataTest.php',
+        'AKlump\\Data\\Data' => __DIR__ . '/..' . '/aklump/data/Data.php',
+        'AKlump\\Data\\DataInterface' => __DIR__ . '/..' . '/aklump/data/DataInterface.php',
+        'AKlump\\Data\\DataTest' => __DIR__ . '/..' . '/aklump/data/Tests/DataTest.php',
         'AKlump\\LoftDataGrids\\ArrayExporter' => __DIR__ . '/..' . '/aklump/loft_data_grids/src/AKlump/LoftDataGrids/ArrayExporter.php',
         'AKlump\\LoftDataGrids\\BootstrapHTMLExporter' => __DIR__ . '/..' . '/aklump/loft_data_grids/src/AKlump/LoftDataGrids/BootstrapHTMLExporter.php',
         'AKlump\\LoftDataGrids\\CSVExporter' => __DIR__ . '/..' . '/aklump/loft_data_grids/src/AKlump/LoftDataGrids/CSVExporter.php',
@@ -92,6 +101,12 @@ class ComposerStaticInit26a4b428a16b347e3e51c0053974b6a6
         'AKlump\\LoftDataGrids\\YAMLFrontMatterImporter' => __DIR__ . '/..' . '/aklump/loft_data_grids/src/AKlump/LoftDataGrids/YAMLFrontMatterImporter.php',
         'AKlump\\LoftLib\\Code\\Arrays' => __DIR__ . '/../..' . '/src/AKlump/LoftLib/Code/Arrays.php',
         'AKlump\\LoftLib\\Code\\ArraysTest' => __DIR__ . '/../..' . '/tests/AKlump/LoftLib/Code/ArraysTest.php',
+        'AKlump\\LoftLib\\Code\\Dataset' => __DIR__ . '/../..' . '/src/AKlump/LoftLib/Code/Dataset.php',
+        'AKlump\\LoftLib\\Code\\DatasetAlpha' => __DIR__ . '/../..' . '/tests/AKlump/LoftLib/Code/DatasetAlpha.php',
+        'AKlump\\LoftLib\\Code\\DatasetAlphaTest' => __DIR__ . '/../..' . '/tests/AKlump/LoftLib/Code/DatasetAlphaTest.php',
+        'AKlump\\LoftLib\\Code\\DatasetBravo' => __DIR__ . '/../..' . '/tests/AKlump/LoftLib/Code/DatasetBravo.php',
+        'AKlump\\LoftLib\\Code\\DatasetBravoTest' => __DIR__ . '/../..' . '/tests/AKlump/LoftLib/Code/DatasetBravoTest.php',
+        'AKlump\\LoftLib\\Code\\DatasetInterface' => __DIR__ . '/../..' . '/src/AKlump/LoftLib/Code/DatasetInterface.php',
         'AKlump\\LoftLib\\Code\\Dates' => __DIR__ . '/../..' . '/src/AKlump/LoftLib/Code/Dates.php',
         'AKlump\\LoftLib\\Code\\DatesTest' => __DIR__ . '/../..' . '/tests/AKlump/LoftLib/Code/DatesTest.php',
         'AKlump\\LoftLib\\Code\\EncryptionInterface' => __DIR__ . '/../..' . '/src/AKlump/LoftLib/Code/EncryptionInterface.obf.php',
@@ -103,6 +118,8 @@ class ComposerStaticInit26a4b428a16b347e3e51c0053974b6a6
         'AKlump\\LoftLib\\Code\\Grammar' => __DIR__ . '/../..' . '/src/AKlump/LoftLib/Code/Grammar.php',
         'AKlump\\LoftLib\\Code\\GrammarTest' => __DIR__ . '/../..' . '/tests/AKlump/LoftLib/Code/GrammarTest.php',
         'AKlump\\LoftLib\\Code\\Liar' => __DIR__ . '/../..' . '/tests/AKlump/LoftLib/Code/ExposerTest.php',
+        'AKlump\\LoftLib\\Code\\Markdown' => __DIR__ . '/../..' . '/src/AKlump/LoftLib/Code/Markdown.php',
+        'AKlump\\LoftLib\\Code\\MarkdownTest' => __DIR__ . '/../..' . '/tests/AKlump/LoftLib/Code/MarkdownTest.php',
         'AKlump\\LoftLib\\Code\\ObjectCacheTrait' => __DIR__ . '/../..' . '/src/AKlump/LoftLib/Code/ObjectCacheTrait.php',
         'AKlump\\LoftLib\\Code\\PhpDocBlock' => __DIR__ . '/../..' . '/src/AKlump/LoftLib/Code/PhpDocBlock.php',
         'AKlump\\LoftLib\\Code\\PhpDocBlockTest' => __DIR__ . '/../..' . '/tests/AKlump/LoftLib/Code/PhpDocBlockTest.php',
@@ -179,6 +196,7 @@ class ComposerStaticInit26a4b428a16b347e3e51c0053974b6a6
         'AKlump\\LoftLib\\Messenger\\MessengerInterface' => __DIR__ . '/../..' . '/src/AKlump/LoftLib/Messenger/MessengerInterface.php',
         'AKlump\\LoftLib\\Messenger\\MessengerShell' => __DIR__ . '/../..' . '/src/AKlump/LoftLib/Messenger/MessengerShell.php',
         'AKlump\\LoftLib\\Messenger\\MessengerShellTestTest' => __DIR__ . '/../..' . '/tests/AKlump/LoftLib/Messenger/MessengerShellTest.php',
+        'AKlump\\LoftLib\\Testing\\DatasetTestBase' => __DIR__ . '/../..' . '/src/AKlump/LoftLib/Testing/DatasetTestBase.php',
         'AKlump\\LoftLib\\Testing\\Mockable' => __DIR__ . '/../..' . '/src/AKlump/LoftLib/Testing/PhpUnitTestCase.php',
         'AKlump\\LoftLib\\Testing\\PhpUnitTestCase' => __DIR__ . '/../..' . '/src/AKlump/LoftLib/Testing/PhpUnitTestCase.php',
         'AKlump\\LoftLib\\Utils\\Blocking' => __DIR__ . '/../..' . '/src/AKlump/LoftLib/Utils/Blocking.php',
@@ -450,6 +468,7 @@ class ComposerStaticInit26a4b428a16b347e3e51c0053974b6a6
         'Symfony\\Component\\Yaml\\Parser' => __DIR__ . '/..' . '/symfony/yaml/Parser.php',
         'Symfony\\Component\\Yaml\\Unescaper' => __DIR__ . '/..' . '/symfony/yaml/Unescaper.php',
         'Symfony\\Component\\Yaml\\Yaml' => __DIR__ . '/..' . '/symfony/yaml/Yaml.php',
+        '__NAmespace\\__CLassNameTest' => __DIR__ . '/../..' . '/src/AKlump/LoftLib/Testing/DatasetTestTemplate.php',
     );
 
     public static function getInitializer(ClassLoader $loader)

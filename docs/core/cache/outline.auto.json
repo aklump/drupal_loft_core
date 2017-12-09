@@ -56,22 +56,28 @@
             "sort": 8
         },
         {
+            "id": "smart_url",
+            "title": "Smart Urls",
+            "file": "smart_url.md",
+            "sort": 9
+        },
+        {
             "id": "testing",
             "title": "Testing",
             "file": "testing.md",
-            "sort": 9
+            "sort": 10
         },
         {
             "id": "trackjs",
             "title": "Add TrackJS.com to your website",
             "file": "trackjs.md",
-            "sort": 10
+            "sort": 11
         },
         {
             "id": "_tasklist",
             "title": " Tasklist",
             "file": "_tasklist.md",
-            "sort": 11
+            "sort": 12
         }
     ],
     "settings": {
