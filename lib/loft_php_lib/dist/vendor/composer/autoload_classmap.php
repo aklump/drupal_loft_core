@@ -38,6 +38,8 @@ return array(
     'AKlump\\LoftDataGrids\\YAMLFrontMatterImporter' => $vendorDir . '/aklump/loft_data_grids/src/AKlump/LoftDataGrids/YAMLFrontMatterImporter.php',
     'AKlump\\LoftLib\\Code\\Arrays' => $baseDir . '/src/AKlump/LoftLib/Code/Arrays.php',
     'AKlump\\LoftLib\\Code\\ArraysTest' => $baseDir . '/tests/AKlump/LoftLib/Code/ArraysTest.php',
+    'AKlump\\LoftLib\\Code\\Cache' => $baseDir . '/src/AKlump/LoftLib/Code/Cache.php',
+    'AKlump\\LoftLib\\Code\\CacheTest' => $baseDir . '/tests/AKlump/LoftLib/Code/CacheTest.php',
     'AKlump\\LoftLib\\Code\\Dataset' => $baseDir . '/src/AKlump/LoftLib/Code/Dataset.php',
     'AKlump\\LoftLib\\Code\\DatasetAlpha' => $baseDir . '/tests/AKlump/LoftLib/Code/DatasetAlpha.php',
     'AKlump\\LoftLib\\Code\\DatasetAlphaTest' => $baseDir . '/tests/AKlump/LoftLib/Code/DatasetAlphaTest.php',
