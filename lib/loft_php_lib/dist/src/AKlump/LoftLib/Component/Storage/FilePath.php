@@ -613,6 +613,8 @@ class FilePath implements PersistentInterface {
         }
         list($this->dir, $this->basename) = static::ensureDir($path);
         $this->type = empty($this->basename) ? static::TYPE_DIR : static::TYPE_FILE;
+
+        return $this;
     }
 
     protected function validateIsDir($method)

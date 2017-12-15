@@ -7,6 +7,7 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'AKlump\\LoftLib\\Code\\Arrays' => $baseDir . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Code/Arrays.php',
+    'AKlump\\LoftLib\\Code\\Cache' => $baseDir . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Code/Cache.php',
     'AKlump\\LoftLib\\Code\\Dataset' => $baseDir . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Code/Dataset.php',
     'AKlump\\LoftLib\\Code\\DatasetInterface' => $baseDir . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Code/DatasetInterface.php',
     'AKlump\\LoftLib\\Code\\Dates' => $baseDir . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Code/Dates.php',

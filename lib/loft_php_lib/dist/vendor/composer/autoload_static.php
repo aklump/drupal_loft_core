@@ -101,6 +101,8 @@ class ComposerStaticInit26a4b428a16b347e3e51c0053974b6a6
         'AKlump\\LoftDataGrids\\YAMLFrontMatterImporter' => __DIR__ . '/..' . '/aklump/loft_data_grids/src/AKlump/LoftDataGrids/YAMLFrontMatterImporter.php',
         'AKlump\\LoftLib\\Code\\Arrays' => __DIR__ . '/../..' . '/src/AKlump/LoftLib/Code/Arrays.php',
         'AKlump\\LoftLib\\Code\\ArraysTest' => __DIR__ . '/../..' . '/tests/AKlump/LoftLib/Code/ArraysTest.php',
+        'AKlump\\LoftLib\\Code\\Cache' => __DIR__ . '/../..' . '/src/AKlump/LoftLib/Code/Cache.php',
+        'AKlump\\LoftLib\\Code\\CacheTest' => __DIR__ . '/../..' . '/tests/AKlump/LoftLib/Code/CacheTest.php',
         'AKlump\\LoftLib\\Code\\Dataset' => __DIR__ . '/../..' . '/src/AKlump/LoftLib/Code/Dataset.php',
         'AKlump\\LoftLib\\Code\\DatasetAlpha' => __DIR__ . '/../..' . '/tests/AKlump/LoftLib/Code/DatasetAlpha.php',
         'AKlump\\LoftLib\\Code\\DatasetAlphaTest' => __DIR__ . '/../..' . '/tests/AKlump/LoftLib/Code/DatasetAlphaTest.php',
