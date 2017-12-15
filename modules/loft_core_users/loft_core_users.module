@@ -35,6 +35,11 @@ define('LOFT_CORE_USERS_STATUS_HONEYBEAR_MADE_SPAMMY', 34);
 define('LOFT_CORE_USERS_STATUS_SPAMMY', 4);
 
 /**
+ * Default value, an ip must have at least this many loft_core_users_get_blocking_statuses() domains to appear in the apache snippet.
+ */
+define('LOFT_CORE_USERS_APACHE_MIN_DOMAINS_PER_IP_TO_LIST', 2);
+
+/**
  * @var LOFT_CORE_USERS_DOMAIN_WHITELIST
  *
  * CSV list of domains to whitelist that cannot will not be blocked, regardless

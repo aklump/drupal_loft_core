@@ -33,9 +33,9 @@ function loft_core_users_settings_form($form, &$form_state) {
     $checked = array_diff($options, loft_core_users_get_domain_whitelist());
     $form['domains'] = array(
       '#type' => 'fieldset',
-      '#title' => t('Blacklist (@checked of @total)', array(
+      '#title' => t('Blacklist (@checked of @domains)', array(
         '@checked' => count($checked),
-        '@total' => count($options),
+        '@domains' => format_plural(count($options), '1 domain', '@count domains'),
       )),
       '#description' => t('The domains listed have been identified as suspicious.  All domains checked here will be blocked.  To allow users from one or more of the listed domains, uncheck those domains.  This will allow new users with emails from said domains to sign up for new accounts.'),
       '#collapsible' => TRUE,
@@ -71,8 +71,8 @@ function loft_core_users_settings_form($form, &$form_state) {
   if (count($options)) {
     $form['honeybears'] = array(
       '#type' => 'fieldset',
-      '#title' => t('Honeybears (@total)', array(
-        '@total' => count($options),
+      '#title' => t('Honeybears (@domains)', array(
+        '@domains' => format_plural(count($options), '1 domain', '@count domains'),
       )),
       '#description' => t('The domains listed have been flagged as suspicious.  These domains are not blocked.  To block any of these domains, check said domains and save the form.'),
       '#collapsible' => TRUE,
@@ -120,21 +120,33 @@ function loft_core_users_settings_form($form, &$form_state) {
       $deny_from[$record->ip][] = '# ' . implode(', ', $comment);
     }
   }
+
+  $min_count = variable_get('loft_core_users_apache_min_domains_per_ip_to_list', LOFT_CORE_USERS_APACHE_MIN_DOMAINS_PER_IP_TO_LIST);
+  $deny_from = array_filter($deny_from, function ($item) use ($min_count) {
+    return count($item) - 1 >= $min_count;
+  });
+
   array_walk($deny_from, function (&$value) {
     $value = implode(PHP_EOL, array_reverse($value)) . PHP_EOL;
   });
 
+  $form['apache'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('.htaccess deny by IP (@ips)', array('@ips' => format_plural(count($deny_from), '1 ip', '@count ips'))),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  );
+  $form['apache']['loft_core_users_apache_min_domains_per_ip_to_list'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Domain Minimum to List'),
+    '#description' => t('An IP will only appear in this list if it has at least this many domains that have been blocked.'),
+    '#default_value' => $min_count,
+    '#required' => TRUE,
+    '#size' => 8,
+  );
+
   // Add a header: note, in reverse stacking order
   if (count($deny_from)) {
-
-    $form['apache'] = array(
-      '#type' => 'fieldset',
-      '#title' => t('.htaccess deny by IP'),
-      '#description' => t('This snippet is generated automatically based on spam levels and provided so that you can copy and paste it into your root-level .htaccess file for blocking by ips.  This is a read-only field.'),
-      '#collapsible' => TRUE,
-      '#collapsed' => TRUE,
-    );
-
     array_unshift($deny_from, NULL);
     array_unshift($deny_from, '#');
     array_unshift($deny_from, '# Exported from: ' . current_path());
@@ -146,6 +158,7 @@ function loft_core_users_settings_form($form, &$form_state) {
 
     $form['apache']['deny_from'] = array(
       '#type' => 'textarea',
+      '#description' => t('This snippet is generated automatically based on spam levels and provided so that you can copy and paste it into your root-level .htaccess file for blocking by ips.  You may want to do this at regular intervals say monthly to decrease server load of spam.  When an ip is blocked at the apache level, it will never get to Drupal, the database, PHP, etc.  This is a read-only field.'),
       '#title' => t('Deny from'),
       '#default_value' => implode(PHP_EOL, $deny_from),
       '#rows' => 10,
