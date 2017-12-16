@@ -13,6 +13,7 @@ return array(
     'AKlump\\LoftLib\\Code\\Dates' => $baseDir . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Code/Dates.php',
     'AKlump\\LoftLib\\Code\\Exposer' => $baseDir . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Code/Exposer.php',
     'AKlump\\LoftLib\\Code\\Grammar' => $baseDir . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Code/Grammar.php',
+    'AKlump\\LoftLib\\Code\\InfiniteSubset' => $baseDir . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Code/InfiniteSubset.php',
     'AKlump\\LoftLib\\Code\\Markdown' => $baseDir . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Code/Markdown.php',
     'AKlump\\LoftLib\\Code\\ObjectCacheTrait' => $baseDir . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Code/ObjectCacheTrait.php',
     'AKlump\\LoftLib\\Code\\PhpDocBlock' => $baseDir . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Code/PhpDocBlock.php',
