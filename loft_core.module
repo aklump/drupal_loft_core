@@ -805,26 +805,32 @@ function loft_core_cl($base) {
  *
  * The stashed users will persist in the SESSION.
  *
- * @param null          $temporary_user  Leave null when unstashing a previously stashed user.
+ * @param null          $temporary_user Leave null when unstashing a previously stashed user.
  * @param callable|NULL $callback
  */
 function loft_core_user_stash($temporary_user = NULL, Callable $callback = NULL) {
   global $user;
-  data_api()->ensure($_SESSION, 'loft_core.stashed_users', []);
-  $stashed =& $_SESSION['loft_core']['stashed_users'];
+  static $stashed = NULL;
+  $needs_unstash = is_null($temporary_user);
 
   if ($temporary_user) {
-    array_push($stashed, $user);
+    if ($stashed) {
+      throw new \RuntimeException("A user has already been stashed; you must unstash before you try to stash another user.");
+    }
+    $needs_unstash = false;
+    $stashed = $user;
     $user = $temporary_user;
 
     // When callback is provided, we unstash post $callback.
     if ($callback) {
       $callback();
-      $user = array_shift($stashed);
+      $needs_unstash = true;
     }
   }
-  else if (count($stashed)) {
-    $user = array_shift($stashed);
+
+  if ($stashed && $needs_unstash) {
+    $user = $stashed;
+    $stashed = NULL;
   }
 }
 
@@ -832,6 +838,9 @@ function loft_core_user_stash($temporary_user = NULL, Callable $callback = NULL)
  * Implements hook_exit().
  */
 function loft_core_exit() {
+
+  // If the user has not been unstashed by now, we need to force it before drupal_session_commit() happens.
+  loft_core_user_stash();
 
   // Remove some messages by hook.
   if (!empty($_SESSION['messages']) && ($masks = module_invoke_all('loft_core_suppress_messages'))) {
