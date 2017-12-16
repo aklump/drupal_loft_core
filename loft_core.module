@@ -794,26 +794,37 @@ function loft_core_cl($base) {
   };
 }
 
-function loft_core_user_stash($stunt_double = NULL, $callback = NULL, $callback_args = array()) {
-  global $user, $_loft_core_user_stash;
+/**
+ * Stash or unstash a user.
+ *
+ * This function:
+ * - allows you to run some code as a different user inside of a callback function, in which case you need simple call
+ * it once with $temporary_user and $callback.
+ * - allows you to set a temporary user for a time until you call this function again.  Unless you call this function
+ * again, the temporary user will become the logged in user, so USE WITH CARE.
+ *
+ * The stashed users will persist in the SESSION.
+ *
+ * @param null          $temporary_user  Leave null when unstashing a previously stashed user.
+ * @param callable|NULL $callback
+ */
+function loft_core_user_stash($temporary_user = NULL, Callable $callback = NULL) {
+  global $user;
+  data_api()->ensure($_SESSION, 'loft_core.stashed_users', []);
+  $stashed =& $_SESSION['loft_core']['stashed_users'];
 
-  // Unstash the user.
-  if (is_null($stunt_double)) {
-    if (isset($_loft_core_user_stash)) {
-      $user = $_loft_core_user_stash;
-      $_loft_core_user_stash = NULL;
+  if ($temporary_user) {
+    array_push($stashed, $user);
+    $user = $temporary_user;
+
+    // When callback is provided, we unstash post $callback.
+    if ($callback) {
+      $callback();
+      $user = array_shift($stashed);
     }
-  } // Stash the user.
-  else {
-
-    $_loft_core_user_stash = $user;
-    $user = $stunt_double;
-    if (is_callable($callback)) {
-      $callback($callback_args);
-
-      // for a callable we will immediately unstash.  If no callable we will assume a stash that will persist until function is called again.
-      loft_core_user_stash();
-    }
+  }
+  else if (count($stashed)) {
+    $user = array_shift($stashed);
   }
 }
 
@@ -821,12 +832,6 @@ function loft_core_user_stash($stunt_double = NULL, $callback = NULL, $callback_
  * Implements hook_exit().
  */
 function loft_core_exit() {
-  global $_loft_core_user_stash;
-
-  // If the user has not been unstashed by now, we need to force it before drupal_session_commit() happens.
-  if ($_loft_core_user_stash) {
-    loft_core_user_stash();
-  }
 
   // Remove some messages by hook.
   if (!empty($_SESSION['messages']) && ($masks = module_invoke_all('loft_core_suppress_messages'))) {
@@ -954,7 +959,7 @@ function loft_core_preprocess_status_report(&$vars) {
  * 'loft_core_smart_url' for how we determine what paths are part of the site.
  *
  * @param string $path
- * @param array  $options  These are the same as for url().  You might want to use alias = true.
+ * @param array  $options These are the same as for url().  You might want to use alias = true.
  *
  * @return bool|false|int|string
  *
