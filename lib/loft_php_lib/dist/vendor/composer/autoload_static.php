@@ -119,6 +119,8 @@ class ComposerStaticInit26a4b428a16b347e3e51c0053974b6a6
         'AKlump\\LoftLib\\Code\\ExposerTest' => __DIR__ . '/../..' . '/tests/AKlump/LoftLib/Code/ExposerTest.php',
         'AKlump\\LoftLib\\Code\\Grammar' => __DIR__ . '/../..' . '/src/AKlump/LoftLib/Code/Grammar.php',
         'AKlump\\LoftLib\\Code\\GrammarTest' => __DIR__ . '/../..' . '/tests/AKlump/LoftLib/Code/GrammarTest.php',
+        'AKlump\\LoftLib\\Code\\InfiniteSubset' => __DIR__ . '/../..' . '/src/AKlump/LoftLib/Code/InfiniteSubset.php',
+        'AKlump\\LoftLib\\Code\\InfiniteSubsetTest' => __DIR__ . '/../..' . '/tests/AKlump/LoftLib/Code/InfiniteSubsetTest.php',
         'AKlump\\LoftLib\\Code\\Liar' => __DIR__ . '/../..' . '/tests/AKlump/LoftLib/Code/ExposerTest.php',
         'AKlump\\LoftLib\\Code\\Markdown' => __DIR__ . '/../..' . '/src/AKlump/LoftLib/Code/Markdown.php',
         'AKlump\\LoftLib\\Code\\MarkdownTest' => __DIR__ . '/../..' . '/tests/AKlump/LoftLib/Code/MarkdownTest.php',

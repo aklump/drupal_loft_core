@@ -56,6 +56,8 @@ return array(
     'AKlump\\LoftLib\\Code\\ExposerTest' => $baseDir . '/tests/AKlump/LoftLib/Code/ExposerTest.php',
     'AKlump\\LoftLib\\Code\\Grammar' => $baseDir . '/src/AKlump/LoftLib/Code/Grammar.php',
     'AKlump\\LoftLib\\Code\\GrammarTest' => $baseDir . '/tests/AKlump/LoftLib/Code/GrammarTest.php',
+    'AKlump\\LoftLib\\Code\\InfiniteSubset' => $baseDir . '/src/AKlump/LoftLib/Code/InfiniteSubset.php',
+    'AKlump\\LoftLib\\Code\\InfiniteSubsetTest' => $baseDir . '/tests/AKlump/LoftLib/Code/InfiniteSubsetTest.php',
     'AKlump\\LoftLib\\Code\\Liar' => $baseDir . '/tests/AKlump/LoftLib/Code/ExposerTest.php',
     'AKlump\\LoftLib\\Code\\Markdown' => $baseDir . '/src/AKlump/LoftLib/Code/Markdown.php',
     'AKlump\\LoftLib\\Code\\MarkdownTest' => $baseDir . '/tests/AKlump/LoftLib/Code/MarkdownTest.php',
