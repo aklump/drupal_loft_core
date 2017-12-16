@@ -46,6 +46,7 @@ class ComposerStaticInita53fe36df132dd600a8787a349a9d1f5
         'AKlump\\LoftLib\\Code\\Dates' => __DIR__ . '/../..' . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Code/Dates.php',
         'AKlump\\LoftLib\\Code\\Exposer' => __DIR__ . '/../..' . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Code/Exposer.php',
         'AKlump\\LoftLib\\Code\\Grammar' => __DIR__ . '/../..' . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Code/Grammar.php',
+        'AKlump\\LoftLib\\Code\\InfiniteSubset' => __DIR__ . '/../..' . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Code/InfiniteSubset.php',
         'AKlump\\LoftLib\\Code\\Markdown' => __DIR__ . '/../..' . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Code/Markdown.php',
         'AKlump\\LoftLib\\Code\\ObjectCacheTrait' => __DIR__ . '/../..' . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Code/ObjectCacheTrait.php',
         'AKlump\\LoftLib\\Code\\PhpDocBlock' => __DIR__ . '/../..' . '/lib/loft_php_lib/dist/src/AKlump/LoftLib/Code/PhpDocBlock.php',
