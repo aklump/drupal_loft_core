@@ -7,3 +7,4 @@ php = 5.3
 homepage = http://www.intheloftstudios.com/packages/drupal/drupal_loft_core
 author = aklump
 dependencies[] = data_api
+dependencies[] = loft_lib
