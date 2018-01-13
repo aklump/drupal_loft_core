@@ -817,14 +817,14 @@ function loft_core_user_stash($temporary_user = NULL, Callable $callback = NULL)
     if ($stashed) {
       throw new \RuntimeException("A user has already been stashed; you must unstash before you try to stash another user.");
     }
-    $needs_unstash = false;
+    $needs_unstash = FALSE;
     $stashed = $user;
     $user = $temporary_user;
 
     // When callback is provided, we unstash post $callback.
     if ($callback) {
       $callback();
-      $needs_unstash = true;
+      $needs_unstash = TRUE;
     }
   }
 
@@ -993,4 +993,25 @@ function loft_core_smart_url($path, array $options = array()) {
   }
 
   return $path;
+}
+
+/**
+ * Load (shadow) entities.
+ *
+ * For a node this returns an object with these properties: nid, vid and type.  These are faster to load and can be
+ * used in some contexts as needed just for reference, like when using entity_extract_ids() or EntityFieldQuery.
+ *
+ * @param string $entity_type
+ * @param array  $entity_ids
+ *
+ * @return array An array of shadow entity objects.
+ */
+function loft_core_shadow_entity_load($entity_type, array $entity_ids) {
+  $query = new \EntityFieldQuery();
+  $entities = $query
+    ->entityCondition('entity_type', $entity_type)
+    ->entityCondition('entity_id', $entity_ids)
+    ->execute();
+
+  return $entities[$entity_type];
 }
