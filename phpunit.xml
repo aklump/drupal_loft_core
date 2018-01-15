@@ -27,6 +27,9 @@
         <testsuite name="My Test Suite">
             <directory>./tests</directory>
         </testsuite>
+        <testsuite name="classes">
+            <directory>./tests/src</directory>
+        </testsuite>
     </testsuites>
     <filter>
         <whitelist>

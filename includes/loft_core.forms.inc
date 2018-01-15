@@ -3,6 +3,9 @@
  * Provides form hooks to implemented by ${9:My Module}
  */
 
+use Drupal\loft_core\Redirect;
+use Drupal\loft_core\Attribute;
+
 /**
  * Implements hook_form_alter().
  *

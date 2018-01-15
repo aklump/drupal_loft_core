@@ -7,7 +7,6 @@
  * @{
  */
 
-use Drupal\loft_core\Attribute;
 use Drupal\loft_core\Redirect;
 
 
@@ -264,7 +263,6 @@ function loft_core_node_page($node, $op) {
       return $func($node);
   }
 }
-
 
 
 /**
@@ -854,4 +852,17 @@ function loft_core_shadow_entity_load($entity_type, array $entity_ids) {
     ->execute();
 
   return $entities[$entity_type];
+}
+
+/**
+ * Remove all null values from an array.
+ *
+ * @param $array
+ *
+ * @return array
+ */
+function null_filter($array) {
+  return array_filter($array, function ($item) {
+    return !is_null($item);
+  });
 }
