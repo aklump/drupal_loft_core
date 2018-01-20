@@ -4,6 +4,8 @@ namespace Drupal\loft_core\Entity;
 
 trait ExtractorTrait {
 
+  protected $safeUseFormat = NULL;
+
   public function __call($name, $arguments) {
 
     //
@@ -16,10 +18,18 @@ trait ExtractorTrait {
       if (!method_exists($this, $method)) {
         throw new \RuntimeException("Method \"$method\" does not exist; therefore method \"$name\" is invalid.");
       }
+
+      // If the format is discovered in the raw function, it should be set using this variable.
+      $this->safeUseFormat = NULL;
+
       $output = call_user_func_array([$this, $method], $arguments);
 
-      return $this->checkMarkup($output);
+      return $this->checkMarkup($output, $this->safeUseFormat);
     }
+  }
+
+  public function date($field_name, $default = 'now') {
+    return $this->e->getDate($this->getEntity(), [$field_name, 0, 'value'], $default);
   }
 
   /**
@@ -63,6 +73,7 @@ trait ExtractorTrait {
    * @endcode
    */
   public function f($default = NULL, $field_name) {
+    $this->ensureEntityIsLoaded();
     $args = func_get_args();
     $default = array_shift($args);
     list(, $field_name, $delta, $column) = $this->getFieldArgs($args, __METHOD__);
@@ -72,10 +83,12 @@ trait ExtractorTrait {
   }
 
   /**
-   * Return safe-for-output data from an entity field.
+   * Return safe-for-output translated data from an entity field.
    *
    * This is more lightweight than field_view_field() and doesn't take into account anything except the format column
    * on the entity item.  Does not hook into the field apis.
+   *
+   * If 'safe_value' is present as a column on a field item, it will be used.
    *
    * @see f()
    * @see field_view_field()
@@ -89,16 +102,40 @@ trait ExtractorTrait {
       $output = $this->f($default, $field_name);
     }
     else {
-      $output = $this->f($default, $field_name, $delta, $column);
-      $format = $this->f($default, $field_name, $delta, 'format');
+      $item = $this->f([], $field_name, $delta);
+      if (isset($item['safe_value'])) {
+        return $item['safe_value'];
+      }
+      $output = isset($item[$column]) ? $item[$column] : '';
+      $format = !empty($item['format']) ? $item['format'] : NULL;
     }
 
-    return $this->checkMarkup($output, $format, TRUE);
-
+    return $output ? $this->checkMarkup($output, $format, TRUE) : $output;
   }
 
+  /**
+   * Return the translated items array for $field_name.
+   *
+   * @param string $field_name
+   * @param array  $default
+   *
+   * @return array
+   */
   public function items($field_name, array $default = array()) {
     return $this->e->get($this->getEntity(), $field_name, $default);
+  }
+
+  /**
+   * Ensure that $this->entity is not a shadow entity.
+   *
+   * @see loft_core_shadow_entity_load()
+   */
+  protected function ensureEntityIsLoaded() {
+    list($entity_type, $entity, , $entity_id) = $this->validateEntity();
+    if ($entity_id && property_exists($entity, 'loft_core_shadow') && $entity->loft_core_shadow === FALSE) {
+      $entities = entity_load($entity_type, [$entity_id]);
+      $this->setEntity($entity_type, $entities[$entity_id]);
+    }
   }
 
   private function checkMarkup($output, $format = NULL, $strict = FALSE) {
@@ -113,34 +150,42 @@ trait ExtractorTrait {
   }
 
   private function getFieldArgs($args, $method) {
-    $num_args = count($args);
-    if ($num_args > 3) {
-      throw new \InvalidArgumentException("Expecting max four arguments in $method.");
-    }
-    $field_name = array_shift($args);
-    $delta = $column = NULL;
-    $info = (array) $this->d7->field_info_field($field_name);
-    $is_field = !empty($info);
-    if (!$is_field && $num_args > 1) {
-      throw new \InvalidArgumentException("Non-field \"$field_name\" does not have \$delta or \$column values.");
-    }
-    if ($is_field) {
-      if ($num_args === 1) {
-        $column = 'value';
-        $delta = 0;
+    // Completed: 1000000 runs in 154 seconds with static cache
+    // Completed: 1000000 runs in 161 seconds without static cache
+    static $runs = [];
+    $cid = json_encode(func_get_args());
+    if (!isset($runs[$cid])) {
+      $num_args = count($args);
+      if ($num_args > 3) {
+        throw new \InvalidArgumentException("Expecting max four arguments in $method.");
       }
-      while (count($args)) {
-        $arg = array_shift($args);
-        if (is_numeric($arg)) {
-          $delta = $arg;
+      $field_name = array_shift($args);
+      $delta = $column = NULL;
+      $info = (array) $this->d7->field_info_field($field_name);
+      $is_field = !empty($info);
+      if (!$is_field && $num_args > 1) {
+        throw new \InvalidArgumentException("Non-field \"$field_name\" does not have \$delta or \$column values.");
+      }
+      if ($is_field) {
+        if ($num_args === 1) {
+          $column = 'value';
+          $delta = 0;
         }
-        if (is_string($arg)) {
-          $column = $arg;
-          $delta = $delta ? $delta : 0;
+        while (count($args)) {
+          $arg = array_shift($args);
+          if (is_numeric($arg)) {
+            $delta = $arg;
+          }
+          if (is_string($arg)) {
+            $column = $arg;
+            $delta = $delta ? $delta : 0;
+          }
         }
       }
+
+      $runs[$cid] = [$is_field, $field_name, $delta, $column];
     }
 
-    return [$is_field, $field_name, $delta, $column];
+    return $runs[$cid];
   }
 }

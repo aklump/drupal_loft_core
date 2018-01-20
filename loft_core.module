@@ -272,6 +272,7 @@ function loft_core_element_info() {
   $types = array();
   $types['form_help'] = array(
     '#weight' => -99,
+
     // string|array If array,
     //elements are separate paragraphs,
     //without <p> tag wrappers.
@@ -327,11 +328,7 @@ function loft_core_min_weight($render_array) {
   return $min;
 }
 
-function loft_core_theme($existing,
-                         $type,
-                         $theme,
-                         $path
-) {
+function loft_core_theme($existing, $type, $theme, $path) {
   return array(
     'form_help' => array(
       'render element' => 'element',
@@ -363,19 +360,17 @@ function loft_core_preprocess_form_help(&$vars) {
 
 
 /**
- * Provides output for form help..
+ * Provides output for form help.
  *
- * @param array $vars
- *
- * @return string
+ * DO NOT CALL DIRECTLY USE ['#type' => 'form_help',...] INSTEAD!
  *
  * @ingroup themeable
  */
 function theme_form_help($vars) {
   $element = $vars['element'];
-  $element['#attributes']['class'][] = 'form-help';
+  $attributes = drupal_attributes($element['#attributes']);
 
-  return '<div' . drupal_attributes($element['#attributes']) . '>' . $element['#message'] . $element['#children'] . '</div>';
+  return '<blockquote' . $attributes . '>' . $element['#message'] . $element['#children'] . '</blockquote>';
 }
 
 /**
@@ -842,14 +837,21 @@ function loft_core_smart_url($path, array $options = array()) {
  * @param string $entity_type
  * @param array  $entity_ids
  *
- * @return array An array of shadow entity objects.
+ * @return array An array of shadow entity objects.  Each item has the key #loaded set to false so you can check if
+ *               this is a shadow entity.
  */
 function loft_core_shadow_entity_load($entity_type, array $entity_ids) {
   $query = new \EntityFieldQuery();
-  $entities = $query
+  $entities = array_map(function ($bundles) {
+    foreach ($bundles as &$bundle) {
+      $bundle->loft_core_shadow = TRUE;
+    }
+
+    return $bundles;
+  }, $query
     ->entityCondition('entity_type', $entity_type)
     ->entityCondition('entity_id', $entity_ids)
-    ->execute();
+    ->execute());
 
   return $entities[$entity_type];
 }
@@ -864,5 +866,163 @@ function loft_core_shadow_entity_load($entity_type, array $entity_ids) {
 function null_filter($array) {
   return array_filter($array, function ($item) {
     return !is_null($item);
+  });
+}
+
+/**
+ * Make a css safe class or id
+ *
+ * @param      string or array $input
+ *                    The string will be made css safe; array values will be
+ *                    made css safe
+ * @param bool $flatten
+ *                    Optional.  Set to TRUE to flatten arrays into space
+ *                    separated strings
+ *
+ * @return string or array
+ */
+function loft_core_css_safe($input, $flatten = FALSE) {
+  if (is_array($input)) {
+    $function = __FUNCTION__;
+    foreach ($input as $key => $value) {
+      $input[$key] = $this->$function($value);
+    }
+
+    return $flatten ? trim(implode(' ', $input)) : $input;
+  }
+  else if ($input == ($strung = strval($input))) {
+    $input = trim(strtolower(preg_replace('/[\W_]{1}/', '-', $strung)), '-');
+    if (preg_match('/^(\d)(.*)/', $input, $found)) {
+      $word = array(
+        'zero',
+        'one',
+        'two',
+        'three',
+        'four',
+        'five',
+        'six',
+        'seven',
+        'eight',
+        'nine',
+      );
+      $input = $word[$found[1]] . $found[2];
+    }
+  }
+
+  return $input;
+}
+
+/**
+ * Builds a list of all token-like patterns that appear in the text.
+ *
+ * @param $text
+ *   The text to be scanned for possible tokens.
+ *
+ * @return
+ *   An associative array of discovered tokens, grouped by type.
+ */
+function loft_core_twiglike_token_scan($text) {
+  // Matches tokens with the following pattern: [$type:$name]
+  // $type and $name may not contain  [ ] characters.
+  // $type may not contain : or whitespace characters, but $name may.
+  preg_match_all('/
+    \{\{\s*([^.]*?)(?:\.(.*?))?\s*\}\}
+    /x', $text, $matches);
+
+  $types = $matches[1];
+  $tokens = $matches[2];
+
+  // Iterate through the matches, building an associative array containing
+  // $tokens grouped by $types, pointing to the version of the token found in
+  // the source text. For example, $results['node']['title'] = '[node:title]';
+  $results = array();
+  for ($i = 0; $i < count($tokens); $i++) {
+    $results['tokens'][$types[$i]][$tokens[$i]] = ($drupal = '[' . $matches[1][$i] . ':' . $matches[2][$i] . ']');
+    $results['map'][$drupal] = $matches[0][$i];
+  }
+
+  return $results;
+}
+
+/**
+ * Replace twig like tokens in a chunk of text.
+ *
+ * @param string $text
+ * @param array  $data
+ * @param array  $options
+ *
+ * @return mixed
+ *
+ * @see token_replace().
+ */
+function loft_core_twiglike_token_replace($text, array $data = array(), array $options = array()) {
+  list($tokens, $values) = loft_core_twiglike_tokens_get($text, $data, $options);
+
+  return $tokens ? str_replace($tokens, $values, $text) : $text;
+}
+
+/**
+ * Get the tokens and values for a chunck of text.
+ *
+ * @param string $text
+ * @param array  $data
+ * @param array  $options
+ *
+ * @return array
+ *
+ * @code
+ *   list($tokens, $values) = loft_core_twiglike_token_get(...
+ * @endcode
+ */
+function loft_core_twiglike_tokens_get($text, array $data = array(), array $options = array()) {
+  $token_data = loft_core_twiglike_token_scan($text);
+  if (empty($token_data)) {
+    return [[], []];
+  }
+  $text_tokens = $token_data['tokens'];
+
+  $replacements = array();
+  foreach ($text_tokens as $type => $tokens) {
+    $replacements += token_generate($type, $tokens, $data, $options);
+    if (!empty($options['clear'])) {
+      $replacements += array_fill_keys($tokens, '');
+    }
+  }
+
+  // Optionally alter the list of replacement values.
+  if (!empty($options['callback']) && function_exists($options['callback'])) {
+    $function = $options['callback'];
+    $function($replacements, $data, $options);
+  }
+
+  $tokens = [];
+  foreach ($replacements as $find => $replace) {
+    $tokens[$token_data['map'][$find]] = $replace;
+  }
+  $values = array_map(function ($item) {
+    return strval($item);
+  }, array_values($tokens));
+  $tokens = array_keys($tokens);
+
+  return [$tokens, $values];
+
+}
+
+/**
+ * Return an array of taxony items filtered to unique.
+ *
+ * @param array $items
+ *
+ * @return array
+ */
+function loft_core_taxonomy_unique(array $items) {
+  $index = [];
+
+  return array_filter($items, function ($item) use (&$index) {
+    $item = (array) $item;
+    $allow = !in_array($item['tid'], $index);
+    $index[] = $item['tid'];
+
+    return $allow;
   });
 }

@@ -1,12 +1,15 @@
 # Forms API
 
 ## Hide elements
+
 See `loft_core_form_hide_elements()`.
 
 ## Disable elements
+
 It is nice to be able to keep an element visible, yet disable it.  Making this easy is the goal of `loft_core_form_disable_elements()`.
 
 ## Form help
+
 This module defines a new element called 'form_help'. It can also take `#weight` and `#attributes` (not shown).
 
         <?php
@@ -21,5 +24,6 @@ This module defines a new element called 'form_help'. It can also take `#weight`
         ];
 
 ## Tabindex
+
 
     loft_core_form_tabindex()
