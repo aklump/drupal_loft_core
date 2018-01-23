@@ -7,9 +7,9 @@ namespace Drupal\loft_core;
 interface CoreInterface {
 
   /**
-   * Return the machine name of the text format to use for safe markup when not otherwise specified.
+   * Return a callable or a text format to use as a fallback when handling safe markup.
    *
-   * @return string
+   * @return string|callable
    */
-  public function getSafeMarkupFormat();
+  public function getSafeMarkupHandler();
 }

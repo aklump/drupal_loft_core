@@ -4,27 +4,27 @@ namespace Drupal\loft_core\Entity;
 
 trait ExtractorTrait {
 
-  protected $safeUseFormat = NULL;
+  protected $safeMarkupFormat = NULL;
 
   public function __call($name, $arguments) {
-
-    //
-    //
-    // A generic fallback for *Safe methods which calls the unsafe method and then passes that output through check_markup using FALLBACK_FORMAT_ID
-    //
     $name = strtolower($name);
     if (substr($name, -4) === 'safe') {
+
+      //
+      //
+      // Fallback for *Safe()
+      //
       $method = str_replace('safe', '', $name);
       if (!method_exists($this, $method)) {
         throw new \RuntimeException("Method \"$method\" does not exist; therefore method \"$name\" is invalid.");
       }
 
       // If the format is discovered in the raw function, it should be set using this variable.
-      $this->safeUseFormat = NULL;
+      $this->safeMarkupFormat = NULL;
 
       $output = call_user_func_array([$this, $method], $arguments);
 
-      return $this->checkMarkup($output, $this->safeUseFormat);
+      return $this->makeOutputSafe($output);
     }
   }
 
@@ -97,20 +97,29 @@ trait ExtractorTrait {
     $safeArgs = func_get_args();
     $default = array_shift($safeArgs);
     list($is_field, $field_name, $delta, $column) = $this->getFieldArgs($safeArgs, __METHOD__);
-    $format = NULL;
     if (!$is_field) {
       $output = $this->f($default, $field_name);
     }
     else {
       $item = $this->f([], $field_name, $delta);
       if (isset($item['safe_value'])) {
+
+        //
+        //
+        // Assume 'safe_value' is safe and do not process.
+        //
         return $item['safe_value'];
       }
       $output = isset($item[$column]) ? $item[$column] : '';
-      $format = !empty($item['format']) ? $item['format'] : NULL;
+
+      //
+      //
+      // Otherwise use the 'format' check for check_markup().
+      //
+      $this->safeMarkupFormat = !empty($item['format']) ? $item['format'] : NULL;;
     }
 
-    return $output ? $this->checkMarkup($output, $format, TRUE) : $output;
+    return $this->makeOutputSafe($output);
   }
 
   /**
@@ -126,6 +135,32 @@ trait ExtractorTrait {
   }
 
   /**
+   * Process "safe" on a string; this can be extended if needed.
+   *
+   * @param $output
+   *
+   * @return bool|float|int|string
+   */
+  protected function makeOutputSafe($output) {
+    if (!is_scalar($output)) {
+      throw new \RuntimeException("Non-scalar cannot be made safe.");
+
+      // TODO Should we throw or not?
+      return $output;
+    }
+
+    $handler = isset($this->safeMarkupFormat) ? $this->safeMarkupFormat : $this->core->getSafeMarkupHandler();
+    if (function_exists($handler) || is_callable($handler)) {
+      return $handler($output);
+    }
+    if (!in_array($handler, filter_formats())) {
+      throw new \RuntimeException("Cannot understand safe markup handler \"$handler\"");
+    }
+
+    return $this->d7->check_markup($output, $handler);
+  }
+
+  /**
    * Ensure that $this->entity is not a shadow entity.
    *
    * @see loft_core_shadow_entity_load()
@@ -136,17 +171,6 @@ trait ExtractorTrait {
       $entities = entity_load($entity_type, [$entity_id]);
       $this->setEntity($entity_type, $entities[$entity_id]);
     }
-  }
-
-  private function checkMarkup($output, $format = NULL, $strict = FALSE) {
-    $format = $format ? $format : $this->core->getSafeMarkupFormat();
-
-    if ($strict && !is_scalar($output)) {
-      throw new \RuntimeException("\$output must be a scalar for check_markup().s");
-    }
-
-    // Only scalars may pass through to check_markup.
-    return is_scalar($output) ? $this->d7->check_markup($output, $format) : $output;
   }
 
   private function getFieldArgs($args, $method) {
@@ -164,7 +188,7 @@ trait ExtractorTrait {
       $info = (array) $this->d7->field_info_field($field_name);
       $is_field = !empty($info);
       if (!$is_field && $num_args > 1) {
-        throw new \InvalidArgumentException("Non-field \"$field_name\" does not have \$delta or \$column values.");
+        throw new \InvalidArgumentException("Non-field with field name = \"$field_name\" does not have \$delta or \$column values.");
       }
       if ($is_field) {
         if ($num_args === 1) {

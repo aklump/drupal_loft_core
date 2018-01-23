@@ -37,3 +37,15 @@ If you don't have access to the _extract_ service, then use this more verbose me
 If you don't have access to the _extract_ service, then use this:
     
     $items = $n->get($node, 'field_references.0', []);
+
+## Technical Details
+
+### Markup Safe
+
+When given an entity field item the safe value will be the first of:
+
+    $extract->safe('', 'field_thing');
+
+1. `$entity->field_thing['und'][0]['safe_value']`
+2. `check_markup($entity->field_thing['und'][0]['value'], $entity->field_thing['und'][0]['format'])`
+1. `Core::getSafeMarkupHandler()`

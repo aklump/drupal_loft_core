@@ -1008,6 +1008,14 @@ function loft_core_twiglike_tokens_get($text, array $data = array(), array $opti
 
 }
 
+
+/**
+ * Implements hook_twiggy_twig_alter().
+ */
+function loft_core_twiggy_twig_alter($twig) {
+  $twig->addFunction(new \Twig_SimpleFunction('splitBy', ['\AKlump\LoftLib\Code\Strings', 'splitBy']));
+}
+
 /**
  * Return an array of taxony items filtered to unique.
  *
