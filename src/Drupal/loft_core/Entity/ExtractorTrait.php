@@ -2,9 +2,21 @@
 
 namespace Drupal\loft_core\Entity;
 
+/**
+ * Trait ExtractorTrait
+ *
+ * All methods that return a string, get a magic safe method.  Here's how it works:
+ *
+ * Given a method called `getSummary`, you automatically get `getSummarySafe` using this trait.  The safe method uses
+ * the makeOutputSafe() method.  If you want to indicate special handling or a filter format then you need to set
+ * $this->safeMarkupHandler to a string, which is a filter format, or to a function name, or to a callable.  See
+ * CoreInterface::getSafeMarkupHandler() for more info.
+ *
+ * @package Drupal\loft_core\Entity
+ */
 trait ExtractorTrait {
 
-  protected $safeMarkupFormat = NULL;
+  protected $safeMarkupHandler = NULL;
 
   public function __call($name, $arguments) {
     $name = strtolower($name);
@@ -19,10 +31,12 @@ trait ExtractorTrait {
         throw new \RuntimeException("Method \"$method\" does not exist; therefore method \"$name\" is invalid.");
       }
 
-      // If the format is discovered in the raw function, it should be set using this variable.
-      $this->safeMarkupFormat = NULL;
-
+      // If the format is discovered in the raw function, it should be set using this variable: safeMarkupHandler
+      $this->safeMarkupHandler = NULL;
       $output = call_user_func_array([$this, $method], $arguments);
+      if (!is_string($output)) {
+        throw new \RuntimeException("Only methods that return a string get the magic *Safe method");
+      }
 
       return $this->makeOutputSafe($output);
     }
@@ -99,27 +113,12 @@ trait ExtractorTrait {
     list($is_field, $field_name, $delta, $column) = $this->getFieldArgs($safeArgs, __METHOD__);
     if (!$is_field) {
       $output = $this->f($default, $field_name);
+
+      return $this->makeOutputSafe($output);
     }
-    else {
-      $item = $this->f([], $field_name, $delta);
-      if (isset($item['safe_value'])) {
+    $item = $this->f([], $field_name, $delta);
 
-        //
-        //
-        // Assume 'safe_value' is safe and do not process.
-        //
-        return $item['safe_value'];
-      }
-      $output = isset($item[$column]) ? $item[$column] : '';
-
-      //
-      //
-      // Otherwise use the 'format' check for check_markup().
-      //
-      $this->safeMarkupFormat = !empty($item['format']) ? $item['format'] : NULL;;
-    }
-
-    return $this->makeOutputSafe($output);
+    return $this->getFieldItemSafeValue($item, $column);
   }
 
   /**
@@ -132,6 +131,35 @@ trait ExtractorTrait {
    */
   public function items($field_name, array $default = array()) {
     return $this->e->get($this->getEntity(), $field_name, $default);
+  }
+
+  /**
+   * Handle the safe output of a field item array.
+   *
+   * @param        $item
+   * @param string $column
+   *
+   * @return bool|float|int|string
+   */
+  protected function getFieldItemSafeValue($item, $column = 'value') {
+    if (isset($item['safe_value'])) {
+
+      //
+      //
+      // Assume 'safe_value' is safe and do not process.
+      //
+      return $item['safe_value'];
+    }
+
+    //
+    //
+    // Otherwise use the 'format' check for check_markup().
+    //
+    $this->safeMarkupHandler = !empty($item['format']) ? $item['format'] : NULL;
+
+    $output = isset($item[$column]) ? $item[$column] : '';
+
+    return $this->makeOutputSafe($output);
   }
 
   /**
@@ -149,11 +177,11 @@ trait ExtractorTrait {
       return $output;
     }
 
-    $handler = isset($this->safeMarkupFormat) ? $this->safeMarkupFormat : $this->core->getSafeMarkupHandler();
+    $handler = isset($this->safeMarkupHandler) ? $this->safeMarkupHandler : $this->core->getSafeMarkupHandler();
     if (function_exists($handler) || is_callable($handler)) {
       return $handler($output);
     }
-    if (!in_array($handler, filter_formats())) {
+    if (!array_key_exists($handler, filter_formats())) {
       throw new \RuntimeException("Cannot understand safe markup handler \"$handler\"");
     }
 
