@@ -7,6 +7,7 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'Drupal\\loft_core\\Attribute' => $baseDir . '/src/Drupal/loft_core/Attribute.php',
+    'Drupal\\loft_core\\CoreBase' => $baseDir . '/src/Drupal/loft_core/CoreBase.php',
     'Drupal\\loft_core\\CoreInterface' => $baseDir . '/src/Drupal/loft_core/CoreInterface.php',
     'Drupal\\loft_core\\Drupal7' => $baseDir . '/tests/src/Drupal/loft_core/Entity/ExtractorTest.php',
     'Drupal\\loft_core\\Entity\\ExtractorTrait' => $baseDir . '/src/Drupal/loft_core/Entity/ExtractorTrait.php',
