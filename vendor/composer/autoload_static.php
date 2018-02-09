@@ -33,6 +33,7 @@ class ComposerStaticInita53fe36df132dd600a8787a349a9d1f5
 
     public static $classMap = array (
         'Drupal\\loft_core\\Attribute' => __DIR__ . '/../..' . '/src/Drupal/loft_core/Attribute.php',
+        'Drupal\\loft_core\\CoreBase' => __DIR__ . '/../..' . '/src/Drupal/loft_core/CoreBase.php',
         'Drupal\\loft_core\\CoreInterface' => __DIR__ . '/../..' . '/src/Drupal/loft_core/CoreInterface.php',
         'Drupal\\loft_core\\Drupal7' => __DIR__ . '/../..' . '/tests/src/Drupal/loft_core/Entity/ExtractorTest.php',
         'Drupal\\loft_core\\Entity\\ExtractorTrait' => __DIR__ . '/../..' . '/src/Drupal/loft_core/Entity/ExtractorTrait.php',
