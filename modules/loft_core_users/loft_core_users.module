@@ -458,7 +458,7 @@ function loft_core_users_menu() {
     'page arguments' => array('loft_core_users_settings_form'),
     'access arguments' => array('loft_core_users:administer'),
     'type' => MENU_NORMAL_ITEM,
-    'file' => 'loft_core.admin.inc',
+    'file' => 'loft_core_users.admin.inc',
   );
 
   return $items;
