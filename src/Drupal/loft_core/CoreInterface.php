@@ -16,4 +16,11 @@ interface CoreInterface {
    * @see filter_formats()
    */
   public function getSafeMarkupHandler();
+
+  public function getBlockRenderable($bid, array $tvars = array());
+
+  public function getBlockTranslation($bid, array $tvars = array(), $use_block_theme = TRUE);
+
+  public function getBlockTitle($bid);
+
 }

@@ -19,6 +19,7 @@ trait ExtractorTrait {
   protected $safeMarkupHandler = NULL;
 
   public function __call($name, $arguments) {
+    $original = $name;
     $name = strtolower($name);
     if (substr($name, -4) === 'safe') {
 
@@ -35,7 +36,7 @@ trait ExtractorTrait {
       $this->safeMarkupHandler = NULL;
       $output = call_user_func_array([$this, $method], $arguments);
       if (!is_string($output)) {
-        throw new \RuntimeException("Only methods that return a string get the magic *Safe method");
+        throw new \RuntimeException("Invalid method \"$original\"; only methods that return a string get the magic *Safe method");
       }
 
       return $this->makeOutputSafe($output);
