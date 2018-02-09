@@ -23,6 +23,8 @@
  */
 function loft_core_users_settings_form(array $form, array &$form_state) {
 
+  $apache_ips = _loft_core_users_parse_apache();
+
   //
   //
   // Blocked domains.
@@ -31,6 +33,7 @@ function loft_core_users_settings_form(array $form, array &$form_state) {
     ->fields('lu', ['domain', 'status', 'id'])
     ->distinct('domain')
     ->condition('status', loft_core_users_get_blocking_statuses(), 'IN')
+    ->condition('ip', $apache_ips, 'NOT IN')
     ->condition('domain', '', '<>');
   $result = $query->execute();
   $options = [];
@@ -46,7 +49,7 @@ function loft_core_users_settings_form(array $form, array &$form_state) {
         '@checked' => count($checked),
         '@domains' => format_plural(count($options), '1 domain', '@count domains'),
       ]),
-      '#description' => t('The domains listed have been identified as suspicious.  All domains checked here will be blocked.  To allow users from one or more of the listed domains, uncheck those domains.  This will allow new users with emails from said domains to sign up for new accounts.'),
+      '#description' => t('The domains listed have been identified as suspicious.  All domains checked here are being blocked by Drupal.  To allow users from one or more of the listed domains, uncheck those domains, thereby allowing new users with emails from said domains to sign up for new accounts.'),
       '#collapsible' => TRUE,
       '#collapsed' => TRUE,
     ];
@@ -117,6 +120,7 @@ function loft_core_users_settings_form(array $form, array &$form_state) {
   $query = db_select('loft_core_users', 'lu')
     ->fields('lu', ['uid', 'domain', 'status', 'ip'])
     ->condition('ip', NULL, 'is not')
+    ->condition('ip', $apache_ips, 'not in')
     ->condition('domain', '', '<>')
     ->condition('status', loft_core_users_get_blocking_statuses(), 'IN');
   $result = $query->execute();
@@ -140,8 +144,9 @@ function loft_core_users_settings_form(array $form, array &$form_state) {
   });
 
   $form['apache'] = [
+    '#weight' => 20,
     '#type' => 'fieldset',
-    '#title' => t('.htaccess deny by IP (@ips)', [
+    '#title' => t('.htaccess deny by IP candidates (@ips)', [
       '@ips' => format_plural(count($deny_from), '1 ip', '@count ips'),
     ]),
     '#collapsible' => TRUE,
@@ -169,7 +174,7 @@ function loft_core_users_settings_form(array $form, array &$form_state) {
 
     $form['apache']['deny_from'] = [
       '#type' => 'textarea',
-      '#description' => t('This snippet is generated automatically based on spam levels and provided so that you can copy and paste it into your root-level .htaccess file for blocking by ips.  You may want to do this at regular intervals say monthly to decrease server load of spam.  When an ip is blocked at the apache level, it will never get to Drupal, the database, PHP, etc.  This is a read-only field.'),
+      '#description' => t('This snippet is generated automatically based on spam levels and provided so that you can copy and paste it into your root-level .htaccess file for blocking by ips.  You may want to do this at regular intervals say monthly to decrease server load of spam.  When an ip is blocked at the apache level, it will never get to Drupal, the database, PHP, etc.  This is a read-only field.  ** If appending to .htaccess only copy the snippet between the open/close comments.'),
       '#title' => t('Deny from'),
       '#default_value' => implode(PHP_EOL, $deny_from),
       '#rows' => 10,
@@ -180,6 +185,34 @@ function loft_core_users_settings_form(array $form, array &$form_state) {
       '#resizable' => TRUE,
     ];
   }
+
+  //
+  //
+  // Currently being denied in .htaccess
+  //
+  $form['apache_current'] = [
+    '#weight' => 18,
+    '#type' => 'fieldset',
+    '#title' => t('.htaccess currently denying (@ips)', [
+      '@ips' => format_plural(count($apache_ips), '1 ip', '@count ips'),
+    ]),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  ];
+  $form['apache_current']['denying'] = [
+    '#type' => 'textarea',
+    '#description' => t('This is a list of IPs currently being blocked by Apache via the webroot .htaccess file.  The goal is to move candidates here by copying the candidate snippet into your .htaccess file.'),
+    '#title' => t('Currently denying'),
+    '#default_value' => implode(PHP_EOL, $apache_ips),
+    '#rows' => 10,
+    '#required' => FALSE,
+    '#attributes' => [
+      'readonly' => 'readonly',
+    ],
+    '#resizable' => TRUE,
+  ];
+
+
   $form['#submit'][] = 'loft_core_users_settings_form_submit';
 
   return system_settings_form($form);
@@ -215,4 +248,19 @@ function loft_core_users_settings_form_submit($form, &$form_state) {
       watchdog_exception('loft_core_admin', $e);
     }
   }
+}
+
+/**
+ * All IPs that have been denied via the .htaccess file at the root of Drupal.
+ *
+ * @return array
+ *   All IPs in ascending order.
+ */
+function _loft_core_users_parse_apache() {
+  $htaccess = file_get_contents(DRUPAL_ROOT . '/.htaccess');
+  preg_match_all('/deny from ([\d\.]+)/is', $htaccess, $matches);
+  $ips = isset($matches[1]) ? $matches[1] : [];
+  sort($ips, SORT_NATURAL);
+
+  return $ips;
 }
