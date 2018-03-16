@@ -76,7 +76,7 @@ abstract class CoreBase implements CoreInterface {
     $build = $this->getBlockRenderable($bid, $tvars);
 
     if ($use_block_theme) {
-      $build['#theme_wrappers'] = $build['_#theme_wrappers'];
+      $build['#theme_wrappers'] = $build['#_theme_wrappers'];
     }
 
     return drupal_render($build);
