@@ -5,12 +5,15 @@ namespace Drupal\loft_core\Entity;
 /**
  * Trait ExtractorTrait
  *
- * All methods that return a string, get a magic safe method.  Here's how it works:
+ * All methods that return a string, get a magic safe method.  Here's how it
+ * works:
  *
- * Given a method called `getSummary`, you automatically get `getSummarySafe` using this trait.  The safe method uses
- * the makeOutputSafe() method.  If you want to indicate special handling or a filter format then you need to set
- * $this->safeMarkupHandler to a string, which is a filter format, or to a function name, or to a callable.  See
- * CoreInterface::getSafeMarkupHandler() for more info.
+ * Given a method called `getSummary`, you automatically get `getSummarySafe`
+ * using this trait.  The safe method uses the makeOutputSafe() method.  If you
+ * want to indicate special handling or a filter format then you need to set
+ * $this->safeMarkupHandler to a string, which is a filter format, or to a
+ * function name, or to a callable.  See CoreInterface::getSafeMarkupHandler()
+ * for more info.
  *
  * @package Drupal\loft_core\Entity
  */
@@ -44,7 +47,11 @@ trait ExtractorTrait {
   }
 
   public function date($field_name, $default = 'now') {
-    return $this->e->getDate($this->getEntity(), [$field_name, 0, 'value'], $default);
+    return $this->e->getDate($this->getEntity(), [
+      $field_name,
+      0,
+      'value',
+    ], $default);
   }
 
   /**
@@ -61,15 +68,17 @@ trait ExtractorTrait {
   /**
    * Return data from an entity field in the entity's language.
    *
-   * @param string      $field_name The field name on the entity.
-   * @param mixed       $default    The default value if non-existant.
-   * @param int|null    $item       The item index for a field entity, e.g. 0, 1, 2.  Send null to load the entire
-   *                                array for the given language.
-   * @param string|null $key        The key of a single item array.  This is ignored when $item is null.
+   * @param string $field_name The field name on the entity.
+   * @param mixed $default The default value if non-existant.
+   * @param int|null $item The item index for a field entity, e.g. 0, 1, 2.
+   *   Send null to load the entire array for the given language.
+   * @param string|null $key The key of a single item array.  This is ignored
+   *   when $item is null.
    *
    * @return mixed
    *
-   * @throws \InvalidArgumentException when $key is not a valid column for $field_name.
+   * @throws \InvalidArgumentException when $key is not a valid column for
+   *   $field_name.
    *
    *
    * Examples of how to use:
@@ -92,7 +101,11 @@ trait ExtractorTrait {
     $args = func_get_args();
     $default = array_shift($args);
     list(, $field_name, $delta, $column) = $this->getFieldArgs($args, __METHOD__);
-    $value = $this->e->get($this->getEntity(), null_filter([$field_name, $delta, $column]), $default);
+    $value = $this->e->get($this->getEntity(), null_filter([
+      $field_name,
+      $delta,
+      $column,
+    ]), $default);
 
     return $value;
   }
@@ -100,8 +113,9 @@ trait ExtractorTrait {
   /**
    * Return safe-for-output translated data from an entity field.
    *
-   * This is more lightweight than field_view_field() and doesn't take into account anything except the format column
-   * on the entity item.  Does not hook into the field apis.
+   * This is more lightweight than field_view_field() and doesn't take into
+   * account anything except the format column on the entity item.  Does not
+   * hook into the field apis.
    *
    * If 'safe_value' is present as a column on a field item, it will be used.
    *
@@ -126,12 +140,47 @@ trait ExtractorTrait {
    * Return the translated items array for $field_name.
    *
    * @param string $field_name
-   * @param array  $default
+   * @param array $default
    *
    * @return array
    */
-  public function items($field_name, array $default = array()) {
+  public function items($field_name, array $default = []) {
     return $this->e->get($this->getEntity(), $field_name, $default);
+  }
+
+  /**
+   * Return an array of field-referenced entities.
+   *
+   * @param string $field_name
+   *   This should field that references entities.
+   *
+   * @return array
+   *   An array of entities.
+   */
+  public function entities($field_name) {
+    $items = $this->items($field_name);
+    if (empty($items)) {
+      return [];
+    }
+    $field_info = $this->d7->field_info_field($field_name);
+    $field_type = $field_info['type'];
+    switch ($field_type) {
+      case 'paragraphs':
+        // TODO is a better way via non-direct call?
+        $info = paragraphs_field_info();
+        $entities_entity_type = $info['paragraphs']['property_type'];
+        $value_key = 'value';
+        break;
+
+      default:
+        $value_key = 'value';
+        break;
+    }
+    $entities = array_map(function ($item) use ($value_key) {
+      return $item[$value_key];
+    }, $items);
+
+    return $this->d7->entity_load($entities_entity_type, $entities);
   }
 
   /**
