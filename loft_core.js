@@ -184,6 +184,23 @@ var trackJS = trackJS || null;
     Drupal.loft.storage = {
 
       /**
+       * Checks if localStorage is available.
+       * @returns {boolean}
+       */
+      isAvailable: function () {
+        try {
+          var storage = window.localStorage,
+              x       = '__storage_test__';
+          storage.setItem(x, x);
+          storage.removeItem(x);
+          return true;
+        }
+        catch (e) {
+          return false;
+        }
+      },
+
+      /**
        * This will prefix the localStorage key.
        *
        * This should be considered a public field and may be overwritten by
@@ -203,6 +220,9 @@ var trackJS = trackJS || null;
        * @param mixed value
        */
       save: function (namespace, path, value) {
+        if (!this.isAvailable()) {
+          throw "LocalStorage is not available.";
+        }
         var key  = this.key + '.' + namespace,
             data = JSON.parse(localStorage.getItem(key)) || {};
         data[path] = value;
