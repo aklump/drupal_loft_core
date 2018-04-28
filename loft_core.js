@@ -215,14 +215,15 @@ var trackJS = trackJS || null;
        *   Namespaces will break the local storage into it's own item.
        * @param string path
        *   The path in the storage object.
-       *
+       * @param mixed defaultValue
+       *   The value to return when it doesn't already exist.
        * @returns {*|null}
        */
-      load: function (namespace, path) {
-        var namespace = namespace || this.defaultNamespace,
-            key       = this.key + '.' + namespace,
-            data      = JSON.parse(localStorage.getItem(key)) || {};
-        return data[path] || null;
+      load: function (namespace, path, defaultValue) {
+        var key          = this.key + '.' + namespace,
+            data         = JSON.parse(localStorage.getItem(key)) || {},
+            defaultValue = defaultValue || null;
+        return data[path] || defaultValue;
       },
 
       /**
