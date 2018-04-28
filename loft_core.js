@@ -182,7 +182,16 @@ var trackJS = trackJS || null;
      * Persistent client-side storage API
      */
     Drupal.loft.storage = {
-      key: 'Drupal.loft',
+
+      /**
+       * This will prefix the localStorage key.
+       *
+       * This should be considered a public field and may be overwritten by
+       * other modules as necessary.
+       *
+       * @var string
+       */
+      key: 'Drupal',
 
       /**
        * Save a key to persistent storage.
