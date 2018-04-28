@@ -84,12 +84,13 @@ var trackJS = trackJS || null;
   }
 
   /**
-   * Displays a JavaScript error from an Ajax response when appropriate to do so.
+   * Displays a JavaScript error from an Ajax response when appropriate to do
+   * so.
    */
   Drupal.displayAjaxError = function (message) {
-    // Skip displaying the message if the user deliberately aborted (for example,
-    // by reloading the page or navigating to a different page) while the Ajax
-    // request was still ongoing. See, for example, the discussion at
+    // Skip displaying the message if the user deliberately aborted (for
+    // example, by reloading the page or navigating to a different page) while
+    // the Ajax request was still ongoing. See, for example, the discussion at
     // http://stackoverflow.com/questions/699941/handle-ajax-error-when-a-user-clicks-refresh.
     if (!Drupal.beforeUnloadCalled) {
       if (trackJS) {
@@ -111,25 +112,30 @@ var trackJS = trackJS || null;
      * @param string theme
      * @param object vars
      *
-     * The DOM must contain a template element provided by the server, containing twig-style dynamic vars.  See code
-     * example below.  Notice the id must begin with 'js-tpl--' followed by the theme name as it will be called by.  It
-     * must have the class 'js-tpl' and the variable {{ message }} will be replaced by var.message.
+     * The DOM must contain a template element provided by the server,
+     *   containing twig-style dynamic vars.  See code example below.  Notice
+     *   the id must begin with 'js-tpl--' followed by the theme name as it
+     *   will be called by.  It must have the class 'js-tpl' and the variable
+     *   {{ message }} will be replaced by var.message.
      *
      * @code
      *   <div id="js-tpl--message" class="js-tpl">{{ message }}</div>
      * @endcode
      *
-     * Markup should be added to the page_bottom in hook_preprocess_html() like so.
+     * Markup should be added to the page_bottom in hook_preprocess_html() like
+     *   so.
      * @code
      *   $vars['page']['page_bottom']['js_tpl__form_item_description'] = [
-     *     #prefix' => '<span id="js-tpl--form_item__description" class="js-tpl form-item__description {{ className
+     *     #prefix' => '<span id="js-tpl--form_item__description" class="js-tpl
+     *   form-item__description {{ className
      *   }}">',
      *     #suffix' => '</span>',
      *     #markup' => '{{ message }}',
      *   ];
      * @endcode
      *
-     * The JS in your theme needs to define a theme method like this, this is how you register your theme.
+     * The JS in your theme needs to define a theme method like this, this is
+     *   how you register your theme.
      * @code
      *   Drupal.theme.prototype.formItemDescription = function (vars) {
      *     vars = $.extend({
@@ -170,6 +176,66 @@ var trackJS = trackJS || null;
       }
 
       return html;
+    };
+
+    /**
+     * Persistent client-side storage API
+     */
+    Drupal.loft.storage = {
+      key: 'Drupal.gop',
+
+      /**
+       * Save a key to persistent storage.
+       *
+       * @param string namespace
+       *   Namespaces will break the local storage into it's own item.
+       * @param string path
+       *   The path in the storage object.
+       * @param mixed value
+       */
+      save: function (namespace, path, value) {
+        var key  = this.key + '.' + namespace,
+            data = JSON.parse(localStorage.getItem(key)) || {};
+        data[path] = value;
+        localStorage.setItem(key, JSON.stringify(data));
+      },
+
+      /**
+       * Load a key from persistent storage.
+       * @param string namespace
+       *   Namespaces will break the local storage into it's own item.
+       * @param string path
+       *   The path in the storage object.
+       *
+       * @returns {*|null}
+       */
+      load: function (namespace, path) {
+        var namespace = namespace || this.defaultNamespace,
+            key       = this.key + '.' + namespace,
+            data      = JSON.parse(localStorage.getItem(key)) || {};
+        return data[path] || null;
+      },
+
+      /**
+       * Delete a key from persistent storage.
+       *
+       * @param string namespace
+       *   Namespaces will break the local storage into it's own item.
+       * @param string path
+       *   The path in the storage object.
+       */
+      delete: function (namespace, path) {
+        var key  = this.key + '.' + namespace,
+            data = JSON.parse(localStorage.getItem(key)) || {};
+        delete data[path];
+        var saving = JSON.stringify(data);
+        if (saving === '{}') {
+          localStorage.removeItem(key);
+        }
+        else {
+          localStorage.setItem(key, saving);
+        }
+      }
     };
   }
 
