@@ -182,7 +182,7 @@ var trackJS = trackJS || null;
      * Persistent client-side storage API
      */
     Drupal.loft.storage = {
-      key: 'Drupal.gop',
+      key: 'Drupal.loft',
 
       /**
        * Save a key to persistent storage.
