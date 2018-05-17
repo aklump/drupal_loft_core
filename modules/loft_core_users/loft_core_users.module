@@ -99,6 +99,9 @@ function loft_core_users_module_implements_alter(&$implementations, $hook) {
  * @return string
  */
 function _loft_core_users_get_email_domain($email) {
+  if (!trim($email)) {
+    return '';
+  }
   $domain = preg_replace('/^.+@/', '', $email);
   $domain = explode('.', $domain);
 
@@ -115,7 +118,7 @@ function _loft_core_users_get_email_domain($email) {
  */
 function loft_core_users_block_user($status, $uid) {
   if ($status > 1) {
-    loft_core_users_set_user_status($status, $uid);
+    loft_core_users_set_user_status($status, $uid, '');
   }
   $account = (object) [
     'uid' => $uid,
