@@ -1,0 +1,93 @@
+<?php
+
+use AKlump\LoftDataGrids\CSVExporter;
+use AKlump\LoftDataGrids\ExportData;
+use AKlump\LoftDataGrids\JSONExporter;
+
+/**
+ * Create an archive of entities.
+ *
+ * This is designed to be used as the sole contents of a hook_update_n
+ * implementation.
+ *
+ * @param string $update_message
+ *   This is the docblock comment for the hook_update_n function.
+ * @param string $sql
+ *   The SQL that generates the dataset to export.
+ * @param string $filename
+ *   The filename of the data files that are exported.
+ * @param array $image_keys_map
+ *   An associative array representing a map of query keys that point to the
+ *   filename and the file URI.  Each element has two values:
+ *   - 0 The key from the query that holds the image filename.
+ *   - 1 The key from teh query that holds the image URI.
+ * @param callable|null $value_transform_callback
+ *   A callable that receives ($key, $value) and must return true if the
+ *   key/value should be added to the export.  $value should be received by
+ *   reference and mutated as desired.
+ *
+ * @return string
+ *   The message of work done.
+ *
+ * @throws \DrupalUpdateException
+ */
+function loft_core_archive_entities_update(
+  $update_message,
+  $sql,
+  $filename,
+  array $image_keys_map,
+  callable $value_transform_callback = NULL
+) {
+  $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
+  array_shift($backtrace);
+  $function = $backtrace[0]['function'];
+
+  $output = [];
+  try {
+    $query = db_query($sql);
+    $query->execute();
+    $dir = 'temporary://' . $function;
+    file_prepare_directory($dir, FILE_CREATE_DIRECTORY);
+    $header = NULL;
+
+    $data = new ExportData();
+    while ($record = $query->fetchAssoc()) {
+      foreach ($record as $key => $value) {
+        $add_to_export = TRUE;
+
+        if (!is_callable($value_transform_callback) || ($value_transform_callback($key, $value))) {
+          $add_to_export = TRUE;
+        }
+
+        // Archive the images.
+        foreach ($image_keys_map as $image_map) {
+          if ($key === $image_map[1]) {
+            $add_to_export = FALSE;
+            $image_dir = "$dir/images/";
+            file_prepare_directory($image_dir, FILE_CREATE_DIRECTORY);
+            $destination = $image_dir . '/' . $record[$image_map[0]];
+            if (!file_exists($destination)) {
+              file_unmanaged_copy($value, $destination, FILE_EXISTS_REPLACE);
+            }
+          }
+        }
+
+        if ($add_to_export) {
+          $data->add($key, $value);
+        }
+      }
+      $data->next();
+    }
+
+    $exporter = new CSVExporter($data, $filename);
+    $exporter->saveFile($dir);
+
+    $exporter = new JSONExporter($data, $filename);
+    $exporter->saveFile($dir);
+
+    return implode(PHP_EOL, $output);
+  }
+  catch (Exception $e) {
+    throw new DrupalUpdateException('FAILED: ' . $update_message . ': ' . $e->getMessage());
+  }
+}
