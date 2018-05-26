@@ -1,8 +1,9 @@
 <?php
 
-use AKlump\LoftDataGrids\CSVExporter;
-use AKlump\LoftDataGrids\ExportData;
-use AKlump\LoftDataGrids\JSONExporter;
+/**
+ * @file
+ * Functions that have to do with installation and updates.
+ */
 
 /**
  * Create an archive of entities.
@@ -35,13 +36,13 @@ function loft_core_archive_entities_update(
   $update_message,
   $sql,
   $filename,
-  array $image_keys_map,
+  array $image_keys_map = [],
   callable $value_transform_callback = NULL
 ) {
+  loft_data_grids_boot();
   $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
   array_shift($backtrace);
   $function = $backtrace[0]['function'];
-
   $output = [];
   try {
     $query = db_query($sql);
@@ -50,7 +51,7 @@ function loft_core_archive_entities_update(
     file_prepare_directory($dir, FILE_CREATE_DIRECTORY);
     $header = NULL;
 
-    $data = new ExportData();
+    $data = new \AKlump\LoftDataGrids\ExportData();
     while ($record = $query->fetchAssoc()) {
       foreach ($record as $key => $value) {
         $add_to_export = TRUE;
@@ -67,7 +68,9 @@ function loft_core_archive_entities_update(
             file_prepare_directory($image_dir, FILE_CREATE_DIRECTORY);
             $destination = $image_dir . '/' . $record[$image_map[0]];
             if (!file_exists($destination)) {
-              file_unmanaged_copy($value, $destination, FILE_EXISTS_REPLACE);
+              if (!file_unmanaged_copy($value, $destination, FILE_EXISTS_REPLACE)) {
+                throw new \RuntimeException("Could not copy: $value.");
+              }
             }
           }
         }
@@ -79,11 +82,19 @@ function loft_core_archive_entities_update(
       $data->next();
     }
 
-    $exporter = new CSVExporter($data, $filename);
-    $exporter->saveFile($dir);
+    $exporter = new \AKlump\LoftDataGrids\CSVExporter($data, $filename);
+    $path = $exporter->saveFile($dir);
+    if (!file_exists($path)) {
+      throw new \RuntimeException("Could not save: $dir/$filename");
+    }
 
-    $exporter = new JSONExporter($data, $filename);
-    $exporter->saveFile($dir);
+    $exporter = new \AKlump\LoftDataGrids\JSONExporter($data, $filename);
+    $path = $exporter->saveFile($dir);
+    if (!file_exists($path)) {
+      throw new \RuntimeException("Could not save: $dir/$filename");
+    }
+
+    $output[] = 'Please move your archive from: ' . $dir . ' to a safe place.';
 
     return implode(PHP_EOL, $output);
   }
