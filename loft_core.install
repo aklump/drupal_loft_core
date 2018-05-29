@@ -6,11 +6,80 @@
  */
 
 /**
+ * Delete an node type definition from the database plus variables.
+ *
+ * @param $node_type
+ *
+ * @return mixed|null|string
+ */
+function loft_core_delete_bundle_update($node_type) {
+  $known_variables = [
+    'additional_settings__active_tab_' . $node_type,
+    'ant_' . $node_type,
+    'ant_pattern_' . $node_type,
+    'ant_php_' . $node_type,
+    'comment_anonymous_' . $node_type,
+    'comment_' . $node_type,
+    'comment_default_mode_' . $node_type,
+    'comment_default_per_page_' . $node_type,
+    'comment_form_location_' . $node_type,
+    'comment_preview_' . $node_type,
+    'comment_subject_field_' . $node_type,
+    'field_bundle_settings_node__' . $node_type,
+    'honeypot_form_' . $node_type . '_node_form',
+    'honeypot_form_comment_node_' . $node_type . '_form',
+    'language_content_type_' . $node_type,
+    'menu_options_' . $node_type,
+    'menu_parent_' . $node_type,
+    'metatag_enable_node__' . $node_type,
+    'node_options_' . $node_type,
+    'node_preview_' . $node_type,
+    'node_submitted_' . $node_type,
+    'page_title_type_' . $node_type,
+    'page_title_type_' . $node_type . '_showfield',
+    'pathauto_node_' . $node_type . '_pattern',
+    'save_continue_' . $node_type,
+    'scheduler_expand_fieldset_' . $node_type,
+    'scheduler_publish_enable_' . $node_type,
+    'scheduler_publish_past_date_' . $node_type,
+    'scheduler_publish_required_' . $node_type,
+    'scheduler_publish_revision_' . $node_type,
+    'scheduler_publish_touch_' . $node_type,
+    'scheduler_unpublish_enable_' . $node_type,
+    'scheduler_unpublish_required_' . $node_type,
+    'scheduler_unpublish_revision_' . $node_type,
+    'scheduler_use_vertical_tabs_' . $node_type,
+    'soft_length_limit_title_max_' . $node_type,
+    'soft_length_limit_title_min_' . $node_type,
+    'soft_length_style_select_' . $node_type,
+    'webform_node_' . $node_type,
+    'xmlsitemap_settings_node_' . $node_type,
+    'workflow_' . $node_type,
+  ];
+  node_type_delete($node_type);
+  node_types_rebuild();
+  menu_rebuild();
+
+  $output = [];
+  if ($count = db_delete('variable')
+    ->condition('name', $known_variables, 'IN')
+    ->execute()) {
+    $output[] = format_plural($count, '1 variable deleted', '@count variables deleted.');
+  };
+
+  $output[] = t('Node type $node_type deleted.');
+
+  return implode(PHP_EOL, $output);
+}
+
+/**
  * Create an archive of entities.
  *
  * This is designed to be used as the sole contents of a hook_update_n
  * implementation.
  *
+ * @param string $destination_dir
+ *   The destination direction for the archive, e.g. 'temporary://foo/bar'.
  * @param string $update_message
  *   This is the docblock comment for the hook_update_n function.
  * @param string $sql
@@ -33,6 +102,7 @@
  * @throws \DrupalUpdateException
  */
 function loft_core_archive_entities_update(
+  $destination_dir,
   $update_message,
   $sql,
   $filename,
@@ -40,15 +110,11 @@ function loft_core_archive_entities_update(
   callable $value_transform_callback = NULL
 ) {
   loft_data_grids_boot();
-  $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
-  array_shift($backtrace);
-  $function = $backtrace[0]['function'];
   $output = [];
   try {
     $query = db_query($sql);
     $query->execute();
-    $dir = 'temporary://' . $function;
-    file_prepare_directory($dir, FILE_CREATE_DIRECTORY);
+    file_prepare_directory($destination_dir, FILE_CREATE_DIRECTORY);
     $header = NULL;
 
     $data = new \AKlump\LoftDataGrids\ExportData();
@@ -64,7 +130,7 @@ function loft_core_archive_entities_update(
         foreach ($image_keys_map as $image_map) {
           if ($key === $image_map[1]) {
             $add_to_export = FALSE;
-            $image_dir = "$dir/images/";
+            $image_dir = "$destination_dir/images/";
             file_prepare_directory($image_dir, FILE_CREATE_DIRECTORY);
             $destination = $image_dir . '/' . $record[$image_map[0]];
             if (!file_exists($destination)) {
@@ -83,18 +149,18 @@ function loft_core_archive_entities_update(
     }
 
     $exporter = new \AKlump\LoftDataGrids\CSVExporter($data, $filename);
-    $path = $exporter->saveFile($dir);
+    $path = $exporter->saveFile($destination_dir);
     if (!file_exists($path)) {
-      throw new \RuntimeException("Could not save: $dir/$filename");
+      throw new \RuntimeException("Could not save: $destination_dir/$filename");
     }
 
     $exporter = new \AKlump\LoftDataGrids\JSONExporter($data, $filename);
-    $path = $exporter->saveFile($dir);
+    $path = $exporter->saveFile($destination_dir);
     if (!file_exists($path)) {
-      throw new \RuntimeException("Could not save: $dir/$filename");
+      throw new \RuntimeException("Could not save: $destination_dir/$filename");
     }
 
-    $output[] = 'Please move your archive from: ' . $dir . ' to a safe place.';
+    $output[] = 'Please move your archive from: ' . $destination_dir . ' to a safe place.';
 
     return implode(PHP_EOL, $output);
   }
