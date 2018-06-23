@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Implements HOOK_loft_core_redirect_node_BUNDLE_TYPE().
+ * Implements HOOK_loft_core_redirect_node_BUNDLE_TYPE()_view.
  *
  * This hook allows your module to register redirects based on node bundles.
  * This hook is fired when the menu caches are cleared as part of

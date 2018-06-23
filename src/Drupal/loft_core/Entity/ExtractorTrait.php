@@ -151,6 +151,11 @@ trait ExtractorTrait {
   /**
    * Return an array of field-referenced entities.
    *
+   * This has been tested with these modules:
+   * - node_reference
+   * - entityreference
+   * - paragraphs.
+   *
    * @param string $field_name
    *   This should field that references entities.
    *
@@ -158,35 +163,47 @@ trait ExtractorTrait {
    *   An array of entities.
    */
   public function entities($field_name) {
-    $items = $this->items($field_name);
-    if (empty($items)) {
+    if (!($items = $this->items($field_name))) {
       return [];
     }
-    $field_info = $this->d7->field_info_field($field_name);
-    $field_type = $field_info['type'];
-    switch ($field_type) {
-      case 'paragraphs':
-        // TODO is a better way via non-direct call?
-        $info = paragraphs_field_info();
-        $entities_entity_type = $info['paragraphs']['property_type'];
-        $value_key = 'value';
-        break;
 
-      default:
-        $value_key = 'value';
-        break;
+    static $metadata = NULL;
+    if (!isset($metadata[$field_name])) {
+      $field_info = $this->d7->field_info_field($field_name);
+      $field_type = $field_info['type'];
+      $field_type_info = $this->d7->field_info_field_types($field_type);
+
+      // How do I know the entity type being referenced by the field?
+      if (isset($field_info['settings']['target_type'])) {
+        $target_entity_type = $field_info['settings']['target_type'];
+      }
+      elseif (isset($field_type_info['property_type'])) {
+        $target_entity_type = $field_type_info['property_type'];
+      }
+
+      // How do I know entity id array key for the reference?
+      $value_key = 'value';
+      if (!empty($field_info['columns'])) {
+        $keys = array_keys($field_info['columns']);
+        $value_key = reset($keys);
+      }
+
+      $metadata[$field_name]['target_type'] = $target_entity_type;
+      $metadata[$field_name]['key'] = $value_key;
     }
-    $entities = array_map(function ($item) use ($value_key) {
-      return $item[$value_key];
+
+    // Convert to an array of ids using $value_key.
+    $entity_ids = array_map(function ($item) use ($field_name, $metadata) {
+      return $item[$metadata[$field_name]['key']];
     }, $items);
 
-    return $this->d7->entity_load($entities_entity_type, $entities);
+    return $this->d7->entity_load($metadata[$field_name]['target_type'], $entity_ids);
   }
 
   /**
    * Handle the safe output of a field item array.
    *
-   * @param        $item
+   * @param array $item
    * @param string $column
    *
    * @return bool|float|int|string
