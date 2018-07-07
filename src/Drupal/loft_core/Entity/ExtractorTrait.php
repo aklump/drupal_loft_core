@@ -169,6 +169,7 @@ trait ExtractorTrait {
 
     static $metadata = NULL;
     if (!isset($metadata[$field_name])) {
+      $target_entity_type = NULL;
       $field_info = $this->d7->field_info_field($field_name);
       $field_type = $field_info['type'];
       $field_type_info = $this->d7->field_info_field_types($field_type);
@@ -187,8 +188,10 @@ trait ExtractorTrait {
         $keys = array_keys($field_info['columns']);
         $value_key = reset($keys);
       }
-      $type_info = $this->d7->entity_get_info($target_entity_type);
-      if (empty($type_info['controller class'])) {
+
+      if (!$target_entity_type
+        || !($type_info = $this->d7->entity_get_info($target_entity_type))
+        || empty($type_info['controller class'])) {
         $target_entity_type = NULL;
       }
       $metadata[$field_name]['target_type'] = $target_entity_type;
