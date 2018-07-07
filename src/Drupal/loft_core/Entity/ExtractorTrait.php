@@ -187,7 +187,10 @@ trait ExtractorTrait {
         $keys = array_keys($field_info['columns']);
         $value_key = reset($keys);
       }
-
+      $type_info = $this->d7->entity_get_info($target_entity_type);
+      if (empty($type_info['controller class'])) {
+        $target_entity_type = NULL;
+      }
       $metadata[$field_name]['target_type'] = $target_entity_type;
       $metadata[$field_name]['key'] = $value_key;
     }
@@ -197,7 +200,7 @@ trait ExtractorTrait {
       return $item[$metadata[$field_name]['key']];
     }, $items);
 
-    return $this->d7->entity_load($metadata[$field_name]['target_type'], $entity_ids);
+    return $metadata[$field_name]['target_type'] ? entity_load($metadata[$field_name]['target_type'], $entity_ids) : [];
   }
 
   /**
