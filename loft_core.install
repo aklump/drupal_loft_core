@@ -6,77 +6,9 @@
  */
 
 /**
- * Delete an node type definition from the database plus variables.
- *
- * @param $node_type
- *
- * @return mixed|null|string
- */
-function loft_core_delete_bundle_update($node_type) {
-  $known_variables = [
-    'additional_settings__active_tab_' . $node_type,
-    'ant_' . $node_type,
-    'ant_pattern_' . $node_type,
-    'ant_php_' . $node_type,
-    'comment_anonymous_' . $node_type,
-    'comment_' . $node_type,
-    'comment_default_mode_' . $node_type,
-    'comment_default_per_page_' . $node_type,
-    'comment_form_location_' . $node_type,
-    'comment_preview_' . $node_type,
-    'comment_subject_field_' . $node_type,
-    'field_bundle_settings_node__' . $node_type,
-    'honeypot_form_' . $node_type . '_node_form',
-    'honeypot_form_comment_node_' . $node_type . '_form',
-    'language_content_type_' . $node_type,
-    'menu_options_' . $node_type,
-    'menu_parent_' . $node_type,
-    'metatag_enable_node__' . $node_type,
-    'node_options_' . $node_type,
-    'node_preview_' . $node_type,
-    'node_submitted_' . $node_type,
-    'page_title_type_' . $node_type,
-    'page_title_type_' . $node_type . '_showfield',
-    'pathauto_node_' . $node_type . '_pattern',
-    'save_continue_' . $node_type,
-    'scheduler_expand_fieldset_' . $node_type,
-    'scheduler_publish_enable_' . $node_type,
-    'scheduler_publish_past_date_' . $node_type,
-    'scheduler_publish_required_' . $node_type,
-    'scheduler_publish_revision_' . $node_type,
-    'scheduler_publish_touch_' . $node_type,
-    'scheduler_unpublish_enable_' . $node_type,
-    'scheduler_unpublish_required_' . $node_type,
-    'scheduler_unpublish_revision_' . $node_type,
-    'scheduler_use_vertical_tabs_' . $node_type,
-    'soft_length_limit_title_max_' . $node_type,
-    'soft_length_limit_title_min_' . $node_type,
-    'soft_length_style_select_' . $node_type,
-    'webform_node_' . $node_type,
-    'xmlsitemap_settings_node_' . $node_type,
-    'workflow_' . $node_type,
-  ];
-  node_type_delete($node_type);
-  node_types_rebuild();
-  menu_rebuild();
-
-  $output = [];
-  if ($count = db_delete('variable')
-    ->condition('name', $known_variables, 'IN')
-    ->execute()) {
-    $output[] = format_plural($count, '1 variable deleted', '@count variables deleted.');
-  };
-
-  $output[] = t('Node type $node_type deleted.');
-
-  return implode(PHP_EOL, $output);
-}
-
-/**
  * Create an archive of entities.
  *
- * This is designed to be used as the sole contents of a hook_update_n
- * implementation.
+ * Wrap this function in a hook_update_n and return it's return value.
  *
  * @param string $destination_dir
  *   The destination direction for the archive, e.g. 'temporary://foo/bar'.
@@ -101,7 +33,7 @@ function loft_core_delete_bundle_update($node_type) {
  *
  * @throws \DrupalUpdateException
  */
-function loft_core_archive_entities_update(
+function loft_core_update__archive_entities(
   $destination_dir,
   $update_message,
   $sql,
@@ -167,4 +99,276 @@ function loft_core_archive_entities_update(
   catch (Exception $e) {
     throw new DrupalUpdateException('FAILED: ' . $update_message . ': ' . $e->getMessage());
   }
+}
+
+/**
+ * Delete entity content and definition.
+ *
+ * Wrap this function in a hook_update_n and return it's return value.
+ *
+ * This function does not archive any data you may want to implement
+ * \loft_core_update__archive_entities before calling this update.
+ *
+ * @param array &$sandbox
+ *   The match context.
+ * @param string $entity_type
+ *   The entity type.
+ * @param string $bundle
+ *   The bundle type.
+ *
+ * @return string
+ *   The results message.
+ *
+ * @throws \DrupalUpdateException
+ *
+ * @see loft_core_update__archive_entities
+ */
+function loft_core_update__delete_content_and_entity_definition(array &$sandbox, $entity_type, $bundle) {
+
+  // TODO Make this work for all entity types if needed.
+  if ($entity_type !== 'node') {
+    throw new \DrupalUpdateException("Only node entity types are supported at this time.");
+  }
+
+  $output = [];
+
+  // Delete the content.
+  if (empty($sandbox['to_delete'])) {
+    $query = new EntityFieldQuery();
+    $found = $query
+      ->entityCondition('entity_type', $entity_type)
+      ->entityCondition('bundle', $bundle)
+      ->execute();
+    $ids = isset($found[$entity_type]) ? $found[$entity_type] : [];
+    if ($ids) {
+      $sandbox['to_delete'] = array_keys($ids);
+      $sandbox['total'] = count($ids);
+    }
+    else {
+      $sandbox['#finished'] = 1;
+    }
+  }
+  $ids = array_splice($sandbox['to_delete'], 0, 10);
+  if (entity_delete_multiple($entity_type, $ids) === FALSE) {
+    throw new \DrupalUpdateException("Could not delete entities");
+  }
+
+  $count = count($sandbox['to_delete']);
+  $sandbox['#finished'] = $count > 0 ? ($sandbox['total'] - $count) / $sandbox['total'] : 1;
+
+  // Once all the content is deleted, then we need to delete the fields and
+  // entity definition.
+  if ($sandbox['#finished'] === 1) {
+    if ($sandbox['total']) {
+      $output[] = t('!entities of content have been deleted', [
+        '!entities' => format_plural($sandbox['total'], '1 piece', '@count pieces'),
+      ]);
+    }
+
+    // Delete bundle's fields.
+    field_attach_delete_bundle($entity_type, $bundle);
+
+    // Delete the entity type.
+
+    $known_variables = [];
+    if ($entity_type === 'node') {
+      $known_variables = [
+        'additional_settings__active_tab_' . $bundle,
+        'ant_' . $bundle,
+        'ant_pattern_' . $bundle,
+        'ant_php_' . $bundle,
+        'comment_anonymous_' . $bundle,
+        'comment_' . $bundle,
+        'comment_default_mode_' . $bundle,
+        'comment_default_per_page_' . $bundle,
+        'comment_form_location_' . $bundle,
+        'comment_preview_' . $bundle,
+        'comment_subject_field_' . $bundle,
+        'field_bundle_settings_node__' . $bundle,
+        'honeypot_form_' . $bundle . '_node_form',
+        'honeypot_form_comment_node_' . $bundle . '_form',
+        'language_content_type_' . $bundle,
+        'menu_options_' . $bundle,
+        'menu_parent_' . $bundle,
+        'metatag_enable_node__' . $bundle,
+        'node_options_' . $bundle,
+        'node_preview_' . $bundle,
+        'node_submitted_' . $bundle,
+        'page_title_type_' . $bundle,
+        'page_title_type_' . $bundle . '_showfield',
+        'pathauto_node_' . $bundle . '_pattern',
+        'save_continue_' . $bundle,
+        'scheduler_expand_fieldset_' . $bundle,
+        'scheduler_publish_enable_' . $bundle,
+        'scheduler_publish_past_date_' . $bundle,
+        'scheduler_publish_required_' . $bundle,
+        'scheduler_publish_revision_' . $bundle,
+        'scheduler_publish_touch_' . $bundle,
+        'scheduler_unpublish_enable_' . $bundle,
+        'scheduler_unpublish_required_' . $bundle,
+        'scheduler_unpublish_revision_' . $bundle,
+        'scheduler_use_vertical_tabs_' . $bundle,
+        'soft_length_limit_title_max_' . $bundle,
+        'soft_length_limit_title_min_' . $bundle,
+        'soft_length_style_select_' . $bundle,
+        'webform_node_' . $bundle,
+        'xmlsitemap_settings_node_' . $bundle,
+        'workflow_' . $bundle,
+      ];
+    }
+
+    // Taken from node_type_delete(), but we pulled out the above code as a step
+    // in the direction of support for non-node entities.
+    // TODO Make this work for entities other than node, then remove this.
+    $info = node_type_get_type($bundle);
+    db_delete('node_type')
+      ->condition('type', $bundle)
+      ->execute();
+    module_invoke_all('node_type_delete', $info);
+
+    // Clear the node type cache.
+    node_type_cache_reset();
+    node_types_rebuild();
+
+    // // TODO End node-only code.
+
+    menu_rebuild();
+
+    if ($known_variables) {
+      if ($count = db_delete('variable')
+        ->condition('name', $known_variables, 'IN')
+        ->execute()) {
+        $output[] = format_plural($count, '1 variable deleted', '@count variables deleted.');
+      };
+    }
+
+
+    $output[] = t('%entity:%bundle structure and fields are marked for deletion', [
+      '%entity' => $entity_type,
+      '%bundle' => $bundle,
+    ]);
+
+    return implode(PHP_EOL, $output);
+  }
+}
+
+/**
+ * Delete one or more field's from an entity bundle definition.
+ *
+ * Wrap this function in a hook_update_n and return it's return value.
+ *
+ * @param string $entity_type
+ *   The entity to target.
+ * @param string $bundle
+ *   The entity's bundle to target.
+ * @param array $field_names
+ *   The field_name(s) to delete from entity:bundle.
+ *
+ * @return string|void
+ *   The update message.
+ *
+ * @throws \DrupalUpdateException
+ *   If the update was unsuccessfuly.
+ */
+function loft_core_update__delete_entity_fields($entity_type, $bundle, array $field_names) {
+  try {
+
+    $update_message = t("Delete field(s): %fields from %entity:%bundle", [
+      '%fields' => implode(', ', $field_names),
+      '%entity' => $entity_type,
+      '%bundle' => $bundle,
+    ]);
+
+    foreach ($field_names as $field_name) {
+      $instance = field_info_instance($entity_type, $field_name, $bundle);
+      field_delete_instance($instance);
+    }
+    field_purge_batch(500);
+
+    return $update_message;
+  }
+  catch (Exception $e) {
+    throw new DrupalUpdateException('FAILED: ' . $update_message . '.: ' . $e->getMessage());
+  }
+}
+
+/**
+ * Delete a node type definition from the database plus it's variables.
+ *
+ * 1. Wrap this function in a hook_update_n and return it's return value.
+ * 2. You do not need to delete all content of this node type first.
+ *
+ * @param string $node_type
+ *   The node type to delete.
+ *
+ * @return mixed|null|string
+ *
+ * @deprecated Use \loft_core_update__delete_content_and_entity_definition()
+ *   instead.
+ */
+function loft_core_update__delete_bundle($node_type) {
+
+  if (!$info = node_type_get_type($node_type)) {
+    throw new \DrupalUpdateException("Unknown node type: %type", [
+      '%type' => $node_type,
+    ]);
+  }
+
+  $known_variables = [
+    'additional_settings__active_tab_' . $node_type,
+    'ant_' . $node_type,
+    'ant_pattern_' . $node_type,
+    'ant_php_' . $node_type,
+    'comment_anonymous_' . $node_type,
+    'comment_' . $node_type,
+    'comment_default_mode_' . $node_type,
+    'comment_default_per_page_' . $node_type,
+    'comment_form_location_' . $node_type,
+    'comment_preview_' . $node_type,
+    'comment_subject_field_' . $node_type,
+    'field_bundle_settings_node__' . $node_type,
+    'honeypot_form_' . $node_type . '_node_form',
+    'honeypot_form_comment_node_' . $node_type . '_form',
+    'language_content_type_' . $node_type,
+    'menu_options_' . $node_type,
+    'menu_parent_' . $node_type,
+    'metatag_enable_node__' . $node_type,
+    'node_options_' . $node_type,
+    'node_preview_' . $node_type,
+    'node_submitted_' . $node_type,
+    'page_title_type_' . $node_type,
+    'page_title_type_' . $node_type . '_showfield',
+    'pathauto_node_' . $node_type . '_pattern',
+    'save_continue_' . $node_type,
+    'scheduler_expand_fieldset_' . $node_type,
+    'scheduler_publish_enable_' . $node_type,
+    'scheduler_publish_past_date_' . $node_type,
+    'scheduler_publish_required_' . $node_type,
+    'scheduler_publish_revision_' . $node_type,
+    'scheduler_publish_touch_' . $node_type,
+    'scheduler_unpublish_enable_' . $node_type,
+    'scheduler_unpublish_required_' . $node_type,
+    'scheduler_unpublish_revision_' . $node_type,
+    'scheduler_use_vertical_tabs_' . $node_type,
+    'soft_length_limit_title_max_' . $node_type,
+    'soft_length_limit_title_min_' . $node_type,
+    'soft_length_style_select_' . $node_type,
+    'webform_node_' . $node_type,
+    'xmlsitemap_settings_node_' . $node_type,
+    'workflow_' . $node_type,
+  ];
+  node_type_delete($node_type);
+  node_types_rebuild();
+  menu_rebuild();
+
+  $output = [];
+  if ($count = db_delete('variable')
+    ->condition('name', $known_variables, 'IN')
+    ->execute()) {
+    $output[] = format_plural($count, '1 variable deleted', '@count variables deleted.');
+  };
+
+  $output[] = t('Node type %node_type deleted.', ['%node_type' => $node_type]);
+
+  return implode(PHP_EOL, $output);
 }
