@@ -27,7 +27,7 @@
 
 <section>
 
-<p>Here is an example of how to use <code>loft_core_archive_entities_update</code> in a <code>hook_update_n</code> implementation to archive entites.</p>
+<p>Here is an example of how to use <code>loft_core_update__archive_entities</code> in a <code>hook_update_n</code> implementation to archive entites.</p>
 
 <pre><code>/**
  * Create archive of the product entities.
@@ -64,7 +64,7 @@ from commerce_product p
 WHERE 1;";
   module_load_include('install', 'loft_core', 'loft_core');
 
-  return loft_core_archive_entities_update(
+  return loft_core_update__archive_entities(
     'Create archive of the product entities.',
     $sql,
     'commerce_products',
@@ -97,7 +97,7 @@ WHERE 1;";
 </div>
   
   <div id="footer-legaleeze">
-    <p class="legaleeze center">Version: 7.x-1.0-rc8 &bull; Last Updated: Fri, 06 Jul 2018 19:22:54 -0700</p>
+    <p class="legaleeze center">Version: 7.x-1.0-rc8 &bull; Last Updated: Thu, 26 Jul 2018 16:38:42 -0700</p>
   </div>
 </footer>
 

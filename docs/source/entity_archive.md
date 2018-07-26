@@ -1,6 +1,6 @@
 # Archiving Entities
 
-Here is an example of how to use `loft_core_archive_entities_update` in a `hook_update_n` implementation to archive entites.
+Here is an example of how to use `loft_core_update__archive_entities` in a `hook_update_n` implementation to archive entites.
 
     /**
      * Create archive of the product entities.
@@ -37,7 +37,7 @@ Here is an example of how to use `loft_core_archive_entities_update` in a `hook_
     WHERE 1;";
       module_load_include('install', 'loft_core', 'loft_core');
     
-      return loft_core_archive_entities_update(
+      return loft_core_update__archive_entities(
         'Create archive of the product entities.',
         $sql,
         'commerce_products',
