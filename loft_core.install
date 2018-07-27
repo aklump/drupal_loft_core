@@ -372,3 +372,34 @@ function loft_core_update__delete_bundle($node_type) {
 
   return implode(PHP_EOL, $output);
 }
+
+/**
+ * Delete a vocabulary in the hook_update_n.
+ *
+ * Wrap this function in a hook_update_n and return it's return value.
+ *
+ * @param int $vid
+ *   The vocabulary ID to delete.
+ *
+ * @return string
+ *   The update message.
+ *
+ * @throws \DrupalUpdateException
+ *   If the vocabulary cannot be deleted.
+ */
+function loft_core_update__delete_taxonomy_vocabulary($vid) {
+  if (!($vocabulary = taxonomy_vocabulary_load($vid))) {
+    return t("There is no vocabulary vid = %vid to delete; skipping this update.", [
+      '%vid' => $vid,
+    ]);
+  }
+  try {
+    if (SAVED_DELETED === taxonomy_vocabulary_delete($vid)) {
+      return t('Deleted vocabulary %title".', ['%title' => $vocabulary->name]);
+    }
+  }
+  catch (\Exception $exception) {
+    throw new DrupalUpdateException("Could not delete vocabulary vid = " . $vid . ': ' . $exception->getMessage());
+  }
+
+}
