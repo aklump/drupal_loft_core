@@ -33,8 +33,11 @@ function loft_core_users_settings_form(array $form, array &$form_state) {
     ->fields('lu', ['domain', 'status', 'id'])
     ->distinct('domain')
     ->condition('status', loft_core_users_get_blocking_statuses(), 'IN')
-    ->condition('ip', $apache_ips, 'NOT IN')
-    ->condition('domain', '', '<>');
+    ->condition('domain', '', '<>')
+    ->orderBy('domain', 'ASC');
+  if ($apache_ips) {
+    $query->condition('ip', $apache_ips, 'NOT IN');
+  }
   $result = $query->execute();
   $options = [];
   while ($record = $result->fetchObject()) {
@@ -120,9 +123,11 @@ function loft_core_users_settings_form(array $form, array &$form_state) {
   $query = db_select('loft_core_users', 'lu')
     ->fields('lu', ['uid', 'domain', 'status', 'ip'])
     ->condition('ip', NULL, 'is not')
-    ->condition('ip', $apache_ips, 'not in')
     ->condition('domain', '', '<>')
     ->condition('status', loft_core_users_get_blocking_statuses(), 'IN');
+  if ($apache_ips) {
+    $query->condition('ip', $apache_ips, 'NOT IN');
+  }
   $result = $query->execute();
   $whitelist = loft_core_users_get_domain_whitelist();
   while ($record = $result->fetchObject()) {
