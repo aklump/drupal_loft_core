@@ -49,7 +49,7 @@ define('LOFT_CORE_USERS_APACHE_MIN_DOMAINS_PER_IP_TO_LIST', 2);
  *
  * @var LOFT_CORE_USERS_DOMAIN_WHITELIST
  */
-define('LOFT_CORE_USERS_DOMAIN_WHITELIST', 'gmail.com,yahoo.com,mail.com,hotmail.com');
+define('LOFT_CORE_USERS_DOMAIN_WHITELIST', 'gmail.com,yahoo.com,mail.com,hotmail.com,aol.com');
 
 /**
  * Return blocking statuses.
