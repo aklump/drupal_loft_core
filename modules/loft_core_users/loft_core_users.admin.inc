@@ -22,6 +22,50 @@
  *   The form array.
  */
 function loft_core_users_settings_form(array $form, array &$form_state) {
+  $form['#tree'] = FALSE;
+  $form['help'] = [
+    '#weight' => -10,
+    '#markup' => t('<p>Get more help at <a href="!url">!url</a>.</p>', array('!url' => url('help/loft_core/loft_core_users'))),
+  ];
+  $form['augmented'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Augmented User Data'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+  );
+  $form['augmented']['loft_core_users_remember_usernames'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Store the IP addresses of authenticated users?'),
+    '#default_value' => variable_get('loft_core_users_store_authenticated_ips', LOFT_CORE_USERS_STORE_AUTHENTICATED_IPS),
+  );
+
+  $form['remember'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Remember Usernames'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+  );
+  $form['remember']['loft_core_users_remember_usernames'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Should the website use cookies to remember usernames?'),
+    '#description' => t('This will autofill the username in the login form for returning users.'),
+    '#default_value' => variable_get('loft_core_users_remember_usernames', FALSE),
+  );
+  $form['remember']['loft_core_remember_user_for_days'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Cookie Duration in Days'),
+    '#size' => 10,
+    '#description' => t('How long before the cookie should expire?'),
+    '#default_value' => variable_get('loft_core_remember_user_for_days', LOFT_CORE_REMEMBER_USER_FOR_DAYS),
+    '#required' => TRUE,
+  );
+
+  $form['spam'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Spam & User Blocking'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  );
 
   $apache_ips = _loft_core_users_parse_apache();
 
@@ -35,9 +79,6 @@ function loft_core_users_settings_form(array $form, array &$form_state) {
     ->condition('status', loft_core_users_get_blocking_statuses(), 'IN')
     ->condition('domain', '', '<>')
     ->orderBy('domain', 'ASC');
-  if ($apache_ips) {
-    $query->condition('ip', $apache_ips, 'NOT IN');
-  }
   $result = $query->execute();
   $options = [];
   while ($record = $result->fetchObject()) {
@@ -46,23 +87,28 @@ function loft_core_users_settings_form(array $form, array &$form_state) {
 
   if (count($options)) {
     $checked = array_diff($options, loft_core_users_get_domain_whitelist());
-    $form['domains'] = [
+    $form['spam']['domains'] = [
       '#type' => 'fieldset',
-      '#title' => t('Blacklist (@checked of @domains)', [
+      '#title' => t('Domain Blocking (@domains tracked, @checked blocked)', [
         '@checked' => count($checked),
         '@domains' => format_plural(count($options), '1 domain', '@count domains'),
       ]),
-      '#description' => t('The domains listed have been identified as suspicious.  All domains checked here are being blocked by Drupal.  To allow users from one or more of the listed domains, uncheck those domains, thereby allowing new users with emails from said domains to sign up for new accounts.'),
+      '#description' => t('Any user whose email address domain appears checked in this list may not login, nor register for a new account.  They will see your website, but cannot use an account.  You may uncheck a domain and save this form, to remove it from the blocked list of domains.'),
       '#collapsible' => TRUE,
       '#collapsed' => TRUE,
     ];
-    $form['domains']['loft_core_users_domain_whitelist'] = [
+    $form['spam']['domains']['loft_core_users_domain_whitelist'] = [
       '#type' => 'checkboxes',
       '#title' => t('Blacklist'),
       '#options' => $options,
       '#default_value' => $checked,
+      '#attributes' => ['class' => ['loft-core-users-3col']],
     ];
   }
+  $form['#attached']['css'][] = array(
+    'type' => 'inline',
+    'data' => '.loft-core-users-3col { column-count: 3 }',
+  );
 
   $form_state['domains'] = $options;
 
@@ -82,38 +128,37 @@ function loft_core_users_settings_form(array $form, array &$form_state) {
   while ($record = $result->fetchObject()) {
     $options[$record->domain] = $record->domain;
   }
+  $form_state['domains'] = $options;
 
   if (count($options)) {
-    $form['honeybears'] = [
+    $form['spam']['honeybears'] = [
+      '#weight' => -1,
       '#type' => 'fieldset',
       '#title' => t('Honeybears (@domains)', [
         '@domains' => format_plural(count($options), '1 domain', '@count domains'),
       ]),
-      '#description' => t('The domains listed have been flagged as suspicious.  These domains are not blocked.  To block any of these domains, check said domains and save the form.'),
+      '#description' => t('The domains listed have been flagged as suspicious, but are not blocked.  To block any of these domains, check said domains and save the form.  This will convert them to spammy users.  Alternately use the MySQL shortcut above to batch convert these users.'),
       '#collapsible' => TRUE,
       '#collapsed' => TRUE,
     ];
-    $form['honeybears']['honeybears'] = [
+    $form['spam']['honeybears']['honeybears'] = [
       '#type' => 'checkboxes',
-      '#title' => t('Honeybears'),
+      '#title' => t('Spammy Candidate Domains'),
       '#options' => $options,
       '#default_value' => [],
+      '#attributes' => ['class' => ['loft-core-users-3col']],
     ];
+
+    // MySql Shortcuts.
+    $form['spam']['honeybears']['mysql'] = [
+      '#weight' => -1,
+      '#type' => 'fieldset',
+      '#title' => t('MySQL shortcuts'),
+      '#collapsible' => FALSE,
+      '#weight' => 1,
+    ];
+    $form['spam']['honeybears']['mysql'][] = ['#markup' => '<h2>List domains of honeybears:</h2><pre>SELECT distinct(domain) FROM loft_core_users WHERE status = 3;</pre><h2>Convert Honeybears to Spammy</h2><pre>UPDATE loft_core_users SET status = 34 where status = 3;</pre>'];
   }
-
-  $form_state['domains'] = $options;
-
-  //
-  //
-  // MySql Shortcuts.
-  //
-  $form['mysql'] = [
-    '#type' => 'fieldset',
-    '#title' => t('MySQL shortcuts'),
-    '#collapsible' => TRUE,
-    '#collapsed' => TRUE,
-  ];
-  $form['mysql'][] = ['#markup' => '<h2>Get Honeybears:</h2><pre>SELECT distinct(domain) FROM loft_core_users WHERE status = 3;</pre><h2>Make Honeybears SPAMMY</h2><pre>UPDATE loft_core_users SET status = 34 where status = 3;</pre>'];
 
   //
   //
@@ -125,9 +170,6 @@ function loft_core_users_settings_form(array $form, array &$form_state) {
     ->condition('ip', NULL, 'is not')
     ->condition('domain', '', '<>')
     ->condition('status', loft_core_users_get_blocking_statuses(), 'IN');
-  if ($apache_ips) {
-    $query->condition('ip', $apache_ips, 'NOT IN');
-  }
   $result = $query->execute();
   $whitelist = loft_core_users_get_domain_whitelist();
   while ($record = $result->fetchObject()) {
@@ -148,22 +190,46 @@ function loft_core_users_settings_form(array $form, array &$form_state) {
     $value = implode(PHP_EOL, array_reverse($value)) . PHP_EOL;
   });
 
-  $form['apache'] = [
+  $form['spam']['ips'] = [
     '#weight' => 20,
     '#type' => 'fieldset',
-    '#title' => t('.htaccess deny by IP candidates (@ips)', [
+    '#title' => t('IP Blocking', [
       '@ips' => format_plural(count($deny_from), '1 ip', '@count ips'),
     ]),
+    '#description' => t('IP blocking means to prevent users from accessing any part of your site.  It can performed at the Drupal level, which requires PHP and a Drupal bootstrap, or at the Apache level.  Drupal IP banning can be set to automatic, whereas Apache level requires manual modification of a configuration file.  The latter is less of a load on your server.'),
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
   ];
-  $form['apache']['loft_core_users_apache_min_domains_per_ip_to_list'] = [
+  $min_title = t('Minimum Spammy Domains to Block IP');
+
+  $form['spam']['ips']['loft_core_users_auto_block_by_ip'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Automatically Block by IP'),
+    '#description' => t('If enabled, IPs that have been associated with at least the %name number of spammy domains will be automatically added to the <a href="!url">IP ban list</a> and blocked at the Drupal level.  See also the Apache .htaccess ban list.',
+      [
+        '!url' => url('admin/config/people/ip-blocking'),
+        '%name' => $min_title,
+      ]),
+
+    '#default_value' => variable_get('loft_core_users_auto_block_by_ip', TRUE),
+  );
+  $form['spam']['ips']['loft_core_users_apache_min_domains_per_ip_to_list'] = [
+    '#weight' => -1,
     '#type' => 'textfield',
-    '#title' => t('Domain Minimum to List'),
-    '#description' => t('An IP will only appear in this list if it has at least this many domains that have been blocked.'),
+    '#title' => $min_title,
+    '#description' => t('How many domains must be associated with an IP before it will be automatically blocked and/or added to the Apache ban list.  If you set this number too low, you run this risk of banning legitimate users.'),
     '#default_value' => $min_count,
     '#required' => TRUE,
     '#size' => 8,
+  ];
+  $form['spam']['ips']['snippet'] = [
+    '#weight' => 20,
+    '#type' => 'fieldset',
+    '#title' => t('Apache .htaccess Ban List (@ips)', [
+      '@ips' => format_plural(count($deny_from), '1 ip', '@count ips'),
+    ]),
+    '#description' => t('This snippet is generated automatically based on spam levels and provided so that you can copy and paste it into your root-level .htaccess file for blocking by ips.  You may want to do this at regular intervals to decrease server load of spam.  When an IP is blocked at the apache level, the request will never get to Drupal, the database, PHP, etc.  This is a read-only field.  <strong>You should always replace the existing snippet in your .htaccess file with this new one during manual copy.</strong>'),
+    '#collapsible' => FALSE,
   ];
 
   // Add a header: note, in reverse stacking order.
@@ -171,15 +237,15 @@ function loft_core_users_settings_form(array $form, array &$form_state) {
     array_unshift($deny_from, NULL);
     array_unshift($deny_from, '#');
     array_unshift($deny_from, '# Exported from: ' . current_path());
+    array_unshift($deny_from, '# user id, domain, status code');
     array_unshift($deny_from, '#');
 
     array_push($deny_from, '#');
     array_push($deny_from, '# End exported code');
     array_push($deny_from, '#');
 
-    $form['apache']['deny_from'] = [
+    $form['spam']['ips']['snippet']['deny_from'] = [
       '#type' => 'textarea',
-      '#description' => t('This snippet is generated automatically based on spam levels and provided so that you can copy and paste it into your root-level .htaccess file for blocking by ips.  You may want to do this at regular intervals say monthly to decrease server load of spam.  When an ip is blocked at the apache level, it will never get to Drupal, the database, PHP, etc.  This is a read-only field.  ** If appending to .htaccess only copy the snippet between the open/close comments.'),
       '#title' => t('Deny from'),
       '#default_value' => implode(PHP_EOL, $deny_from),
       '#rows' => 10,
@@ -195,16 +261,16 @@ function loft_core_users_settings_form(array $form, array &$form_state) {
   //
   // Currently being denied in .htaccess
   //
-  $form['apache_current'] = [
+  $form['spam']['ips']['apache']['current'] = [
     '#weight' => 18,
     '#type' => 'fieldset',
-    '#title' => t('.htaccess currently denying (@ips)', [
+    '#title' => t('Apache is Currently Blocking (@ips)', [
       '@ips' => format_plural(count($apache_ips), '1 ip', '@count ips'),
     ]),
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
   ];
-  $form['apache_current']['denying'] = [
+  $form['spam']['ips']['apache']['current']['denying'] = [
     '#type' => 'textarea',
     '#description' => t('This is a list of IPs currently being blocked by Apache via the webroot .htaccess file.  The goal is to move candidates here by copying the candidate snippet into your .htaccess file.'),
     '#title' => t('Currently denying'),
@@ -231,14 +297,15 @@ function loft_core_users_settings_form_validate($form, &$form_state) {
   $array = array_filter($array, function (&$value) {
     return empty($value);
   });
-  form_set_value($form['domains']['loft_core_users_domain_whitelist'], array_keys($array), $form_state);
+  form_set_value($form['spam']['domains']['loft_core_users_domain_whitelist'], array_keys($array), $form_state);
 }
 
 /**
  * Form submission handler.
  */
 function loft_core_users_settings_form_submit($form, &$form_state) {
-  if (($honeybears = array_values(array_filter($form_state['values']['honeybears'])))) {
+  if (isset($form_state['values']['honeybears'])
+    && ($honeybears = array_values(array_filter($form_state['values']['honeybears'])))) {
     try {
       $num_updated = db_update('loft_core_users')
         ->fields(['status' => LOFT_CORE_USERS_STATUS_HONEYBEAR_MADE_SPAMMY])
@@ -259,13 +326,20 @@ function loft_core_users_settings_form_submit($form, &$form_state) {
  * All IPs that have been denied via the .htaccess file at the root of Drupal.
  *
  * @return array
- *   All IPs in ascending order.
+ *   All unique IPs in ascending order.
  */
 function _loft_core_users_parse_apache() {
-  $htaccess = file_get_contents(DRUPAL_ROOT . '/.htaccess');
-  preg_match_all('/deny from ([\d\.]+)/is', $htaccess, $matches);
-  $ips = isset($matches[1]) ? $matches[1] : [];
-  sort($ips, SORT_NATURAL);
+  static $drupal_static_fast;
+  if (!isset($drupal_static_fast)) {
+    $drupal_static_fast['ips'] = &drupal_static(__FUNCTION__, NULL);
+  }
+  $ips = &$drupal_static_fast['ips'];
+  if (empty($ips)) {
+    $htaccess = file_get_contents(DRUPAL_ROOT . '/.htaccess');
+    preg_match_all('/deny from ([\d\.]+)/is', $htaccess, $matches);
+    $ips = isset($matches[1]) ? array_unique($matches[1]) : [];
+    sort($ips, SORT_NATURAL);
+  }
 
   return $ips;
 }
