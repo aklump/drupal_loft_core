@@ -96,7 +96,7 @@ function loft_core_users_get_domain_whitelist() {
   $whitelist = explode(',', trim(LOFT_CORE_USERS_DOMAIN_WHITELIST));
 
   // This variable is modified when the admin form is submitted.
-  $whitelist = array_merge($whitelist, variable_get('loft_core_users_domain_whitelist'));
+  $whitelist = array_merge($whitelist, variable_get('loft_core_users_domain_whitelist', []));
 
   // This CSV variable is not exposed in the UI and is meant to be used in your
   // settings.php file for hard-coding values, something like this:

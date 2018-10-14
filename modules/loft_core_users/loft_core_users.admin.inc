@@ -123,9 +123,13 @@ function loft_core_users_settings_form(array $form, array &$form_state) {
     ->fields('lu', ['domain', 'status', 'id'])
     ->distinct('domain')
     ->condition('status', LOFT_CORE_USERS_STATUS_HONEYBEAR)
-    ->condition('domain', '', '<>')
-    ->condition('domain', $form_state['domains'], 'NOT IN')
-    ->condition('domain', loft_core_users_get_domain_whitelist(), 'NOT IN');
+    ->condition('domain', '', '<>');
+  if (!empty($form_state['domains'])) {
+    $query->condition('domain', $form_state['domains'], 'NOT IN');
+  }
+  if ($whitelist) {
+    $query->condition('domain', $whitelist, 'NOT IN');
+  }
   $result = $query->execute();
   $options = [];
   while ($record = $result->fetchObject()) {
@@ -241,6 +245,7 @@ function loft_core_users_settings_form(array $form, array &$form_state) {
     '#size' => 8,
   ];
   $form['spam']['ips']['snippet'] = [
+    '#access' => !empty($deny_from),
     '#weight' => 20,
     '#type' => 'fieldset',
     '#title' => t('Apache .htaccess Ban List (@ips)', [
