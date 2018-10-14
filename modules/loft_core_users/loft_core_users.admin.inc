@@ -36,7 +36,7 @@ function loft_core_users_settings_form(array $form, array &$form_state) {
     '#collapsible' => TRUE,
     '#collapsed' => FALSE,
   );
-  $form['augmented']['loft_core_users_remember_usernames'] = array(
+  $form['augmented']['loft_core_users_store_authenticated_ips'] = array(
     '#type' => 'checkbox',
     '#title' => t('Store the IP addresses of authenticated users?'),
     '#default_value' => variable_get('loft_core_users_store_authenticated_ips', LOFT_CORE_USERS_STORE_AUTHENTICATED_IPS),
