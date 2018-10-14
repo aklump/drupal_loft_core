@@ -63,3 +63,26 @@ function loft_core_users_schema() {
 
   return $schema;
 }
+
+/**
+ * Trim whitespace from domain names.
+ */
+function loft_core_users_update_7101(&$sandbox) {
+
+  // For help refer to hook_update_N in system.api.php D7
+  $output = array();
+  try {
+    db_query("UPDATE {loft_core_users} set domain = TRIM(REPLACE(REPLACE(REPLACE(domain, '\t', ''), '\n', ''), '\r', ''));")
+      ->execute();
+    $output[] = t('Whitespace trimmed from domain name column.');
+  }
+  catch (Exception $e) {
+    throw new DrupalUpdateException('FAILED: Trim whitespace from domain names.: ' . $e->getMessage());
+  }
+
+  if (empty($output)) {
+    $output[] = t('Nothing to update.');
+  }
+
+  return implode(PHP_EOL, $output);
+}
