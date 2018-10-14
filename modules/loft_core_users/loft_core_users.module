@@ -489,6 +489,7 @@ function loft_core_users_form_user_login_alter(&$form, $form_state, $form_id) {
 function _loft_core_users_form_add_remember_me(&$form) {
   if (!variable_get('loft_core_users_remember_usernames', FALSE)) {
     _loft_core_users_remove_persistent_username();
+
     return;
   }
 
@@ -542,6 +543,49 @@ function _loft_core_users_persist_username($cookie_value) {
 function _loft_core_users_remove_persistent_username() {
   $params = session_get_cookie_params();
   setcookie('loft_core_users_remember_me', '', REQUEST_TIME - 3600, $params['path'], $params['domain'], $params['secure'], $params['httponly']);
+}
+
+/**
+ * Convert status code to a description word.
+ *
+ * @param int $value
+ *   The status code.
+ *
+ * @return string
+ *   A word(s) representing the status code.
+ */
+function loft_core_get_status_as_description($value) {
+  switch ($value) {
+    case LOFT_CORE_USERS_STATUS_BLOCKED:
+      $value = 'Blocked';
+      break;
+
+    case LOFT_CORE_USERS_STATUS_CLEAR:
+      $value = 'Active';
+      break;
+
+    case LOFT_CORE_USERS_STATUS_ROBOT:
+      $value = 'Robot';
+      break;
+
+    case LOFT_CORE_USERS_STATUS_HONEYBEAR:
+      $value = 'Honeybear';
+      break;
+
+    case LOFT_CORE_USERS_STATUS_SPAMMY:
+      $value = 'Spammy';
+      break;
+
+    case LOFT_CORE_USERS_STATUS_HONEYBEAR_MADE_SPAMMY:
+      $value = 'Spammy Honeybear';
+      break;
+
+    default:
+      $value = NULL;
+      break;
+  }
+
+  return $value;
 }
 
 /**

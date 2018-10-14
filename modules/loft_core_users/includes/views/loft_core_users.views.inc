@@ -56,7 +56,7 @@ function loft_core_users_views_data() {
         'title' => t('Record Id'),
         'help' => t('DB record identifier.'),
         'field' => array(
-            'handler' => 'views_handler_field_numeric',
+            'handler' => 'views_handler_field_loft_core_users',
             'click sortable' => TRUE,
         ),
         'filter' => array(
@@ -103,12 +103,11 @@ function loft_core_users_views_data() {
         ),
     );
 
-    // TODO Can we make the handler user human values instead of codes?
     $data['loft_core_users']['status'] = array(
         'title' => t('Status'),
-        'help' => t('Augmented user status code.'),
+        'help' => t('Augmented user status.'),
         'field' => array(
-            'handler' => 'views_handler_field_numeric',
+            'handler' => 'views_handler_field_loft_core_users',
             'click sortable' => TRUE,
         ),
         'filter' => array(
@@ -123,7 +122,7 @@ function loft_core_users_views_data() {
         'title' => t('IP'),
         'help' => t('IP address associated with this account.'),
         'field' => array(
-            'handler' => 'views_handler_field',
+            'handler' => 'views_handler_field_loft_core_users',
             'click sortable' => TRUE, // This is use by the table display plugin.
         ),
         'sort' => array(
@@ -141,7 +140,7 @@ function loft_core_users_views_data() {
         'title' => t('Domain'),
         'help' => t('Associated email domain.'),
         'field' => array(
-            'handler' => 'views_handler_field',
+            'handler' => 'views_handler_field_loft_core_users',
             'click sortable' => TRUE, // This is use by the table display plugin.
         ),
         'sort' => array(
