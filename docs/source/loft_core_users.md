@@ -102,4 +102,4 @@ Blocks users with an email address containing any domains that have been found a
 ## Todos
 
 - [] batch process to mark all users that match domains or ips in our loft_users_core.
-- [] automatically add to `blocked_ips` table.
+- [] vbo integration.
