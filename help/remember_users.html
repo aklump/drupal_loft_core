@@ -11,17 +11,17 @@
 
 <p>To enable this feature add the following to <em>settings.php</em>:</p>
 
-<pre><code>$conf['loft_core_remember_usernames'] = true;
+<pre><code>$conf['loft_core_users_remember_usernames'] = true;
 </code></pre>
 
 <p>If you enable this feature and you are not going to use Persistent Login, you can leverage a different switch by setting this variable in a hook_form_alter:</p>
 
-<pre><code>$form['#loft_core_remember_key'] = 'some_form_value_that_is_toggled';
+<pre><code>$form['#loft_core_users_remember_key'] = 'some_form_value_that_is_toggled';
 </code></pre>
 
 <p>By default, all usernames will be remembered if you enalbe this feature.</p>
 
 <p>And to control the number of days the username is stored in the cookie you can add this to <em>settings.php</em>.</p>
 
-<pre><code>$conf['loft_core_remember_user_for_days'] = 30;
+<pre><code>$conf['loft_core_users_remember_user_for_days'] = 30;
 </code></pre>

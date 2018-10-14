@@ -10,7 +10,7 @@ Expanding upon core's ability to block or unblock a user in a binary fashion, th
 
 This module has a setting to record the IPs for **authenticated** users when they register, which augments the information stored about a user by Drupal core.
 
-It also provides a setting that affects the login form, which will save the username of a user when they login, to a cookie in their browser.  When they visit the login form later, their username in the form is filled in from the cookie.
+It also provides a setting that affects the login form, which will save the username of a user when they login, to a cookie in their browser.  When they visit the login form later, their username in the form is filled in from the cookie. [Read more here](remember_users.md).
 
 ## How Are Users Flagged/Blocked?
 
