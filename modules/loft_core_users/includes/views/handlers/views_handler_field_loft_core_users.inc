@@ -68,23 +68,14 @@ class views_handler_field_loft_core_users extends views_handler_field {
   }
 
   /**
-   * Provide defaults for the handler.
-   */
-  function extra_options(&$option) {
-    if ($option === 'loft_core_users_status') {
-      return self::FORMAT_DEFAULT;
-    }
-  }
-
-  /**
    * {@inheritdoc}
    */
   function extra_options_form(&$form, &$form_state) {
     $form['loft_core_users_status'] = array(
       '#type' => 'select',
       '#title' => t('Format'),
-      '#description' => t("Choose the display format for the status"),
-      '#default_value' => $this->options['loft_core_users_status_as_code'],
+      '#description' => t("Choose how you would like the status displayed."),
+      '#default_value' => $this->options['loft_core_users_status'],
       '#options' => array(
         'code' => t('{CODE}'),
         'description' => t('{DESCRIPTION}'),
