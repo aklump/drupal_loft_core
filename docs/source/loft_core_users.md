@@ -99,6 +99,10 @@ This module is not a dependecy, but without it blocking a user doesn't have any 
 
 Blocks users with an email address containing any domains that have been found as "spammy".  The list of domains are found in `loft_core_users`.
 
+### Contact Module
+
+When a user is banned by drupal we will link them to the contact page, where they can ask to be unbanned.
+
 ## Todos
 
 - [] batch process to mark all users that match domains or ips in our loft_users_core.
