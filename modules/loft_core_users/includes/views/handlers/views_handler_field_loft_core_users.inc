@@ -13,6 +13,15 @@
 class views_handler_field_loft_core_users extends views_handler_field {
 
   /**
+   * The default display format for the status.
+   *
+   * @var string
+   *
+   * @see ::extra_options_form().
+   */
+  const FORMAT_DEFAULT = 'description';
+
+  /**
    * {@inheritdoc}
    */
   function render($values) {
@@ -29,8 +38,15 @@ class views_handler_field_loft_core_users extends views_handler_field {
           $value = LOFT_CORE_USERS_STATUS_CLEAR;
         }
 
-        if (!$this->options['loft_core_users_status_as_code']) {
-          $value = loft_core_get_status_as_description($value);
+        $format = isset($this->options['loft_core_users_status']) ? $this->options['loft_core_users_status'] : self::FORMAT_DEFAULT;
+        if ($format !== 'code') {
+          $description = loft_core_get_status_as_description($value);
+          if ($format === 'description') {
+            $value = $description;
+          }
+          else {
+            $value = "$description ($value)";
+          }
         }
         break;
 
@@ -55,8 +71,8 @@ class views_handler_field_loft_core_users extends views_handler_field {
    * Provide defaults for the handler.
    */
   function extra_options(&$option) {
-    if ($option === 'loft_core_users_status_as_code') {
-      return FALSE;
+    if ($option === 'loft_core_users_status') {
+      return self::FORMAT_DEFAULT;
     }
   }
 
@@ -64,11 +80,16 @@ class views_handler_field_loft_core_users extends views_handler_field {
    * {@inheritdoc}
    */
   function extra_options_form(&$form, &$form_state) {
-    $form['loft_core_users_status_as_code'] = array(
-      '#type' => 'checkbox',
-      '#title' => t('Display code, not description'),
-      '#description' => t('Check this to display status as the raw code, instead of description text.'),
+    $form['loft_core_users_status'] = array(
+      '#type' => 'select',
+      '#title' => t('Format'),
+      '#description' => t("Choose the display format for the status"),
       '#default_value' => $this->options['loft_core_users_status_as_code'],
+      '#options' => array(
+        'code' => t('{CODE}'),
+        'description' => t('{DESCRIPTION}'),
+        'description_code' => t('{DESCRIPTION} ({CODE})'),
+      ),
     );
   }
 
