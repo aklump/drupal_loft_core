@@ -1,8 +1,8 @@
 name = "Loft Core Users"
 description = "Submodule augments user tracking and SPAM control options"
 package = Other
-version = 7.x-0.1
+version = 7.x-1.0
 core = 7.x
 php = 5.3
-configure = admin/config/system/loft-core-users
+configure = admin/config/people/loft-core-users
 author = aklump
