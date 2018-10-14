@@ -60,11 +60,13 @@ define('LOFT_CORE_USERS_STATUS_SPAMMY', 4);
 define('LOFT_CORE_USERS_APACHE_MIN_DOMAINS_PER_IP_TO_LIST', 3);
 
 /**
- * CSV list of domains to whitelist that cannot will not be blocked.
+ * CSV list of domains to whitelist that cannot be blocked.
  *
- * This is regardless of the spam levels associated with their users.
+ * No settings will override these domains; they will never be blacklisted.
  *
  * @var LOFT_CORE_USERS_DOMAIN_WHITELIST
+ *
+ * @see loft_core_users_get_domain_whitelist().
  */
 define('LOFT_CORE_USERS_DOMAIN_WHITELIST', 'gmail.com,yahoo.com,mail.com,hotmail.com,aol.com');
 
@@ -89,10 +91,19 @@ function loft_core_users_get_blocking_statuses() {
  * @return mixed|null
  */
 function loft_core_users_get_domain_whitelist() {
-  $whitelist = variable_get('loft_core_users_domain_whitelist', explode(',', LOFT_CORE_USERS_DOMAIN_WHITELIST));
 
-  // This variable is not exposed in the UI and is meant to protect the basic domains like gmail and yahoo; if you really want to alter this then add something to settings.php like $conf['loft_core_users_absolute_domain_whitelist'] = 'do.com,re.com'.
-  $whitelist = array_unique(array_merge($whitelist, variable_get('loft_core_users_absolute_domain_whitelist', explode(',', LOFT_CORE_USERS_DOMAIN_WHITELIST))));
+  // Module-defined, hardcoded domains that can never be blacklisted.
+  $whitelist = explode(',', LOFT_CORE_USERS_DOMAIN_WHITELIST);
+
+  // This variable is modified when the admin form is submitted.
+  $whitelist = array_merge($whitelist, variable_get('loft_core_users_domain_whitelist'));
+
+  // This CSV variable is not exposed in the UI and is meant to be used in your
+  // settings.php file for hard-coding values, something like this:
+  // $conf['loft_core_users_absolute_domain_whitelist'] = 'do.com,re.com'.
+  $whitelist = array_merge($whitelist, explode(',', variable_get('loft_core_users_absolute_domain_whitelist')));
+
+  $whitelist = array_unique(array_filter($whitelist));
 
   return $whitelist;
 }
