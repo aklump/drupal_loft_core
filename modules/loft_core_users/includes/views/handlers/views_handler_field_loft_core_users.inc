@@ -60,6 +60,13 @@ class views_handler_field_loft_core_users extends views_handler_field {
     return $this->sanitize_value($value);
   }
 
+}
+
+/**
+ * Adds the format display extra options form.
+ */
+class views_handler_field_loft_core_users_status extends views_handler_field_loft_core_users {
+
   /**
    * {@inheritdoc}
    */

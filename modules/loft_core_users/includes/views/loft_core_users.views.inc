@@ -107,7 +107,7 @@ function loft_core_users_views_data() {
         'title' => t('Status'),
         'help' => t('Augmented user status.'),
         'field' => array(
-            'handler' => 'views_handler_field_loft_core_users',
+            'handler' => 'views_handler_field_loft_core_users_status',
             'click sortable' => TRUE,
         ),
         'filter' => array(
