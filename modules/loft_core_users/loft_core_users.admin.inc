@@ -22,6 +22,9 @@
  *   The form array.
  */
 function loft_core_users_settings_form(array $form, array &$form_state) {
+  $whitelist = loft_core_users_get_domain_whitelist();
+  $apache_ips = _loft_core_users_parse_apache();
+
   $form['#tree'] = FALSE;
   $form['help'] = [
     '#weight' => -10,
@@ -51,12 +54,12 @@ function loft_core_users_settings_form(array $form, array &$form_state) {
     '#description' => t('This will autofill the username in the login form for returning users.'),
     '#default_value' => variable_get('loft_core_users_remember_usernames', FALSE),
   );
-  $form['remember']['loft_core_remember_user_for_days'] = array(
+  $form['remember']['loft_core_users_remember_user_for_days'] = array(
     '#type' => 'textfield',
     '#title' => t('Cookie Duration in Days'),
     '#size' => 10,
     '#description' => t('How long before the cookie should expire?'),
-    '#default_value' => variable_get('loft_core_remember_user_for_days', LOFT_CORE_REMEMBER_USER_FOR_DAYS),
+    '#default_value' => variable_get('loft_core_users_remember_user_for_days', LOFT_CORE_USERS_REMEMBER_USER_FOR_DAYS),
     '#required' => TRUE,
   );
 
@@ -66,8 +69,6 @@ function loft_core_users_settings_form(array $form, array &$form_state) {
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
   );
-
-  $apache_ips = _loft_core_users_parse_apache();
 
   //
   //
@@ -81,16 +82,14 @@ function loft_core_users_settings_form(array $form, array &$form_state) {
     ->orderBy('domain', 'ASC');
   $result = $query->execute();
   $options = [];
-  $whitelist = loft_core_users_get_domain_whitelist();
   while ($record = $result->fetchObject()) {
     $options[$record->domain] = $record->domain;
     if (in_array($record->domain, $whitelist)) {
       $options[$record->domain] .= '<sup>WL</sup>';
     }
   }
-
   if (count($options)) {
-    $checked = array_diff($options, $whitelist);
+    $checked = array_diff_key($options, array_flip($whitelist));
     $form['spam']['domains'] = [
       '#type' => 'fieldset',
       '#title' => t('Domain Blocking (@domains tracked, @checked blocked)', [
@@ -191,7 +190,6 @@ function loft_core_users_settings_form(array $form, array &$form_state) {
     ->condition('domain', '', '<>')
     ->condition('status', loft_core_users_get_blocking_statuses(), 'IN');
   $result = $query->execute();
-  $whitelist = loft_core_users_get_domain_whitelist();
   while ($record = $result->fetchObject()) {
     $comment = (array) $record;
     if (!in_array($comment['domain'], $whitelist)) {
