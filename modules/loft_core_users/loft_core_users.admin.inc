@@ -81,19 +81,23 @@ function loft_core_users_settings_form(array $form, array &$form_state) {
     ->orderBy('domain', 'ASC');
   $result = $query->execute();
   $options = [];
+  $whitelist = loft_core_users_get_domain_whitelist();
   while ($record = $result->fetchObject()) {
     $options[$record->domain] = $record->domain;
+    if (in_array($record->domain, $whitelist)) {
+      $options[$record->domain] .= '<sup>WL</sup>';
+    }
   }
 
   if (count($options)) {
-    $checked = array_diff($options, loft_core_users_get_domain_whitelist());
+    $checked = array_diff($options, $whitelist);
     $form['spam']['domains'] = [
       '#type' => 'fieldset',
       '#title' => t('Domain Blocking (@domains tracked, @checked blocked)', [
         '@checked' => count($checked),
         '@domains' => format_plural(count($options), '1 domain', '@count domains'),
       ]),
-      '#description' => t('Any user whose email address domain appears checked in this list may not login, nor register for a new account.  They will see your website, but cannot use an account.  You may uncheck a domain and save this form, to remove it from the blocked list of domains.'),
+      '#description' => t('Any user whose email address domain appears checked in this list may not login, nor register for a new account.  They may browse your website anonymously, but cannot use an account.  You may uncheck a domain and save this form, to remove it from the blocked list of domains. Domains marked by <sup>WL</sup> are whitelisted and cannot be checked.'),
       '#collapsible' => TRUE,
       '#collapsed' => TRUE,
     ];
@@ -148,17 +152,33 @@ function loft_core_users_settings_form(array $form, array &$form_state) {
       '#default_value' => [],
       '#attributes' => ['class' => ['loft-core-users-3col']],
     ];
-
-    // MySql Shortcuts.
-    $form['spam']['honeybears']['mysql'] = [
-      '#weight' => -1,
-      '#type' => 'fieldset',
-      '#title' => t('MySQL shortcuts'),
-      '#collapsible' => FALSE,
-      '#weight' => 1,
-    ];
-    $form['spam']['honeybears']['mysql'][] = ['#markup' => '<h2>List domains of honeybears:</h2><pre>SELECT distinct(domain) FROM loft_core_users WHERE status = 3;</pre><h2>Convert Honeybears to Spammy</h2><pre>UPDATE loft_core_users SET status = 34 where status = 3;</pre>'];
   }
+  // MySql Shortcuts.
+  $form['spam']['mysql'] = [
+    '#weight' => 10,
+    '#type' => 'fieldset',
+    '#title' => t('MySQL shortcuts'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  ];
+
+  $form['spam']['mysql'][] = array(
+    '#theme' => 'table',
+    '#rows' => [
+      [
+        "List all honeybears",
+        "<pre>SELECT distinct(domain) FROM loft_core_users WHERE status = 3;</pre>",
+      ],
+      [
+        "Convert Honeybears to Spammy",
+        "<pre>UPDATE loft_core_users SET status = 34 where status = 3;</pre>",
+      ],
+      [
+        "Bulk unblock IPs",
+        "<pre>DELETE b FROM blocked_ips b JOIN loft_core_users u ON (u.ip = b.ip) WHERE u.status IN (" . implode(',', loft_core_users_get_blocking_statuses()) . ");</pre>",
+      ],
+    ],
+  );
 
   //
   //
@@ -191,7 +211,7 @@ function loft_core_users_settings_form(array $form, array &$form_state) {
   });
 
   $form['spam']['ips'] = [
-    '#weight' => 20,
+    '#weight' => 5,
     '#type' => 'fieldset',
     '#title' => t('IP Blocking', [
       '@ips' => format_plural(count($deny_from), '1 ip', '@count ips'),

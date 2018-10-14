@@ -76,6 +76,7 @@ define('LOFT_CORE_USERS_DOMAIN_WHITELIST', 'gmail.com,yahoo.com,mail.com,hotmail
  */
 function loft_core_users_get_blocking_statuses() {
   return [
+    LOFT_CORE_USERS_STATUS_BLOCKED,
     LOFT_CORE_USERS_STATUS_ROBOT,
     LOFT_CORE_USERS_STATUS_SPAMMY,
     LOFT_CORE_USERS_STATUS_HONEYBEAR_MADE_SPAMMY,
@@ -237,7 +238,7 @@ function _loft_core_users_set_user_status($status, $uid, $mail, $ip = NULL) {
     'uid_init' => $uid,
     'status' => $status,
     'domain' => _loft_core_users_get_email_domain($mail),
-    'ip' => $ip,
+    'ip' => trim($ip),
   ];
   $meta = array_filter($meta, function ($value) {
     return !is_null($value);
@@ -273,6 +274,26 @@ function _loft_core_users_set_user_status($status, $uid, $mail, $ip = NULL) {
   }
   else {
     drupal_write_record('loft_core_users', $meta);
+  }
+
+  // Decide if we should auto ban this IP.
+  if (in_array($status, loft_core_users_get_blocking_statuses())
+    && variable_get('loft_core_users_auto_block_by_ip', TRUE)) {
+    $denied = (bool) db_query("SELECT 1 FROM {blocked_ips} WHERE ip = :ip", array(':ip' => $meta['ip']))->fetchField();
+    if (!$denied) {
+      $spammy_domains_by_ip = db_select('loft_core_users', 'lcu')
+        ->fields('lcu', array('domain'))
+        ->condition('ip', $meta['ip'])
+        ->countQuery()
+        ->execute()
+        ->fetchField();
+      $min_count = variable_get('loft_core_users_apache_min_domains_per_ip_to_list', LOFT_CORE_USERS_APACHE_MIN_DOMAINS_PER_IP_TO_LIST);
+      if ($spammy_domains_by_ip && $spammy_domains_by_ip >= $min_count) {
+        db_insert('blocked_ips')
+          ->fields(array('ip' => $meta['ip']))
+          ->execute();
+      }
+    }
   }
 }
 
@@ -346,7 +367,7 @@ function loft_core_users_user_restrictions_alter(&$denied, &$error, &$context) {
     $domain = _loft_core_users_get_email_domain($context['form_state']['values']['mail']);
 
     // Check if this domain is whitelisted.
-    if (!in_array($domain, loft_core_users_get_domain_whitelist())) {
+    if ($domain && !in_array($domain, loft_core_users_get_domain_whitelist())) {
 
       $query = db_select('loft_core_users', 'lu')
         ->fields('lu', ['uid', 'domain'])
