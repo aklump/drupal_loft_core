@@ -437,8 +437,8 @@ function theme_form_help($vars) {
  *   }
  * @endcode
  *
- * @param string $html  Expecting to contain ?itok=123"
- * @param array  $build Expecting to find:
+ * @param string $html Expecting to contain ?itok=123"
+ * @param array $build Expecting to find:
  *                      - #object->changed
  *
  * @return string The modified html
@@ -453,7 +453,7 @@ function loft_core_image_src_itok_cache_buster($html, $build) {
   if ((!empty($build['#object']->changed))) {
     $buster[1] = $build['#object']->changed;
   }
-  else if ((!empty($user->access))) {
+  elseif ((!empty($user->access))) {
     $buster[1] = $user->access;
   }
   else {
@@ -598,10 +598,10 @@ function loft_core_ajax_command_bbq_push_state($hash_string) {
 }
 
 /**
- * @param string $selector   jQuery selector of the element to replace
+ * @param string $selector jQuery selector of the element to replace
  * @param string $content
- * @param int    $duration   Milliseconds for the fade to last.
- * @param int    $delay      Milliseconds before fade out commences.
+ * @param int $duration Milliseconds for the fade to last.
+ * @param int $delay Milliseconds before fade out commences.
  * @param string $css_prefix A means to custom or remove the css class prefix
  *                           on the fade classes.
  *
@@ -694,14 +694,17 @@ function loft_core_cl($base) {
  * Stash or unstash a user.
  *
  * This function:
- * - allows you to run some code as a different user inside of a callback function, in which case you need simple call
- * it once with $temporary_user and $callback.
- * - allows you to set a temporary user for a time until you call this function again.  Unless you call this function
- * again, the temporary user will become the logged in user, so USE WITH CARE.
+ * - allows you to run some code as a different user inside of a callback
+ * function, in which case you need simple call it once with $temporary_user
+ * and $callback.
+ * - allows you to set a temporary user for a time until you call this function
+ * again.  Unless you call this function again, the temporary user will become
+ * the logged in user, so USE WITH CARE.
  *
  * The stashed users will persist in the SESSION.
  *
- * @param null          $temporary_user Leave null when unstashing a previously stashed user.
+ * @param null $temporary_user Leave null when unstashing a previously stashed
+ *   user.
  * @param callable|NULL $callback
  */
 function loft_core_user_stash($temporary_user = NULL, Callable $callback = NULL) {
@@ -778,8 +781,8 @@ function loft_core_mail_alter(&$message) {
 /**
  * Return a build array for a div, optionally wrapping another build array.
  *
- * @param string|array $class   One or more classes to add to the div.
- * @param array        $element Optional, the build array which you will wrap
+ * @param string|array $class One or more classes to add to the div.
+ * @param array $element Optional, the build array which you will wrap
  *                              with the div.
  *
  * @return array The wrapped element.
@@ -828,11 +831,11 @@ function loft_core_preprocess_status_report(&$vars) {
         'severity' => REQUIREMENT_ERROR,
       ];
     }
-    else if (DRUPAL_ENV_ROLE === 'prod' && $item['value'] === t('Enabled')) {
+    elseif (DRUPAL_ENV_ROLE === 'prod' && $item['value'] === t('Enabled')) {
       $item['severity'] = REQUIREMENT_WARNING;
       $item['description'] = t('Update module should not be enabled on production as updates are handled by ITLS.');
     }
-    else if (isset($item['severity']) && $item['severity'] === REQUIREMENT_WARNING) {
+    elseif (isset($item['severity']) && $item['severity'] === REQUIREMENT_WARNING) {
       $unset = $key;
     }
   });
@@ -845,11 +848,13 @@ function loft_core_preprocess_status_report(&$vars) {
 /**
  * Returns a relative path from an absolute path that points to this site.
  *
- * For www.mysite.com if $path = 'http://www.mysite.com/node/21', '/node/21' will be returned.  See the variable
+ * For www.mysite.com if $path = 'http://www.mysite.com/node/21', '/node/21'
+ * will be returned.  See the variable
  * 'loft_core_smart_url' for how we determine what paths are part of the site.
  *
  * @param string $path
- * @param array  $options These are the same as for url().  You might want to use alias = true.
+ * @param array $options These are the same as for url().  You might want to
+ *   use alias = true.
  *
  * @return bool|false|int|string
  *
@@ -879,14 +884,15 @@ function loft_core_smart_url($path, array $options = array()) {
 /**
  * Load (shadow) entities.
  *
- * For a node this returns an object with these properties: nid, vid and type.  These are faster to load and can be
- * used in some contexts as needed just for reference, like when using entity_extract_ids() or EntityFieldQuery.
+ * For a node this returns an object with these properties: nid, vid and type.
+ * These are faster to load and can be used in some contexts as needed just for
+ * reference, like when using entity_extract_ids() or EntityFieldQuery.
  *
  * @param string $entity_type
- * @param array  $entity_ids
+ * @param array $entity_ids
  *
- * @return array An array of shadow entity objects.  Each item has the key #loaded set to false so you can check if
- *               this is a shadow entity.
+ * @return array An array of shadow entity objects.  Each item has the key
+ *   #loaded set to false so you can check if this is a shadow entity.
  */
 function loft_core_shadow_entity_load($entity_type, array $entity_ids) {
   $query = new \EntityFieldQuery();
@@ -938,7 +944,7 @@ function loft_core_css_safe($input, $flatten = FALSE) {
 
     return $flatten ? trim(implode(' ', $input)) : $input;
   }
-  else if ($input == ($strung = strval($input))) {
+  elseif ($input == ($strung = strval($input))) {
     $input = trim(strtolower(preg_replace('/[\W_]{1}/', '-', $strung)), '-');
     if (preg_match('/^(\d)(.*)/', $input, $found)) {
       $word = array(
@@ -1008,7 +1014,7 @@ function loft_core_twiglike_token_scan($text) {
  * @see loft_core_twiglike_token_replace for Token module usage.
  *
  * @param string $text Should contain something like {{ sender.name }}
- * @param array  $data Should be like ['sender'=>['name'=>'Paul']]
+ * @param array $data Should be like ['sender'=>['name'=>'Paul']]
  *
  * @return string
  */
@@ -1032,8 +1038,8 @@ function loft_core_twiglike_replace($text, array $data = array()) {
  * Only use this if your tokens are generated by hook_tokens().
  *
  * @param string $text
- * @param array  $data
- * @param array  $options
+ * @param array $data
+ * @param array $options
  *
  * @return mixed
  *
@@ -1049,8 +1055,8 @@ function loft_core_twiglike_token_replace($text, array $data = array(), array $o
  * Get the tokens and values for a chunk of text.
  *
  * @param string $text
- * @param array  $data
- * @param array  $options
+ * @param array $data
+ * @param array $options
  *
  * @return array
  *
@@ -1097,7 +1103,10 @@ function loft_core_twiglike_tokens_get($text, array $data = array(), array $opti
  * Implements hook_twiggy_twig_alter().
  */
 function loft_core_twiggy_twig_alter($twig) {
-  $twig->addFunction(new \Twig_SimpleFunction('splitBy', ['\AKlump\LoftLib\Code\Strings', 'splitBy']));
+  $twig->addFunction(new \Twig_SimpleFunction('splitBy', [
+    '\AKlump\LoftLib\Code\Strings',
+    'splitBy',
+  ]));
 }
 
 /**
@@ -1120,7 +1129,8 @@ function loft_core_taxonomy_unique(array $items) {
 }
 
 /**
- * Return $element with all children keys turned into property keys (prepend '#')
+ * Return $element with all children keys turned into property keys (prepend
+ * '#')
  *
  * @param $element
  *
