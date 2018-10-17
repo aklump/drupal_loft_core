@@ -6,4 +6,15 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'Drupal\\loft_core\\Attribute' => $baseDir . '/src/Attribute.php',
+    'Drupal\\loft_core\\CoreBase' => $baseDir . '/src/CoreBase.php',
+    'Drupal\\loft_core\\CoreInterface' => $baseDir . '/src/CoreInterface.php',
+    'Drupal\\loft_core\\Drupal7' => $baseDir . '/tests/src/Entity/ExtractorTest.php',
+    'Drupal\\loft_core\\Entity\\ExtractorTrait' => $baseDir . '/src/Entity/ExtractorTrait.php',
+    'Drupal\\loft_core\\ExtractorTest' => $baseDir . '/tests/src/Entity/ExtractorTest.php',
+    'Drupal\\loft_core\\Redirect' => $baseDir . '/src/Redirect.php',
+    'Drupal\\loft_core\\StaticContentStreamWrapper' => $baseDir . '/src/StaticContentStreamWrapper.php',
+    'Drupal\\loft_core\\TestableCore' => $baseDir . '/tests/src/Entity/ExtractorTest.php',
+    'Drupal\\loft_core\\TestableExtractor' => $baseDir . '/tests/src/Entity/ExtractorTest.php',
+    'Sunra\\PhpSimple\\HtmlDomParser' => $vendorDir . '/sunra/php-simple-html-dom-parser/Src/Sunra/PhpSimple/HtmlDomParser.php',
 );
