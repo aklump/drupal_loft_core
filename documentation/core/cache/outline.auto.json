@@ -96,12 +96,6 @@
             "title": "Add TrackJS.com to your website",
             "file": "trackjs.md",
             "sort": 15
-        },
-        {
-            "id": "_tasklist",
-            "title": " Tasklist",
-            "file": "_tasklist.md",
-            "sort": 16
         }
     ],
     "settings": {
