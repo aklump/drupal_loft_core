@@ -1,14 +1,6 @@
 # Loft Core
 
-This module contains features that I wish were in core, and which I often use for all my projects.  Documentation can be found in:
-
-    docs/public_html
-    
-of with Advanced Help module.
-
-## Features
-
-* May configure the registration from emails separate from site email.
+This module contains features that I wish were in core, and which I often use for all my projects.  Documentation can be found at _docs/index.html_ or by using the Advanced Help module.
 
 ## Contact
 * **In the Loft Studios**
