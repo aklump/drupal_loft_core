@@ -1,7 +1,7 @@
 name = Loft Core
 description = Missing Drupal core functionality, IMHO.
 package = In the Loft Studios
-version = 7.x-1.0-rc17
+version = 7.x-1.0-rc18
 core = 7.x
 php = 5.3
 homepage = http://www.intheloftstudios.com/packages/drupal/drupal_loft_core
