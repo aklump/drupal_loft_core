@@ -2,17 +2,17 @@
 
 <html>
 <head>
-  <title>Loft Core</title>
+  <title>Smart Urls</title>
   <link href="search/tipuesearch.css" rel="stylesheet">
   <link href="style.css" rel="stylesheet">
 </head>
 
-<body class="page--readme">
+<body class="page--smart_url">
 <header>
   <div class="pager">
-  <a href="CHANGELOG.html" class="prev CHANGELOG">&laquo;CHANGELOG</a>
+  <a href="settings.html" class="prev settings">&laquo;settings.php</a>
   <a href="index.html" class="index">Index</a>
-  <a href="database.html" class="next database">Database&raquo;</a>
+  <a href="static_content.html" class="next static_content">Stream wrapper `static-content://`&raquo;</a>
 </div>
 </header>
 
@@ -22,34 +22,18 @@
   </form>
 </div>
 
-  <h1>Loft Core</h1>
+  <h1>Smart Urls</h1>
   <div class="breadcrumb"><a href="index.html">Index</a></div>
 
 <section>
 
-<p>This module contains features that I wish were in core, and which I often use for all my projects.  Documentation can be found in:</p>
+<p>Imagine an admin entering a link to the site.  As developer want the unaliased relative path, as the admin, they copy and past the absolute aliased path.  It's a pain to explain to theme that they have to convert it to the way you want it, so you give up.  But that's where <code>loft_core_smart_url()</code> comes in.  Hand it the url they entered, and it will give you the url you want.</p>
 
-<pre><code>docs/public_html
-</code></pre>
+<p>Add this to a presave hook after collection an url in a node form.</p>
 
-<p>of with Advanced Help module.</p>
+<p>Add this to a filter that can then convert the bad urls to good urls.</p>
 
-<h2>Features</h2>
-
-<ul>
-<li>May configure the registration from emails separate from site email.</li>
-</ul>
-
-<h2>Contact</h2>
-
-<ul>
-<li><strong>In the Loft Studios</strong></li>
-<li>Aaron Klump - Developer</li>
-<li>PO Box 29294 Bellingham, WA 98228-1294</li>
-<li><em>skype</em>: intheloftstudios</li>
-<li><em>d.o</em>: aklump</li>
-<li><a href="http://www.InTheLoftStudios.com">http://www.InTheLoftStudios.com</a></li>
-</ul>
+<p>Rock.</p>
 </section>
 
 <div class="search__results">
@@ -58,13 +42,13 @@
 
 <footer>
   <div class="pager">
-  <a href="CHANGELOG.html" class="prev CHANGELOG">&laquo;CHANGELOG</a>
+  <a href="settings.html" class="prev settings">&laquo;settings.php</a>
   <a href="index.html" class="index">Index</a>
-  <a href="database.html" class="next database">Database&raquo;</a>
+  <a href="static_content.html" class="next static_content">Stream wrapper `static-content://`&raquo;</a>
 </div>
   
   <div id="footer-legaleeze">
-    <p class="legaleeze center">Version: 7.x-1.0-rc17 &bull; Last Updated: Wed, 17 Oct 2018 09:54:09 -0700</p>
+    <p class="legaleeze center">Version: 7.x-1.0-rc17 &bull; Last Updated: Wed, 17 Oct 2018 09:57:53 -0700</p>
   </div>
 </footer>
 

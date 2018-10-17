@@ -2,17 +2,17 @@
 
 <html>
 <head>
-  <title></title>
+  <title>Database</title>
   <link href="search/tipuesearch.css" rel="stylesheet">
   <link href="style.css" rel="stylesheet">
 </head>
 
-<body class="">
+<body class="page--database">
 <header>
   <div class="pager">
-  <a href="javascript:void(0)" class="prev ">&laquo;</a>
+  <a href="README.html" class="prev README">&laquo;Loft Core</a>
   <a href="index.html" class="index">Index</a>
-  <a href="javascript:void(0)" class="next ">&raquo;</a>
+  <a href="entities.html" class="next entities">Working With Entities Cheat Sheet&raquo;</a>
 </div>
 </header>
 
@@ -22,10 +22,18 @@
   </form>
 </div>
 
-  <h1></h1>
+  <h1>Database</h1>
   <div class="breadcrumb"><a href="index.html">Index</a></div>
 
 <section>
+
+<h2>loft_core_users</h2>
+
+<p>This table augments the <code>users</code> table.  By design, when a user is deleted, their associated record in this table remains; this is because thier information may be used to fight SPAM.</p>
+
+<h3><code>loft_core_users.status</code></h3>
+
+<p>This column shows if a user has been blocked as a robotrap.</p>
 </section>
 
 <div class="search__results">
@@ -34,13 +42,13 @@
 
 <footer>
   <div class="pager">
-  <a href="javascript:void(0)" class="prev ">&laquo;</a>
+  <a href="README.html" class="prev README">&laquo;Loft Core</a>
   <a href="index.html" class="index">Index</a>
-  <a href="javascript:void(0)" class="next ">&raquo;</a>
+  <a href="entities.html" class="next entities">Working With Entities Cheat Sheet&raquo;</a>
 </div>
   
   <div id="footer-legaleeze">
-    <p class="legaleeze center">Version: 7.x-1.0-rc17 &bull; Last Updated: Wed, 17 Oct 2018 09:54:12 -0700</p>
+    <p class="legaleeze center">Version: 7.x-1.0-rc17 &bull; Last Updated: Wed, 17 Oct 2018 09:57:50 -0700</p>
   </div>
 </footer>
 

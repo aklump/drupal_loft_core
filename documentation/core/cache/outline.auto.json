@@ -1,0 +1,110 @@
+{
+    "chapters": [],
+    "sections": [
+        {
+            "id": "changelog",
+            "title": "CHANGELOG",
+            "file": "CHANGELOG.md",
+            "sort": 0
+        },
+        {
+            "id": "readme",
+            "title": "Loft Core",
+            "file": "README.md",
+            "sort": 1
+        },
+        {
+            "id": "database",
+            "title": "Database",
+            "file": "database.md",
+            "sort": 2
+        },
+        {
+            "id": "entities",
+            "title": "Working With Entities Cheat Sheet",
+            "file": "entities.md",
+            "sort": 3
+        },
+        {
+            "id": "entity_archive",
+            "title": "Archiving Entities",
+            "file": "entity_archive.md",
+            "sort": 4
+        },
+        {
+            "id": "forms",
+            "title": "Forms API",
+            "file": "forms.md",
+            "sort": 5
+        },
+        {
+            "id": "html_parsing",
+            "title": "Parsing HTML\/DOM in PHP",
+            "file": "html_parsing.md",
+            "sort": 6
+        },
+        {
+            "id": "images",
+            "title": "Images",
+            "file": "images.md",
+            "sort": 7
+        },
+        {
+            "id": "loft_core_users",
+            "title": "Loft Core: Users",
+            "file": "loft_core_users.md",
+            "sort": 8
+        },
+        {
+            "id": "redirects",
+            "title": "Redirects",
+            "file": "redirects.md",
+            "sort": 9
+        },
+        {
+            "id": "remember_users",
+            "title": "Remember Usernames in Login Form",
+            "file": "remember_users.md",
+            "sort": 10
+        },
+        {
+            "id": "settings",
+            "title": "settings.php",
+            "file": "settings.md",
+            "sort": 11
+        },
+        {
+            "id": "smart_url",
+            "title": "Smart Urls",
+            "file": "smart_url.md",
+            "sort": 12
+        },
+        {
+            "id": "static_content",
+            "title": "Stream wrapper `static-content:\/\/`",
+            "file": "static_content.md",
+            "sort": 13
+        },
+        {
+            "id": "testing",
+            "title": "Testing",
+            "file": "testing.md",
+            "sort": 14
+        },
+        {
+            "id": "trackjs",
+            "title": "Add TrackJS.com to your website",
+            "file": "trackjs.md",
+            "sort": 15
+        },
+        {
+            "id": "_tasklist",
+            "title": " Tasklist",
+            "file": "_tasklist.md",
+            "sort": 16
+        }
+    ],
+    "settings": {
+        "search": "tipuesearch"
+    }
+}

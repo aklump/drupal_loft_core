@@ -66,7 +66,7 @@ version_file = "../loft_core.info"
 
 #
 # These paths are relative to the directory containing core-config.sh.
-#website_dir = 'public_html'
+website_dir = '../docs'
 #html_dir = 'html'
 #mediawiki_dir = 'mediawiki'
 #text_dir = 'text'
