@@ -1,0 +1,21 @@
+
+<p>In some cases you may want to provide static content to your website, which is source controlled; not publicly accessible; is programatically appended to content; not editable by the CMS.  For all of these reasons the <code>private://</code> and <code>public://</code> stream wrappers will not suffice.  And example use case is your sites "Privacy Policy", with HTML that is too detailed to simply drop into a node body field.  Also in this case you may want to protect it from being altered except by your developers.</p>
+
+<p>So then, let's use the stream wrapper <code>static-content://privacy-policy.html</code>.</p>
+
+<p>By default this points to the following directory relative to web root: <em>../private/default/content</em>.  But this can be changed doing something like so in <em>settings.php</em>:</p>
+
+<pre><code>$conf['files_static_content_path'] = '../private/cms'
+</code></pre>
+
+<h2>Permission &amp; Access</h2>
+
+<p>The stream wrapper creates an URL like <em>http://website.com/system/content/privacy-policy.html</em>, however you must grant user the permission <em>Access static content</em> for this to be allowed.</p>
+
+<h2>How to Use</h2>
+
+<p>Here's an example of how you might use this in your code:</p>
+
+<pre><code>&lt;?php
+['#markup' =&gt; file_get_contents('static-content://privacy-policy.html')];
+</code></pre>
