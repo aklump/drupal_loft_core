@@ -1,4 +1,4 @@
-# Stream wrapper `static-content://`
+# Stream wrapper "static-content://"
 
 In some cases you may want to provide static content to your website, which is source controlled; not publicly accessible; is programatically appended to content; not editable by the CMS.  For all of these reasons the `private://` and `public://` stream wrappers will not suffice.  And example use case is your sites "Privacy Policy", with HTML that is too detailed to simply drop into a node body field.  Also in this case you may want to protect it from being altered except by your developers.
 

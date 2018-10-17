@@ -1,5 +1,7 @@
 # Redirects
 
+> Consider using the [Rabbit Hole](https://www.drupal.org/project/rabbit_hole) module instead.
+
 **In order to use this feature you must add the following to `settings.php`**
 
     $conf['loft_core_node_redirects'] = true;
