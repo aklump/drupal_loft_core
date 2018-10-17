@@ -13,6 +13,7 @@ return array(
     'Drupal\\loft_core\\Entity\\ExtractorTrait' => $baseDir . '/src/Drupal/loft_core/Entity/ExtractorTrait.php',
     'Drupal\\loft_core\\ExtractorTest' => $baseDir . '/tests/src/Drupal/loft_core/Entity/ExtractorTest.php',
     'Drupal\\loft_core\\Redirect' => $baseDir . '/src/Drupal/loft_core/Redirect.php',
+    'Drupal\\loft_core\\StaticContentStreamWrapper' => $baseDir . '/src/Drupal/loft_core/StaticContentStreamWrapper.php',
     'Drupal\\loft_core\\TestableCore' => $baseDir . '/tests/src/Drupal/loft_core/Entity/ExtractorTest.php',
     'Drupal\\loft_core\\TestableExtractor' => $baseDir . '/tests/src/Drupal/loft_core/Entity/ExtractorTest.php',
     'Sunra\\PhpSimple\\HtmlDomParser' => $vendorDir . '/sunra/php-simple-html-dom-parser/Src/Sunra/PhpSimple/HtmlDomParser.php',

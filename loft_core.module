@@ -8,7 +8,7 @@
  */
 
 use Drupal\loft_core\Redirect;
-
+use Drupal\loft_core\StaticContentStreamWrapper;
 
 // By default we will assume production environment.  To control or override this behavior see the documentation regarding these constants, e.g. settings.env.php, etc.
 if (!defined('DRUPAL_ENV')) {
@@ -133,15 +133,63 @@ function loft_core_menu() {
     'access arguments' => array(3),
   );
 
+  $items[StaticContentStreamWrapper::URL_BASE] = [
+    'type' => MENU_CALLBACK,
+    'title' => 'Raw static content',
+    'page callback' => 'loft_core_static_content_stream',
+    'access arguments' => ['access raw static content'],
+  ];
+
   return $items;
 }
 
+/**
+ * Implements hook_permission().
+ */
+function loft_core_permission() {
+  return array(
+    'access raw static content' => array(
+      'restrict access' => TRUE,
+      'title' => t('Access raw static content'),
+      'description' => t('Allow user to access static content files directly.'),
+    ),
+  );
+}
+
+/**
+ * Determine if the user has access to test mode.
+ *
+ * @param string $token
+ *   The public access token for test access.
+ *
+ * @return bool
+ *   True if access should be granted.
+ */
 function loft_core_test_mode_access($token) {
   if (!($control = variable_get('loft_core_testing_key', NULL))) {
     throw new \RuntimeException("You must set a value for \$conf['loft_core_testing_key'] in your settings.php file.");
   }
 
   return $token === $control;
+}
+
+/**
+ * Stream a static-content file.
+ *
+ * @param string $target
+ *   The target static content file relative to the static content directory.
+ */
+function loft_core_static_content_stream($target) {
+  $uri = 'static-content://' . $target;
+  if (file_exists($uri)) {
+    $headers = [];
+    file_transfer($uri, $headers);
+    drupal_access_denied();
+  }
+  else {
+    drupal_not_found();
+  }
+  drupal_exit();
 }
 
 /**
@@ -1082,4 +1130,19 @@ function loft_core_element_children_to_properties($element) {
   return array_combine(array_map(function ($item) {
     return '#' . $item;
   }, array_keys($element)), array_values($element));
+}
+
+/**
+ * Implements hook_stream_wrappers().
+ */
+function loft_core_stream_wrappers() {
+  $wrappers = [
+    'static-content' => [
+      'name' => t('Static content'),
+      'class' => '\Drupal\loft_core\StaticContentStreamWrapper',
+      'description' => t("Content that should not be exposed to the CMS, but included in the final output."),
+    ],
+  ];
+
+  return $wrappers;
 }

@@ -39,6 +39,7 @@ class ComposerStaticInita53fe36df132dd600a8787a349a9d1f5
         'Drupal\\loft_core\\Entity\\ExtractorTrait' => __DIR__ . '/../..' . '/src/Drupal/loft_core/Entity/ExtractorTrait.php',
         'Drupal\\loft_core\\ExtractorTest' => __DIR__ . '/../..' . '/tests/src/Drupal/loft_core/Entity/ExtractorTest.php',
         'Drupal\\loft_core\\Redirect' => __DIR__ . '/../..' . '/src/Drupal/loft_core/Redirect.php',
+        'Drupal\\loft_core\\StaticContentStreamWrapper' => __DIR__ . '/../..' . '/src/Drupal/loft_core/StaticContentStreamWrapper.php',
         'Drupal\\loft_core\\TestableCore' => __DIR__ . '/../..' . '/tests/src/Drupal/loft_core/Entity/ExtractorTest.php',
         'Drupal\\loft_core\\TestableExtractor' => __DIR__ . '/../..' . '/tests/src/Drupal/loft_core/Entity/ExtractorTest.php',
         'Sunra\\PhpSimple\\HtmlDomParser' => __DIR__ . '/..' . '/sunra/php-simple-html-dom-parser/Src/Sunra/PhpSimple/HtmlDomParser.php',
