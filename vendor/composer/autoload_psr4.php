@@ -6,5 +6,5 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    'Drupal\\loft_core\\' => array($baseDir . '/src/Drupal/loft_core', $baseDir . '/tests/src/Drupal/loft_core'),
+    'Drupal\\loft_core\\' => array($baseDir . '/src', $baseDir . '/tests/src'),
 );

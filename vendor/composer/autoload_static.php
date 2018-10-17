@@ -16,8 +16,8 @@ class ComposerStaticInita53fe36df132dd600a8787a349a9d1f5
     public static $prefixDirsPsr4 = array (
         'Drupal\\loft_core\\' => 
         array (
-            0 => __DIR__ . '/../..' . '/src/Drupal/loft_core',
-            1 => __DIR__ . '/../..' . '/tests/src/Drupal/loft_core',
+            0 => __DIR__ . '/../..' . '/src',
+            1 => __DIR__ . '/../..' . '/tests/src',
         ),
     );
 
@@ -31,27 +31,12 @@ class ComposerStaticInita53fe36df132dd600a8787a349a9d1f5
         ),
     );
 
-    public static $classMap = array (
-        'Drupal\\loft_core\\Attribute' => __DIR__ . '/../..' . '/src/Drupal/loft_core/Attribute.php',
-        'Drupal\\loft_core\\CoreBase' => __DIR__ . '/../..' . '/src/Drupal/loft_core/CoreBase.php',
-        'Drupal\\loft_core\\CoreInterface' => __DIR__ . '/../..' . '/src/Drupal/loft_core/CoreInterface.php',
-        'Drupal\\loft_core\\Drupal7' => __DIR__ . '/../..' . '/tests/src/Drupal/loft_core/Entity/ExtractorTest.php',
-        'Drupal\\loft_core\\Entity\\ExtractorTrait' => __DIR__ . '/../..' . '/src/Drupal/loft_core/Entity/ExtractorTrait.php',
-        'Drupal\\loft_core\\ExtractorTest' => __DIR__ . '/../..' . '/tests/src/Drupal/loft_core/Entity/ExtractorTest.php',
-        'Drupal\\loft_core\\Redirect' => __DIR__ . '/../..' . '/src/Drupal/loft_core/Redirect.php',
-        'Drupal\\loft_core\\StaticContentStreamWrapper' => __DIR__ . '/../..' . '/src/Drupal/loft_core/StaticContentStreamWrapper.php',
-        'Drupal\\loft_core\\TestableCore' => __DIR__ . '/../..' . '/tests/src/Drupal/loft_core/Entity/ExtractorTest.php',
-        'Drupal\\loft_core\\TestableExtractor' => __DIR__ . '/../..' . '/tests/src/Drupal/loft_core/Entity/ExtractorTest.php',
-        'Sunra\\PhpSimple\\HtmlDomParser' => __DIR__ . '/..' . '/sunra/php-simple-html-dom-parser/Src/Sunra/PhpSimple/HtmlDomParser.php',
-    );
-
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
             $loader->prefixLengthsPsr4 = ComposerStaticInita53fe36df132dd600a8787a349a9d1f5::$prefixLengthsPsr4;
             $loader->prefixDirsPsr4 = ComposerStaticInita53fe36df132dd600a8787a349a9d1f5::$prefixDirsPsr4;
             $loader->prefixesPsr0 = ComposerStaticInita53fe36df132dd600a8787a349a9d1f5::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInita53fe36df132dd600a8787a349a9d1f5::$classMap;
 
         }, null, ClassLoader::class);
     }
