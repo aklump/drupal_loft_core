@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/loft_core.iml" filepath="$PROJECT_DIR$/.idea/loft_core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/Loft Core.iml" filepath="$PROJECT_DIR$/.idea/Loft Core.iml" />
     </modules>
   </component>
 </project>
