@@ -18,7 +18,11 @@ use Drupal\loft_core\Entity\ExtractorTrait;
  */
 class ExtractorTest extends PhpUnitTestCase {
 
-
+  public function testFReturnsTypeWhichIsNotAField() {
+    global $entity;
+    $entity = $this->prepareTestableEntity();
+    $this->assertSame('page', $this->obj->f('default', 'type'));
+  }
 
   public function testSafeReturnsTheValueForAllSignatures() {
     global $entity;
@@ -29,6 +33,17 @@ class ExtractorTest extends PhpUnitTestCase {
     $this->assertSame('lorem', $this->obj->safe('default', 'field_summary', 'value', 0));
     $this->assertSame('ipsum', $this->obj->safe('default', 'field_summary', 1, 'value'));
     $this->assertSame('ipsum', $this->obj->safe('default', 'field_summary', 'value', 1));
+  }
+
+  public function testFReturnsTheValueForAllSignatures() {
+    global $entity;
+    $entity = $this->prepareTestableEntity();
+    $this->assertSame('lorem', $this->obj->f('default', 'field_summary'));
+    $this->assertSame('lorem', $this->obj->f('default', 'field_summary', 'value'));
+    $this->assertSame('lorem', $this->obj->f('default', 'field_summary', 0, 'value'));
+    $this->assertSame('lorem', $this->obj->f('default', 'field_summary', 'value', 0));
+    $this->assertSame('ipsum', $this->obj->f('default', 'field_summary', 1, 'value'));
+    $this->assertSame('ipsum', $this->obj->f('default', 'field_summary', 'value', 1));
   }
 
   public function testSafeFiltersHtmlTags() {
@@ -66,6 +81,8 @@ class ExtractorTest extends PhpUnitTestCase {
    * @expectedException InvalidArgumentException
    */
   public function testMoreThanFourArgsToFThrows() {
+    global $entity;
+    $entity = $this->prepareTestableEntity();
     $this->obj->f(NULL, 'field_summary', 1, 2, 3);
   }
 
@@ -88,23 +105,6 @@ class ExtractorTest extends PhpUnitTestCase {
       0 => ['value' => 'lorem'],
       1 => ['value' => 'ipsum'],
     ], $this->obj->items('field_summary'));
-  }
-
-  public function testFReturnsTypeWhichIsNotAField() {
-    global $entity;
-    $entity = $this->prepareTestableEntity();
-    $this->assertSame('page', $this->obj->f('default', 'type'));
-  }
-
-  public function testFReturnsTheValueForAllSignatures() {
-    global $entity;
-    $entity = $this->prepareTestableEntity();
-    $this->assertSame('lorem', $this->obj->f('default', 'field_summary'));
-    $this->assertSame('lorem', $this->obj->f('default', 'field_summary', 'value'));
-    $this->assertSame('lorem', $this->obj->f('default', 'field_summary', 0, 'value'));
-    $this->assertSame('lorem', $this->obj->f('default', 'field_summary', 'value', 0));
-    $this->assertSame('ipsum', $this->obj->f('default', 'field_summary', 1, 'value'));
-    $this->assertSame('ipsum', $this->obj->f('default', 'field_summary', 'value', 1));
   }
 
   public function testFReturnsTheItemArrayAtZeroForAllSignatures() {
@@ -168,15 +168,15 @@ class TestableExtractor {
 
   public function __construct(Drupal7 $d7, Data $data) {
     $this->d7 = $d7;
-    $this->core = new TestableCore();
+    $this->core = new TestableCore($data);
     $this->setDataApiData($data);
     $this->e = $this->getDataApiData('node');
   }
 }
 
-class TestableCore implements CoreInterface {
+class TestableCore extends CoreBase {
 
-  function getSafeMarkupFormat() {
+  function getSafeMarkupHandler() {
     return 'plain_text';
   }
 }

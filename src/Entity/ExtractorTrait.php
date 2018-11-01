@@ -68,8 +68,8 @@ trait ExtractorTrait {
   /**
    * Return data from an entity field in the entity's language.
    *
-   * @param string $field_name The field name on the entity.
    * @param mixed $default The default value if non-existant.
+   * @param string $field_name The field name on the entity.
    * @param int|null $item The item index for a field entity, e.g. 0, 1, 2.
    *   Send null to load the entire array for the given language.
    * @param string|null $key The key of a single item array.  This is ignored
@@ -96,18 +96,25 @@ trait ExtractorTrait {
    *   $extract->f('lorem', 'field_pull_quote', 1, 'target_id');
    * @endcode
    */
-  public function f($default = NULL, $field_name) {
-    $this->ensureEntityIsLoaded();
+  public function f($default, $field_name) {
+    list(, $entity) = $this->ensureEntityIsLoaded();
     $args = func_get_args();
     $default = array_shift($args);
-    list(, $field_name, $delta, $column) = $this->getFieldArgs($args, __METHOD__);
-    $value = $this->e->get($this->getEntity(), null_filter([
-      $field_name,
-      $delta,
-      $column,
-    ]), $default);
+    list($is_field, $field_name, $delta, $column) = $this->getFieldArgs($args, __METHOD__);
 
-    return $value;
+    if (!$is_field) {
+      return isset($entity->{$field_name}) ? $entity->{$field_name} : $default;
+    }
+    $items = $this->items($field_name);
+
+    if (!isset($items[$delta])) {
+      return $default;
+    }
+    elseif (is_null($column)) {
+      return $items[$delta];
+    }
+
+    return isset($items[$delta][$column]) ? $items[$delta][$column] : $default;
   }
 
   /**
@@ -140,12 +147,27 @@ trait ExtractorTrait {
    * Return the translated items array for $field_name.
    *
    * @param string $field_name
+   *   The entity field name.
    * @param array $default
+   *   The default value if the field is missing or empty.
    *
    * @return array
+   *   An array of field items in the entity language, if defined, or 'und' if
+   *   not.
    */
   public function items($field_name, array $default = []) {
-    return $this->e->get($this->getEntity(), $field_name, $default);
+    $entity = $this->getEntity();
+    if (isset($entity->{$field_name})) {
+      $lang = isset($entity->language) ? $entity->language : 'und';
+      if (isset($entity->{$field_name}[$lang])) {
+        return $entity->{$field_name}[$lang];
+      }
+      elseif (isset($entity->{$field_name}['und'])) {
+        return $entity->{$field_name}['und'];
+      }
+    }
+
+    return $default;
   }
 
   /**
@@ -254,7 +276,8 @@ trait ExtractorTrait {
     if (function_exists($handler) || is_callable($handler)) {
       return $handler($output);
     }
-    if (!array_key_exists($handler, filter_formats())) {
+    $formats = [];
+    if (function_exists('filter_formats') && !array_key_exists($handler, filter_formats())) {
       throw new \RuntimeException("Cannot understand safe markup handler \"$handler\"");
     }
 
@@ -265,15 +288,36 @@ trait ExtractorTrait {
    * Ensure that $this->entity is not a shadow entity.
    *
    * @see loft_core_shadow_entity_load()
+   *
+   * @return array
+   *   - entity_type
+   *   - entity
+   *   - bundle_type
+   *   - entity_id
    */
   protected function ensureEntityIsLoaded() {
-    list($entity_type, $entity, , $entity_id) = $this->validateEntity();
+    list($entity_type, $entity, $bundle, $entity_id) = $this->validateEntity();
     if ($entity_id && property_exists($entity, 'loft_core_shadow') && $entity->loft_core_shadow === FALSE) {
       $entities = entity_load($entity_type, [$entity_id]);
       $this->setEntity($entity_type, $entities[$entity_id]);
     }
+
+    return [$entity_type, $entity, $bundle, $entity_id];
   }
 
+  /**
+   * Return information about a field
+   *
+   * @param $args
+   * @param string $method
+   *   The method name of the caller. This is only used for error reporting.
+   *
+   * @return array
+   *  - 0 bool Is this a field.
+   *  - 1 string The fieldname.
+   *  - 2 int The item delta.
+   *  - 3 string The name of the value column.
+   */
   private function getFieldArgs($args, $method) {
     // Completed: 1000000 runs in 154 seconds with static cache
     // Completed: 1000000 runs in 161 seconds without static cache
