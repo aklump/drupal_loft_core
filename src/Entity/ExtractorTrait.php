@@ -276,7 +276,6 @@ trait ExtractorTrait {
     if (function_exists($handler) || is_callable($handler)) {
       return $handler($output);
     }
-    $formats = [];
     if (function_exists('filter_formats') && !array_key_exists($handler, filter_formats())) {
       throw new \RuntimeException("Cannot understand safe markup handler \"$handler\"");
     }
@@ -298,7 +297,7 @@ trait ExtractorTrait {
   protected function ensureEntityIsLoaded() {
     list($entity_type, $entity, $bundle, $entity_id) = $this->validateEntity();
     if ($entity_id && property_exists($entity, 'loft_core_shadow') && $entity->loft_core_shadow === FALSE) {
-      $entities = entity_load($entity_type, [$entity_id]);
+      $entities = $this->d7->entity_load($entity_type, [$entity_id]);
       $this->setEntity($entity_type, $entities[$entity_id]);
     }
 

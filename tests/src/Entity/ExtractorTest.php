@@ -18,6 +18,38 @@ use Drupal\loft_core\Entity\ExtractorTrait;
  */
 class ExtractorTest extends PhpUnitTestCase {
 
+  public function testItemsReturnsUnlocalizedValueWhenLocalizedNotPresentEvenWithLanguage() {
+    global $entity;
+    $entity = $this->prepareTestableEntity();
+    $entity->language = 'en';
+    $this->assertSame([
+      0 => ['value' => 'lorem'],
+      1 => ['value' => 'ipsum'],
+    ], $this->obj->items('field_summary'));
+  }
+
+  public function testItemsReturnsLocalizedValueWhenPresent() {
+    global $entity;
+    $entity = $this->prepareTestableEntity();
+    $entity->language = 'en';
+    $entity->field_summary['en'][0]['value'] = 'alpha';
+    $entity->field_summary['en'][1]['value'] = 'bravo';
+    $this->assertSame([
+      0 => ['value' => 'alpha'],
+      1 => ['value' => 'bravo'],
+    ], $this->obj->items('field_summary'));
+  }
+
+  public function testFReturnsDefaultWhenNoDelta() {
+    $this->prepareTestableEntity();
+    $entity = (object) [
+      'type' => 'page',
+      'field_summary' => [],
+    ];
+    $this->obj->setEntity('node', $entity);
+    $this->assertSame('eggnog_latte', $this->obj->f('eggnog_latte', 'field_summary'));
+  }
+
   public function testFReturnsTypeWhichIsNotAField() {
     global $entity;
     $entity = $this->prepareTestableEntity();
@@ -89,7 +121,10 @@ class ExtractorTest extends PhpUnitTestCase {
   public function testItemsReturnsDefaultForBogusField() {
     global $entity;
     $entity = $this->prepareTestableEntity();
-    $this->assertSame(['do', 're'], $this->obj->items('field_bogus', ['do', 're']));
+    $this->assertSame(['do', 're'], $this->obj->items('field_bogus', [
+      'do',
+      're',
+    ]));
   }
 
   public function testItemsReturnsArrayForBogusField() {
