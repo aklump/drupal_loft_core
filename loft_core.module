@@ -671,12 +671,19 @@ function loft_core_trackjs_echo_drupal_messages(array &$commands, array $severit
  * $class === 'my-base__title';
  * @endcode
  *
- * @param string $base The SMACSS module base.
+ * @param string $base The BEM module name
+ * @param bool $pass_through Set this to true and $base will not be filtered
+ *   for invalid chars.  Set it to false and spaces and underscores will be
+ *   converted to hyphens.
  *
  * @return callable
+ *
+ * @deprecated Use loft_core_bem() instead.
  */
-function loft_core_cl($base) {
-  $base = preg_replace('/[_ ]/', '-', $base);
+function loft_core_cl($base, $pass_through = FALSE) {
+  if (!$pass_through) {
+    $base = preg_replace('/[_ ]/', '-', $base);
+  }
 
   return function ($name = '', $isComponent = TRUE) use ($base) {
     $names = is_array($name) ? $name : array($name);
@@ -688,6 +695,36 @@ function loft_core_cl($base) {
 
     return implode(' ', $classes);
   };
+}
+
+/**
+ * Return callbacks to use for generating BEM element and modifier classes.
+ *
+ * @param string $block
+ *   The block name.
+ *
+ * @return array
+ *   - 0 Callback taking element and returning the full BEM element class.
+ *   - 1 Callback taking modifier and returning the full BEM modifier class.
+ * @code
+ *   list($bem, $bem_mod) = loft_core_bem('resource-hero');
+ * @endcode
+ */
+function loft_core_bem($block) {
+
+  // Single underscores should not exist in a block name.
+  if (preg_match('/[^_]_[^_]/', $block)) {
+    throw new \InvalidArgumentException("This BEM block name contains invalid characters: \"$block\".");
+  }
+
+  return [
+    function ($element = '') use ($block) {
+      return $element ? $block . '__' . $element : $block;
+    },
+    function ($modifier = '') use ($block) {
+      return $modifier ? $block . '--' . $modifier : $block;
+    },
+  ];
 }
 
 /**
