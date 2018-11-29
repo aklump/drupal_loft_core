@@ -244,6 +244,7 @@ function loft_core_users_get_user_status($uid = NULL, $domain = NULL, $ip = NULL
  * @see      loft_core_users_set_user_status().
  */
 function _loft_core_users_set_user_status($status, $uid, $mail, $ip = NULL) {
+  $status = intval($status);
   $meta = [
     'uid' => $uid,
     'uid_init' => $uid,
@@ -295,6 +296,7 @@ function _loft_core_users_set_user_status($status, $uid, $mail, $ip = NULL) {
       $spammy_domains_by_ip = db_select('loft_core_users', 'lcu')
         ->fields('lcu', array('domain'))
         ->condition('ip', $meta['ip'])
+        ->condition('status', loft_core_users_get_blocking_statuses(), 'IN')
         ->countQuery()
         ->execute()
         ->fetchField();
