@@ -171,6 +171,22 @@ trait ExtractorTrait {
   }
 
   /**
+   * Return the first loaded entity.
+   *
+   * @param string $field_name
+   *   This should field that references entities.
+   *
+   * @return mixed
+   *
+   * @see ::entities().
+   */
+  public function entity($field_name) {
+    $entities = $this->entities($field_name);
+
+    return reset($entities);
+  }
+
+  /**
    * Return an array of field-referenced entities.
    *
    * This has been tested with these modules:
