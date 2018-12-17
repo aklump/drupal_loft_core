@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "bf3fad3ba55341b201e12e651c3e3b54",
+    "content-hash": "55ad6e29d53077a2ca9b00d68cb94c82",
     "packages": [
         {
             "name": "sunra/php-simple-html-dom-parser",
@@ -61,6 +61,8 @@
     "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
-    "platform": [],
+    "platform": {
+        "php": "~5.6"
+    },
     "platform-dev": []
 }
