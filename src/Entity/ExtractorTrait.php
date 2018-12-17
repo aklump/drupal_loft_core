@@ -241,7 +241,17 @@ trait ExtractorTrait {
       return $item[$metadata[$field_name]['key']];
     }, $items);
 
-    return $metadata[$field_name]['target_type'] ? entity_load($metadata[$field_name]['target_type'], $entity_ids) : [];
+    if (!$metadata[$field_name]['target_type']) {
+      return [];
+    }
+
+    return array_map(function ($item) {
+      if (method_exists($item, 'setHostEntity') && !$item->hostEntity()) {
+        $item->setHostEntity($this->getEntityTypeId(), $this->getEntity());
+      }
+
+      return $item;
+    }, entity_load($metadata[$field_name]['target_type'], $entity_ids));
   }
 
   /**
