@@ -10,7 +10,6 @@ return array(
     'Illuminate\\Support\\' => array($vendorDir . '/illuminate/support'),
     'Illuminate\\Contracts\\' => array($vendorDir . '/illuminate/contracts'),
     'Drupal\\loft_core\\' => array($baseDir . '/src', $baseDir . '/tests/src'),
-    'Doctrine\\Common\\Inflector\\' => array($vendorDir . '/doctrine/inflector/lib/Doctrine/Common/Inflector'),
     'AKlump\\LoftLib\\' => array($vendorDir . '/aklump/loft-lib/src/AKlump/LoftLib'),
     'AKlump\\Data\\' => array($vendorDir . '/aklump/data'),
 );

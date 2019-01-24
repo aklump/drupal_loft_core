@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInitc6044db5e95c9111326e8bd09003e46e
+class ComposerStaticInita9b2a98493fc49d88d01bb38365afaca
 {
     public static $files = array (
         '5255c38a0faeba867671b61dfda6d864' => __DIR__ . '/..' . '/paragonie/random_compat/lib/random.php',
@@ -24,7 +24,6 @@ class ComposerStaticInitc6044db5e95c9111326e8bd09003e46e
         'D' => 
         array (
             'Drupal\\loft_core\\' => 17,
-            'Doctrine\\Common\\Inflector\\' => 26,
         ),
         'A' => 
         array (
@@ -51,10 +50,6 @@ class ComposerStaticInitc6044db5e95c9111326e8bd09003e46e
             0 => __DIR__ . '/../..' . '/src',
             1 => __DIR__ . '/../..' . '/tests/src',
         ),
-        'Doctrine\\Common\\Inflector\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/doctrine/inflector/lib/Doctrine/Common/Inflector',
-        ),
         'AKlump\\LoftLib\\' => 
         array (
             0 => __DIR__ . '/..' . '/aklump/loft-lib/src/AKlump/LoftLib',
@@ -71,6 +66,13 @@ class ComposerStaticInitc6044db5e95c9111326e8bd09003e46e
             'Sunra\\PhpSimple\\HtmlDomParser' => 
             array (
                 0 => __DIR__ . '/..' . '/sunra/php-simple-html-dom-parser/Src',
+            ),
+        ),
+        'D' => 
+        array (
+            'Doctrine\\Common\\Inflector\\' => 
+            array (
+                0 => __DIR__ . '/..' . '/doctrine/inflector/lib',
             ),
         ),
     );
@@ -265,10 +267,10 @@ class ComposerStaticInitc6044db5e95c9111326e8bd09003e46e
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInitc6044db5e95c9111326e8bd09003e46e::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInitc6044db5e95c9111326e8bd09003e46e::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInitc6044db5e95c9111326e8bd09003e46e::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInitc6044db5e95c9111326e8bd09003e46e::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInita9b2a98493fc49d88d01bb38365afaca::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInita9b2a98493fc49d88d01bb38365afaca::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInita9b2a98493fc49d88d01bb38365afaca::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInita9b2a98493fc49d88d01bb38365afaca::$classMap;
 
         }, null, ClassLoader::class);
     }
