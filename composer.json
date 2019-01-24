@@ -15,12 +15,13 @@
     },
     "autoload": {
         "psr-4": {
-            "Drupal\\loft_core\\": "src/"
+            "": "src",
+            "Drupal\\loft_core\\": "src/Drupal/loft_core"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Drupal\\loft_core\\": "tests/src/"
+            "Drupal\\loft_core\\": "tests/src/Drupal/loft_core"
         }
     }
 }
