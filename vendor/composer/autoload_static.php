@@ -6,18 +6,62 @@ namespace Composer\Autoload;
 
 class ComposerStaticInitc6044db5e95c9111326e8bd09003e46e
 {
+    public static $files = array (
+        '5255c38a0faeba867671b61dfda6d864' => __DIR__ . '/..' . '/paragonie/random_compat/lib/random.php',
+        '72579e7bd17821bb1321b87411366eae' => __DIR__ . '/..' . '/illuminate/support/helpers.php',
+    );
+
     public static $prefixLengthsPsr4 = array (
+        'M' => 
+        array (
+            'Mimey\\' => 6,
+        ),
+        'I' => 
+        array (
+            'Illuminate\\Support\\' => 19,
+            'Illuminate\\Contracts\\' => 21,
+        ),
         'D' => 
         array (
             'Drupal\\loft_core\\' => 17,
+            'Doctrine\\Common\\Inflector\\' => 26,
+        ),
+        'A' => 
+        array (
+            'AKlump\\LoftLib\\' => 15,
+            'AKlump\\Data\\' => 12,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
+        'Mimey\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/ralouphie/mimey/src',
+        ),
+        'Illuminate\\Support\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/illuminate/support',
+        ),
+        'Illuminate\\Contracts\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/illuminate/contracts',
+        ),
         'Drupal\\loft_core\\' => 
         array (
             0 => __DIR__ . '/../..' . '/src',
             1 => __DIR__ . '/../..' . '/tests/src',
+        ),
+        'Doctrine\\Common\\Inflector\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/doctrine/inflector/lib/Doctrine/Common/Inflector',
+        ),
+        'AKlump\\LoftLib\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/aklump/loft-lib/src/AKlump/LoftLib',
+        ),
+        'AKlump\\Data\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/aklump/data',
         ),
     );
 
@@ -31,27 +75,12 @@ class ComposerStaticInitc6044db5e95c9111326e8bd09003e46e
         ),
     );
 
-    public static $classMap = array (
-        'Drupal\\loft_core\\Attribute' => __DIR__ . '/../..' . '/src/Attribute.php',
-        'Drupal\\loft_core\\CoreBase' => __DIR__ . '/../..' . '/src/CoreBase.php',
-        'Drupal\\loft_core\\CoreInterface' => __DIR__ . '/../..' . '/src/CoreInterface.php',
-        'Drupal\\loft_core\\Drupal7' => __DIR__ . '/../..' . '/tests/src/Entity/ExtractorTest.php',
-        'Drupal\\loft_core\\Entity\\ExtractorTrait' => __DIR__ . '/../..' . '/src/Entity/ExtractorTrait.php',
-        'Drupal\\loft_core\\ExtractorTest' => __DIR__ . '/../..' . '/tests/src/Entity/ExtractorTest.php',
-        'Drupal\\loft_core\\Redirect' => __DIR__ . '/../..' . '/src/Redirect.php',
-        'Drupal\\loft_core\\StaticContentStreamWrapper' => __DIR__ . '/../..' . '/src/StaticContentStreamWrapper.php',
-        'Drupal\\loft_core\\TestableCore' => __DIR__ . '/../..' . '/tests/src/Entity/ExtractorTest.php',
-        'Drupal\\loft_core\\TestableExtractor' => __DIR__ . '/../..' . '/tests/src/Entity/ExtractorTest.php',
-        'Sunra\\PhpSimple\\HtmlDomParser' => __DIR__ . '/..' . '/sunra/php-simple-html-dom-parser/Src/Sunra/PhpSimple/HtmlDomParser.php',
-    );
-
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
             $loader->prefixLengthsPsr4 = ComposerStaticInitc6044db5e95c9111326e8bd09003e46e::$prefixLengthsPsr4;
             $loader->prefixDirsPsr4 = ComposerStaticInitc6044db5e95c9111326e8bd09003e46e::$prefixDirsPsr4;
             $loader->prefixesPsr0 = ComposerStaticInitc6044db5e95c9111326e8bd09003e46e::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInitc6044db5e95c9111326e8bd09003e46e::$classMap;
 
         }, null, ClassLoader::class);
     }
