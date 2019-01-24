@@ -40,12 +40,4 @@
             </exclude>
         </whitelist>
     </filter>
-    <logging>
-        <log type="coverage-html" target="./tests/build/coverage" lowUpperBound="35"
-             highLowerBound="70"/>
-        <log type="tap" target="./tests/build/logs/junit.tap"/>
-        <log type="junit" target="./tests/build/logs/junit.xml" logIncompleteSkipped="false"/>
-        <log type="testdox-html" target="./tests/build/logs/testdox.html"/>
-        <log type="testdox-text" target="./tests/build/logs/testdox.txt"/>
-    </logging>
 </phpunit>
