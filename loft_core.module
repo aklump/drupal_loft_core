@@ -1144,6 +1144,7 @@ function loft_core_twiggy_twig_alter($twig) {
     '\AKlump\LoftLib\Code\Strings',
     'splitBy',
   ]));
+  $twig->addFunction(new \Twig_SimpleFunction('loft_core_test_class', 'loft_core_test_class'));
 }
 
 /**
