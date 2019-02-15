@@ -1184,6 +1184,12 @@ function loft_core_element_children_to_properties($element) {
  * Implements hook_stream_wrappers().
  */
 function loft_core_stream_wrappers() {
+
+  // This is here to address an issue of missing class when using drush updb.
+  if (!class_exists('\Drupal\loft_core\StaticContentStreamWrapper')) {
+    module_load_include('php', 'loft_core', 'src/Drupal/loft_core/StaticContentStreamWrapper');
+  }
+
   $wrappers = [
     'static-content' => [
       'name' => t('Static content'),
