@@ -1,6 +1,6 @@
 <?php
 /**
- * Provides form hooks to implemented by ${9:My Module}
+ * Provides form hooks to implemented by loft_core.
  */
 
 use Drupal\loft_core\Redirect;

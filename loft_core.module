@@ -7,6 +7,7 @@
  * @{
  */
 
+use Drupal\loft_core\Attribute;
 use Drupal\loft_core\Redirect;
 use Drupal\loft_core\StaticContentStreamWrapper;
 
@@ -618,6 +619,42 @@ function loft_core_ajax_command_html_and_fade($selector, $content, $duration = 8
       'cssPrefix' => $css_prefix,
     ),
   );
+}
+
+/**
+ * Add the data-data-refresh value to an Attributes instance.
+ *
+ * @param \Drupal\loft_core\Attribute $attributes
+ *   The attributes instance.
+ */
+function loft_core_add_data_refresh(Attribute $attributes) {
+  static $microtime = NULL;
+  if (is_null($microtime)) {
+    $microtime = microtime(TRUE);
+  }
+  $attributes->setAttribute('data-data-refresh', $microtime);
+}
+
+/**
+ * Update the data-data-refresh attribute of an element.
+ *
+ * @param string $selector
+ *   The CSS selector of the element with data-data-refresh.
+ *
+ * @return array
+ */
+function loft_core_ajax_command_update_data_refresh($selector) {
+  static $microtime = NULL;
+  if (is_null($microtime)) {
+    $microtime = microtime(TRUE);
+  }
+
+  return [
+    'command' => 'update_data_refresh',
+    'selector' => $selector,
+    'value' => $microtime,
+
+  ];
 }
 
 /**

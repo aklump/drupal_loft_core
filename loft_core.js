@@ -38,6 +38,18 @@ var trackJS = trackJS || null;
     };
 
     /**
+     * Update the data-data-refresh value for an element.
+     *
+     * @param ajax
+     * @param response
+     *   - selector
+     *   - value
+     */
+    Drupal.ajax.prototype.commands.update_data_refresh = function(ajax, response) {
+      $(response.selector).attr('data-data-refresh', response.value)
+    }
+
+    /**
      * Ajax command for messages that fade out.
      *
      * @param ajax
