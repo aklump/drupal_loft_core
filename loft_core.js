@@ -38,7 +38,7 @@ var trackJS = trackJS || null;
     };
 
     /**
-     * Update the data-data-refresh value for an element.
+     * Update the data-data-time value for an element.
      *
      * @param ajax
      * @param response
@@ -46,7 +46,7 @@ var trackJS = trackJS || null;
      *   - value
      */
     Drupal.ajax.prototype.commands.update_data_refresh = function(ajax, response) {
-      $(response.selector).attr('data-data-refresh', response.value)
+      $(response.selector).attr('data-data-time', response.value)
     }
 
     /**

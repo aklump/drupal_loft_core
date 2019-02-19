@@ -622,7 +622,7 @@ function loft_core_ajax_command_html_and_fade($selector, $content, $duration = 8
 }
 
 /**
- * Add the data-data-refresh value to an Attributes instance.
+ * Add the data-data-time value to an Attributes instance.
  *
  * @param \Drupal\loft_core\Attribute $attributes
  *   The attributes instance.
@@ -632,14 +632,14 @@ function loft_core_add_data_refresh(Attribute $attributes) {
   if (is_null($microtime)) {
     $microtime = microtime(TRUE);
   }
-  $attributes->setAttribute('data-data-refresh', $microtime);
+  $attributes->setAttribute('data-data-time', $microtime);
 }
 
 /**
- * Update the data-data-refresh attribute of an element.
+ * Update the data-data-time attribute of an element.
  *
  * @param string $selector
- *   The CSS selector of the element with data-data-refresh.
+ *   The CSS selector of the element with data-data-time.
  *
  * @return array
  */
