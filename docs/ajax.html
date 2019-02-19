@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>Ajax</title>
+  <link href="search/tipuesearch.css" rel="stylesheet">
+  <link href="style.css" rel="stylesheet">
+</head>
+
+<body class="page--ajax">
+<header>
+  <div class="pager">
+  <a href="README.html" class="prev README">&laquo;Loft Core</a>
+  <a href="index.html" class="index">Index</a>
+  <a href="database.html" class="next database">Database&raquo;</a>
+</div>
+</header>
+
+  <div class="search__wrapper">
+  <form action="search--results.html">
+    <input type="text" class="search-input" name="q" id="tipue_search_input" autocomplete="off" required>
+  </form>
+</div>
+
+  <h1>Ajax</h1>
+  <div class="breadcrumb"><a href="index.html">Index</a></div>
+
+<section><h2>Ajax</h2>
+
+<h2>Testing and Waiting for Ajax Responses</h2>
+
+<p>In automated testing you may need to wait for an ajax request to complete.  Here are some strategy.</p>
+
+<h3>Use <code>data-data-time</code></h3>
+
+<p>The idea is to monitor a data attribute timestamp that gets updated by the ajax response, here is the markup model:</p>
+
+<pre><code>&lt;div class="story t-story" data-data-time="1550610871.67"&gt;...&lt;/div&gt;
+</code></pre>
+
+<p>In the page markup for the initial render you must call <code>loft_core_add_data_refresh</code>:</p>
+
+<pre><code>$attributes
+  -&gt;addClass('story')
+  -&gt;addClass(loft_core_test_class('story'));
+gop3_core_include('ajax');
+loft_core_add_data_refresh($attributes);
+</code></pre>
+
+<p>In your commands response you add this command:</p>
+
+<pre><code>public function getCommands__favorites__post(&amp;$commands, $markup) {
+  $commands[] = loft_core_ajax_command_update_data_refresh('.story');
+}
+</code></pre>
+
+<p>Then, in the test method you do something like this:</p>
+
+<pre><code>$this-&gt;loadPageByUrl('/node/11206');
+$el = $this-&gt;getDomElements([
+  '.t-story',
+  '.t-favorite-add--11206',
+]);
+$el['.t-favorite-add--11206']-&gt;click();
+$this-&gt;waitForDataRefresh('.t-story');
+</code></pre>
+</section>
+
+<div class="search__results">
+  <div id="tipue_search_content"></div>
+</div>
+
+<footer>
+  <div class="pager">
+  <a href="README.html" class="prev README">&laquo;Loft Core</a>
+  <a href="index.html" class="index">Index</a>
+  <a href="database.html" class="next database">Database&raquo;</a>
+</div>
+  
+  <div id="footer-legaleeze">
+    <p class="legaleeze center">Version: 7.x-1.0-rc37 &bull; Last Updated: Tue, 19 Feb 2019 14:50:21 -0800</p>
+  </div>
+</footer>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script src="search/tipuesearch_content.js"></script>
+  <script src="search/tipuesearch_set.js"></script>
+  <script src="search/tipuesearch.min.js"></script>
+  <script>
+    $(document).ready(function () {
+      $('#tipue_search_input').tipuesearch();
+    });
+  </script>
+<script src="js/core.js"></script>
+</body>
+</html>
+
