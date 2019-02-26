@@ -8,6 +8,8 @@
 /**
  * Create an archive of entities.
  *
+ * This function also handles archiving of files, attachments, images, etc.
+ *
  * Wrap this function in a hook_update_n and return it's return value.
  *
  * @param string $destination_dir
@@ -17,12 +19,16 @@
  * @param string $sql
  *   The SQL that generates the dataset to export.
  * @param string $filename
- *   The filename of the data files that are exported.
- * @param array $image_keys_map
- *   An associative array representing a map of query keys that point to the
- *   filename and the file URI.  Each element has two values:
- *   - 0 The key from the query that holds the image filename.
- *   - 1 The key from teh query that holds the image URI.
+ *   The filename of the file that holds the archived data.
+ * @param array $file_keys_map
+ *   An associative array representing a map of query keys that point to files.
+ *    The query key is the final alias for a column. Each element has two
+ *   values:
+ *   - 0 The key from the query that holds the filename as stored by Drupal.
+ *   The image will be saved-as using this filename.
+ *   - 1 The key from the query that holds the path to the existing file.  This
+ *   will be used as the copy source, and the basename will be lost, since it
+ *   will be saved as the key 0 when archived.
  * @param callable|null $value_transform_callback
  *   A callable that receives ($key, $value) and must return true if the
  *   key/value should be added to the export.  $value should be received by
@@ -38,7 +44,7 @@ function loft_core_update__archive_entities(
   $update_message,
   $sql,
   $filename,
-  array $image_keys_map = [],
+  array $file_keys_map = [],
   callable $value_transform_callback = NULL
 ) {
   loft_data_grids_boot();
@@ -58,13 +64,14 @@ function loft_core_update__archive_entities(
           $add_to_export = TRUE;
         }
 
-        // Archive the images.
-        foreach ($image_keys_map as $image_map) {
-          if ($key === $image_map[1]) {
+        // Archive the files.
+        foreach ($file_keys_map as $file_map) {
+          list($basename_key, $path_key) = $file_map;
+          if ($key === $path_key) {
             $add_to_export = FALSE;
-            $image_dir = "$destination_dir/images/";
-            file_prepare_directory($image_dir, FILE_CREATE_DIRECTORY);
-            $destination = $image_dir . '/' . $record[$image_map[0]];
+            $file_dir = "$destination_dir/files/";
+            file_prepare_directory($file_dir, FILE_CREATE_DIRECTORY);
+            $destination = $file_dir . '/' . $record[$basename_key];
             if (!file_exists($destination)) {
               if (!file_unmanaged_copy($value, $destination, FILE_EXISTS_REPLACE)) {
                 throw new \RuntimeException("Could not copy: $value.");
