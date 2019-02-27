@@ -60,8 +60,8 @@ function loft_core_update__archive_entities(
       foreach ($record as $key => $value) {
         $add_to_export = TRUE;
 
-        if (!is_callable($value_transform_callback) || ($value_transform_callback($key, $value))) {
-          $add_to_export = TRUE;
+        if (is_callable($value_transform_callback)) {
+          $add_to_export = $value_transform_callback($key, $value);
         }
 
         // Archive the files.
