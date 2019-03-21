@@ -9,21 +9,19 @@
 
 <body class="page--testing">
 <header>
-  <div class="pager">
-  <a href="static_content.html" class="prev static_content">&laquo;Stream wrapper &quot;static-content://&quot;</a>
-  <a href="index.html" class="index">Index</a>
-  <a href="trackjs.html" class="next trackjs">Add TrackJS.com to your website&raquo;</a>
-</div>
-</header>
-
-  <div class="search__wrapper">
+  <div class="pager"><a href="static_content.html" class="prev static_content">&laquo;Stream wrapper &quot;static-content://&quot;</a><a href="index.html" class="index pager__book-title">Loft Drupal Core</a><a href="entities.html" class="next entities">Working With Entities Cheat Sheet&raquo;</a></div></header>
+<section class="sub-header">
+  <div class="breadcrumbs"><a href="index.html">Index</a>
+         &raquo
+      </div>      <div class="search__wrapper">
   <form action="search--results.html">
     <input type="text" class="search-input" name="q" id="tipue_search_input" autocomplete="off" required>
   </form>
 </div>
+  </section>
 
-  <h1>Testing</h1>
-  <div class="breadcrumb"><a href="index.html">Index</a></div>
+
+<h1>Testing</h1>
 
 <section>
 
@@ -51,14 +49,9 @@
 </div>
 
 <footer>
-  <div class="pager">
-  <a href="static_content.html" class="prev static_content">&laquo;Stream wrapper &quot;static-content://&quot;</a>
-  <a href="index.html" class="index">Index</a>
-  <a href="trackjs.html" class="next trackjs">Add TrackJS.com to your website&raquo;</a>
-</div>
-  
+  <div class="pager"><a href="static_content.html" class="prev static_content">&laquo;Stream wrapper &quot;static-content://&quot;</a><a href="index.html" class="index pager__book-title">Loft Drupal Core</a><a href="entities.html" class="next entities">Working With Entities Cheat Sheet&raquo;</a></div>  
   <div id="footer-legaleeze">
-    <p class="legaleeze center">Version: 7.x-1.0 &bull; Last Updated: Thu, 21 Mar 2019 15:22:26 -0700</p>
+    <p class="legaleeze center">Version: 7.x-1.0 &bull; Last Updated: Thu, 21 Mar 2019 15:33:12 -0700</p>
   </div>
 </footer>
 
@@ -67,9 +60,9 @@
   <script src="search/tipuesearch_set.js"></script>
   <script src="search/tipuesearch.min.js"></script>
   <script>
-    $(document).ready(function () {
-      $('#tipue_search_input').tipuesearch();
-    });
+    $(document).ready(function() {
+      $('#tipue_search_input').tipuesearch()
+    })
   </script>
 <script src="js/core.js"></script>
 </body>
