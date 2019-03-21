@@ -2,3 +2,6 @@ tests/build
 docs/core/cache
 /.idea
 /node_modules/
+code-coverage/
+documentation/core
+documentation/README.md
