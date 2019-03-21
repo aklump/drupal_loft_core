@@ -9,21 +9,19 @@
 
 <body class="page--static_content">
 <header>
-  <div class="pager">
-  <a href="smart_url.html" class="prev smart_url">&laquo;Smart Urls</a>
-  <a href="index.html" class="index">Index</a>
-  <a href="testing.html" class="next testing">Testing&raquo;</a>
-</div>
-</header>
-
-  <div class="search__wrapper">
+  <div class="pager"><a href="smart_url.html" class="prev smart_url">&laquo;Smart Urls</a><a href="index.html" class="index pager__book-title">Loft Drupal Core</a><a href="testing.html" class="next testing">Testing&raquo;</a></div></header>
+<section class="sub-header">
+  <div class="breadcrumbs"><a href="index.html">Index</a>
+         &raquo
+      </div>      <div class="search__wrapper">
   <form action="search--results.html">
     <input type="text" class="search-input" name="q" id="tipue_search_input" autocomplete="off" required>
   </form>
 </div>
+  </section>
 
-  <h1>Stream wrapper &quot;static-content://&quot;</h1>
-  <div class="breadcrumb"><a href="index.html">Index</a></div>
+
+<h1>Stream wrapper &quot;static-content://&quot;</h1>
 
 <section>
 
@@ -85,14 +83,9 @@ function my_module_form_page_node_form_alter(&amp;$form, &amp;$form_state, $form
 </div>
 
 <footer>
-  <div class="pager">
-  <a href="smart_url.html" class="prev smart_url">&laquo;Smart Urls</a>
-  <a href="index.html" class="index">Index</a>
-  <a href="testing.html" class="next testing">Testing&raquo;</a>
-</div>
-  
+  <div class="pager"><a href="smart_url.html" class="prev smart_url">&laquo;Smart Urls</a><a href="index.html" class="index pager__book-title">Loft Drupal Core</a><a href="testing.html" class="next testing">Testing&raquo;</a></div>  
   <div id="footer-legaleeze">
-    <p class="legaleeze center">Version: 7.x-1.0 &bull; Last Updated: Thu, 21 Mar 2019 15:22:26 -0700</p>
+    <p class="legaleeze center">Version: 7.x-1.0 &bull; Last Updated: Thu, 21 Mar 2019 15:38:44 -0700</p>
   </div>
 </footer>
 
@@ -101,9 +94,9 @@ function my_module_form_page_node_form_alter(&amp;$form, &amp;$form_state, $form
   <script src="search/tipuesearch_set.js"></script>
   <script src="search/tipuesearch.min.js"></script>
   <script>
-    $(document).ready(function () {
-      $('#tipue_search_input').tipuesearch();
-    });
+    $(document).ready(function() {
+      $('#tipue_search_input').tipuesearch()
+    })
   </script>
 <script src="js/core.js"></script>
 </body>
