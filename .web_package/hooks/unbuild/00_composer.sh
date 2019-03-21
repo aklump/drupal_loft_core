@@ -1,3 +1,8 @@
 #!/usr/bin/env bash
-rm -r vendor || build_fail_exception
-rm composer.lock || build_fail_exception
+wp_rm node_module
+wp_rm vendor
+wp_rm help
+wp_rm docs
+wp_rm README.md
+wp_rm README.txt
+wp_rm tests/build/

@@ -1,3 +1,4 @@
 tests/build
 docs/core/cache
 /.idea
+/node_modules/
