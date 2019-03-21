@@ -6,8 +6,8 @@
  */
 var trackJS = trackJS || null;
 
-(function ($, Drupal, trackJS) {
-  "use strict";
+(function($, Drupal, trackJS) {
+  'use strict';
 
   Drupal.loft = {};
 
@@ -22,7 +22,11 @@ var trackJS = trackJS || null;
      * @see loft_core_ajax_command_trackjs_console().
      * @link http://docs.trackjs.com/tracker/top-level-api#trackjsconsole
      */
-    Drupal.ajax.prototype.commands.loftCoreTrackJsConsole = function (ajax, response, status) {
+    Drupal.ajax.prototype.commands.loftCoreTrackJsConsole = function(
+      ajax,
+      response,
+      status
+    ) {
       trackJS && trackJS.console[response.data.severity](response.data.message);
     };
 
@@ -33,7 +37,11 @@ var trackJS = trackJS || null;
      *   - hash string
      * @param status
      */
-    Drupal.ajax.prototype.commands.loftCoreAjaxBbqPushState = function (ajax, response, status) {
+    Drupal.ajax.prototype.commands.loftCoreAjaxBbqPushState = function(
+      ajax,
+      response,
+      status
+    ) {
       $.bbq && $.bbq.pushState(response.data.hash);
     };
 
@@ -45,9 +53,12 @@ var trackJS = trackJS || null;
      *   - selector
      *   - value
      */
-    Drupal.ajax.prototype.commands.update_data_refresh = function(ajax, response) {
-      $(response.selector).attr('data-data-time', response.value)
-    }
+    Drupal.ajax.prototype.commands.update_data_refresh = function(
+      ajax,
+      response
+    ) {
+      $(response.selector).attr('data-data-time', response.value);
+    };
 
     /**
      * Ajax command for messages that fade out.
@@ -60,10 +71,14 @@ var trackJS = trackJS || null;
      *   - delay int How long before fade out.
      * @param status
      */
-    Drupal.ajax.prototype.commands.loftCoreAjaxHtmlAndFade = function (ajax, response, status) {
-      var $el  = $(response.data.selector),
-          prev = $el.data('loftCoreAjaxHtmlAndFade') || {},
-          pre  = response.data.cssPrefix || '';
+    Drupal.ajax.prototype.commands.loftCoreAjaxHtmlAndFade = function(
+      ajax,
+      response,
+      status
+    ) {
+      var $el = $(response.data.selector),
+        prev = $el.data('loftCoreAjaxHtmlAndFade') || {},
+        pre = response.data.cssPrefix || '';
 
       // Remove any delay timeouts currently underway.
       if (prev.timeout) {
@@ -71,25 +86,25 @@ var trackJS = trackJS || null;
       }
 
       $el
-      .html(response.data.content)
+        .html(response.data.content)
 
-      // Stops any fading animations currently underway
-      .stop(false, true)
-      .show()
-      .addClass(pre + 'is-not-faded')
-      .removeClass(pre + 'is-faded');
+        // Stops any fading animations currently underway
+        .stop(false, true)
+        .show()
+        .addClass(pre + 'is-not-faded')
+        .removeClass(pre + 'is-faded');
 
       if (response.data.duration) {
-        var timeout = setTimeout(function () {
-          $el.fadeOut(response.data.duration, function () {
+        var timeout = setTimeout(function() {
+          $el.fadeOut(response.data.duration, function() {
             $(response.data.selector)
-            .removeClass(pre + 'is-not-faded')
-            .addClass(pre + 'is-faded')
-            .show();
+              .removeClass(pre + 'is-not-faded')
+              .addClass(pre + 'is-faded')
+              .show();
           });
         }, response.data.delay);
         $el.data('loftCoreAjaxHtmlAndFade', {
-          timeout: timeout
+          timeout: timeout,
         });
       }
     };
@@ -99,7 +114,7 @@ var trackJS = trackJS || null;
    * Displays a JavaScript error from an Ajax response when appropriate to do
    * so.
    */
-  Drupal.displayAjaxError = function (message) {
+  Drupal.displayAjaxError = function(message) {
     // Skip displaying the message if the user deliberately aborted (for
     // example, by reloading the page or navigating to a different page) while
     // the Ajax request was still ongoing. See, for example, the discussion at
@@ -117,7 +132,6 @@ var trackJS = trackJS || null;
   };
 
   if (Drupal.theme) {
-
     /**
      * Client-side theming using server-side templates.
      *
@@ -165,14 +179,14 @@ var trackJS = trackJS || null;
      *   }));
      * @endcode
      */
-    Drupal.loft.theme = function (theme, vars) {
+    Drupal.loft.theme = function(theme, vars) {
       var $tpl = $('#js-tpl--' + theme);
       if (!$tpl.length) {
         trackJS && trackJS.console.error('Missing template #js-tpl--" + theme');
         return '';
       }
       var regex,
-          html = $tpl
+        html = $tpl
           .clone()
           .removeAttr('id')
           .removeClass('js-tpl')
@@ -194,20 +208,18 @@ var trackJS = trackJS || null;
      * Persistent client-side storage API
      */
     Drupal.loft.storage = {
-
       /**
        * Checks if localStorage is available.
        * @returns {boolean}
        */
-      isAvailable: function () {
+      isAvailable: function() {
         try {
           var storage = window.localStorage,
-              x       = '__storage_test__';
+            x = '__storage_test__';
           storage.setItem(x, x);
           storage.removeItem(x);
           return true;
-        }
-        catch (e) {
+        } catch (e) {
           return false;
         }
       },
@@ -231,12 +243,12 @@ var trackJS = trackJS || null;
        *   The path in the storage object.
        * @param mixed value
        */
-      save: function (namespace, path, value) {
+      save: function(namespace, path, value) {
         if (!this.isAvailable()) {
-          throw "LocalStorage is not available.";
+          throw 'LocalStorage is not available.';
         }
-        var key  = this.key + '.' + namespace,
-            data = JSON.parse(localStorage.getItem(key)) || {};
+        var key = this.key + '.' + namespace,
+          data = JSON.parse(localStorage.getItem(key)) || {};
         data[path] = value;
         localStorage.setItem(key, JSON.stringify(data));
       },
@@ -251,10 +263,10 @@ var trackJS = trackJS || null;
        *   The value to return when it doesn't already exist.
        * @returns {*|null}
        */
-      load: function (namespace, path, defaultValue) {
-        var key          = this.key + '.' + namespace,
-            data         = JSON.parse(localStorage.getItem(key)) || {},
-            defaultValue = defaultValue || null;
+      load: function(namespace, path, defaultValue) {
+        var key = this.key + '.' + namespace,
+          data = JSON.parse(localStorage.getItem(key)) || {},
+          defaultValue = defaultValue || null;
         return data[path] || defaultValue;
       },
 
@@ -266,19 +278,17 @@ var trackJS = trackJS || null;
        * @param string path
        *   The path in the storage object.
        */
-      delete: function (namespace, path) {
-        var key  = this.key + '.' + namespace,
-            data = JSON.parse(localStorage.getItem(key)) || {};
+      delete: function(namespace, path) {
+        var key = this.key + '.' + namespace,
+          data = JSON.parse(localStorage.getItem(key)) || {};
         delete data[path];
         var saving = JSON.stringify(data);
         if (saving === '{}') {
           localStorage.removeItem(key);
-        }
-        else {
+        } else {
           localStorage.setItem(key, saving);
         }
-      }
+      },
     };
   }
-
 })(jQuery, Drupal, trackJS);
