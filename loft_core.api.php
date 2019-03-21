@@ -27,11 +27,18 @@ function HOOK_loft_core_redirect_node_BUNDLE_TYPE_view($node) {
   );
 }
 
+/**
+ * Implements hook_loft_core_redirect_node_BUNDLE_TYPE_edit().
+ */
 function HOOK_loft_core_redirect_node_BUNDLE_TYPE_edit($node) {
-  // Only allow admins to edit, otherwise deny access.  This overrides the normal access check of node_access('update'...
+  // Only allow admins to edit, otherwise deny access.  This overrides the
+  // normal access check of node_access('update'...
   return user_is_admin() ? FALSE : MENU_ACCESS_DENIED;
 }
 
+/**
+ * Implements hook_loft_core_redirect_node_BUNDLE_TYPE_delete().
+ */
 function HOOK_loft_core_redirect_node_BUNDLE_TYPE_delete($node) {
 
 }
@@ -120,7 +127,8 @@ function HOOK_loft_core_trackjs_alter(&$config) {
  *
  * @return array
  *   Keyed by message status, e.g. status, error.
- *   Each value is an array of regex expressions, that when matched causes the message to never display.
+ *   Each value is an array of regex expressions, that when matched causes the
+ *   message to never display.
  */
 function HOOK_loft_core_suppress_messages() {
   return array(

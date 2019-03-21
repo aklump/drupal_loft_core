@@ -9,7 +9,7 @@ use DrupalLocalStreamWrapper;
  *
  * An example of static content is an HTML document that lays out the terms of
  * service, which you do not want exposed to the Drupal node system, but rather
- * is programatically appended to a page.  The static content should be added
+ * is programmatically appended to a page.  The static content should be added
  * to SCM as well.
  */
 class StaticContentStreamWrapper extends DrupalLocalStreamWrapper {

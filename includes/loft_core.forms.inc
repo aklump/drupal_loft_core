@@ -1,30 +1,40 @@
 <?php
+
 /**
- * Provides form hooks to implemented by loft_core.
+ * @file
+ * Provides extra form functionality.
  */
 
-use Drupal\loft_core\Redirect;
 use Drupal\loft_core\Attribute;
+use Drupal\loft_core\Redirect;
 
 /**
  * Implements hook_form_alter().
  *
  * Make sure we don't redirect admins after editing a "redirected" node.
+ *
+ * @param array $form
+ *   The form definition.
+ * @param array $form_state
+ *   The state of the form.
  */
-function loft_core_form_node_form_alter(&$form, &$form_state) {
+function loft_core_form_node_form_alter(array &$form, array &$form_state) {
   if (Redirect::isNodeRedirected($form_state['node'], 'view')) {
-    $form['actions']['submit']['#submit'][] = 'loft_core_node_form_submit_redirect_handler';
+    $form['actions']['submit']['#submit'][] = '_loft_core_node_form_submit_redirect_handler';
   }
 }
 
 /**
- * Redirect a node form to the edit page,
- * no the view page as normal.
+ * Handle post edit node redirect.
  *
- * @param $form
- * @param $form_state
+ * Redirect a node form to the edit page, or the view page as normal.
+ *
+ * @param array $form
+ *   The form definition.
+ * @param array $form_state
+ *   The state of the form.
  */
-function loft_core_node_form_submit_redirect_handler($form, &$form_state) {
+function _loft_core_node_form_submit_redirect_handler(array $form, array &$form_state) {
   if (!empty($form_state['redirect']) && $form_state['nid']) {
     $form_state['redirect'] = node_access('update',
       $form_state['nid']) ? 'node/' . $form_state['nid'] . '/edit' : '<front>';
@@ -32,22 +42,23 @@ function loft_core_node_form_submit_redirect_handler($form, &$form_state) {
 }
 
 /**
- * Adds a tabindex to a form element
+ * Adds a tabindex to a form element.
  *
- * @param array  &$element The form element to add to.
- * @param int    $index    The next tabindex, will automatically be incremented.
- * @param string $key      What is the array key to add to? Defaults to
- *                         #attributes.
+ * Near the bottom of the form do something like this:
  *
- * @return int The next tabindex available.
- *
- * Near the bottom of the form do something like this
  * @code
  *   $tabindex = 100;
  *   loft_core_form_tabindex($form['title'], $tabindex);
  *   loft_core_form_tabindex($form['actions']['create'], $tabindex);
  *   loft_core_form_tabindex($form['actions']['cancel'], $tabindex);
  * @endcode
+ *
+ * @param array &$element
+ *   The form element to add to.
+ * @param int $index
+ *   The next tabindex, will automatically be incremented.
+ * @param string $key
+ *   What is the array key to add to? Defaults to #attributes.
  */
 function loft_core_form_tabindex(array &$element, &$index, $key = '#attributes') {
   $g = data_api();
@@ -60,7 +71,6 @@ function loft_core_form_tabindex(array &$element, &$index, $key = '#attributes')
   }
 }
 
-
 /**
  * Disable an array of form elements with a consistent message.
  *
@@ -72,14 +82,16 @@ function loft_core_form_tabindex(array &$element, &$index, $key = '#attributes')
  * $paths);
  * @endcode
  *
- * @param array  &$form
- * @param array  $paths       An array of paths to be used by data_api().
- * @param string $module_name This will be used in the default message.
- * @param null   $message     If the default message is not sufficient,
- *                            enter a
- *                            custom message here.
+ * @param array &$form
+ *   The form definition.
+ * @param array $paths
+ *   An array of paths to be used by data_api().
+ * @param string $module_name
+ *   This will be used in the default message.
+ * @param null $message
+ *   If the default message is not sufficient, enter a custom message here.
  */
-function loft_core_form_disable_elements(&$form, $paths, $module_name = NULL, $message = NULL) {
+function loft_core_form_disable_elements(array &$form, array $paths, $module_name = NULL, $message = NULL) {
   $g = data_api();
   if (is_null($message)) {
     $module_name = empty($module_name) ? 'Loft Core' : $module_name;
@@ -87,40 +99,40 @@ function loft_core_form_disable_elements(&$form, $paths, $module_name = NULL, $m
       array('%module' => $module_name));
   }
   foreach ($paths as $path) {
-    if ($g->get($form,
-      $path)
-    ) {
-      $type = $g->get($form,
-        "$path.#type");
-      $g->set($form,
-        "$path.#required",
-        FALSE);
-      $g->set($form,
-        "$path.#disabled",
-        TRUE);
+    if ($g->get($form, $path)) {
+      $type = $g->get($form, "$path.#type");
+      $g->set($form, "$path.#required", FALSE);
+      $g->set($form, "$path.#disabled", TRUE);
+
       switch ($type) {
         case 'container':
           $message_path = "$path.#suffix";
           break;
+
         default:
           $message_path = "$path.#description";
           break;
       }
-      $g->set($form,
-        $message_path,
-        $message);
+      $g->set($form, $message_path, $message);
     }
   }
 }
 
-function loft_core_form_hide_elements(&$form, $paths) {
+/**
+ * Hide form elements by adding #access = false.
+ *
+ * @param array $form
+ *   The FAPI form definition.
+ * @param array $paths
+ *   An array of paths for data_api pointing to the form elment to hide.
+ */
+function loft_core_form_hide_elements(array &$form, array $paths) {
   $g = data_api();
   foreach ($paths as $path) {
     if ($g->get($form,
       $path)
     ) {
-      $g->onlyIfHas($form,
-        "$path.#required")->call(function () {
+      $g->onlyIfHas($form, "$path.#required")->call(function () {
         return FALSE;
       })->set($form);
       $g->set($form,
@@ -131,12 +143,16 @@ function loft_core_form_hide_elements(&$form, $paths) {
 }
 
 /**
+ * Get form during AJAX callback response.
+ *
  * Use this to get a form during an ajax response; it suppressed the $_POST so
  * the form doesn't think it's already submitted.
  *
  * @param string $form_id
+ *   The id of the form to get.
  *
- * @return array|mixed
+ * @return array
+ *   The FAPI form definition.
  */
 function loft_core_get_form_during_ajaxing($form_id) {
   $stash = $_POST;
@@ -149,6 +165,11 @@ function loft_core_get_form_during_ajaxing($form_id) {
 
 /**
  * Implements hook_form_alter().
+ *
+ * Add an additional configuration variable for defining an email from address
+ * for when a user is cancelled.
+ *
+ * @see loft_core_mail_alter
  */
 function loft_core_form_user_admin_settings_alter(&$form, &$form_state, $form_id) {
   $form['registration_cancellation']['loft_core_mail_registration_from'] = array(

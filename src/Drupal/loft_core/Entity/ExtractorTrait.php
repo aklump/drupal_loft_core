@@ -3,7 +3,7 @@
 namespace Drupal\loft_core\Entity;
 
 /**
- * Trait ExtractorTrait
+ * A trait for obtaining entity data using convenient/safe methods.
  *
  * All methods that return a string, get a magic safe method.  Here's how it
  * works:
@@ -19,8 +19,16 @@ namespace Drupal\loft_core\Entity;
  */
 trait ExtractorTrait {
 
+  /**
+   * Holds the fallback safe markup handler.
+   *
+   * @var string|callable
+   */
   protected $safeMarkupHandler = NULL;
 
+  /**
+   * {@inheritdoc}
+   */
   public function __call($name, $arguments) {
     $original = $name;
     $name = strtolower($name);
@@ -35,7 +43,8 @@ trait ExtractorTrait {
         throw new \RuntimeException("Method \"$method\" does not exist; therefore method \"$name\" is invalid.");
       }
 
-      // If the format is discovered in the raw function, it should be set using this variable: safeMarkupHandler
+      // If the format is discovered in the raw function, it should be set using
+      // this variable: safeMarkupHandler.
       $this->safeMarkupHandler = NULL;
       $output = call_user_func_array([$this, $method], $arguments);
       if (!is_string($output)) {
@@ -58,6 +67,7 @@ trait ExtractorTrait {
    * Return the path to the entity.
    *
    * @return string
+   *   The local path to the entity.
    */
   public function uri() {
     list($entity_type, $entity) = $this->validateEntity();
@@ -68,18 +78,16 @@ trait ExtractorTrait {
   /**
    * Return data from an entity field in the entity's language.
    *
-   * @param mixed $default The default value if non-existant.
-   * @param string $field_name The field name on the entity.
-   * @param int|null $item The item index for a field entity, e.g. 0, 1, 2.
-   *   Send null to load the entire array for the given language.
-   * @param string|null $key The key of a single item array.  This is ignored
-   *   when $item is null.
+   * @param mixed $default
+   *   The default value if non-existant.
+   * @param string $field_name
+   *   The field name on the entity.
    *
    * @return mixed
+   *   The value of the field as described by the request.
    *
-   * @throws \InvalidArgumentException when $key is not a valid column for
-   *   $field_name.
-   *
+   * @throws \InvalidArgumentException
+   *   When $key is not a valid column for $field_name.
    *
    * Examples of how to use:
    * @code
@@ -331,7 +339,7 @@ trait ExtractorTrait {
   }
 
   /**
-   * Return information about a field
+   * Return information about a field.
    *
    * @param $args
    * @param string $method
@@ -382,4 +390,5 @@ trait ExtractorTrait {
 
     return $runs[$cid];
   }
+
 }

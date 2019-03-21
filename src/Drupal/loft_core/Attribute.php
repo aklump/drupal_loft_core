@@ -4,29 +4,38 @@ namespace Drupal\loft_core;
 
 use Drupal\Core\Template\Attribute as CoreAttribute;
 
+/**
+ * Attributes object handler, adding methods for the "style" attribute.
+ *
+ * Adds shortcut methods for working with CSS styles, i.e., "style" attribute.
+ */
 class Attribute extends CoreAttribute {
 
   /**
-   * Test if a css style is present, e.g. background
+   * Test if a CSS style is present.
    *
-   * @param string $cssStyleName
+   * @param string $style_name
+   *   The CSS style to check for, e.g., "background".
    *
    * @return bool
+   *   True if present.
    */
-  public function hasStyle($cssStyleName) {
-    return ($style = $this->getStyle()) && isset($style[$cssStyleName]);
+  public function hasStyle($style_name) {
+    return ($style = $this->getStyle()) && isset($style[$style_name]);
   }
 
   /**
-   * Remove a css style if present.
+   * Remove a CSS style if present.
    *
-   * @param $cssStyleName
+   * @param string $style_name
+   *   The style attribute name, e.g. "font-size".
    *
-   * @return $this
+   * @return \Drupal\loft_core\Attribute
+   *   Self for chaining.
    */
-  public function removeStyle($cssStyleName) {
+  public function removeStyle($style_name) {
     if (($style = $this->getStyle())) {
-      unset($style[$cssStyleName]);
+      unset($style[$style_name]);
       $this->setStyle($style);
     }
 
@@ -34,25 +43,28 @@ class Attribute extends CoreAttribute {
   }
 
   /**
-   * Add (replace) a css style by name.
+   * Add (replace) a CSS style by name.
    *
-   * @param $cssStyleName  e.g. color
-   * @param $cssStyleValue e.g. #fff
+   * @param string $style_name
+   *   The name of the style attribute, e.g., "color".
+   * @param mixed $style_value
+   *   It's value, e.g., "#fff".
    *
    * @return $this
    */
-  public function addStyle($cssStyleName, $cssStyleValue) {
+  public function addStyle($style_name, $style_value) {
     $style = $this->getStyle();
-    $style[$cssStyleName] = $cssStyleValue;
+    $style[$style_name] = $style_value;
     $this->setStyle($style);
 
     return $this;
   }
 
   /**
-   * Return the css styles as a key value associative array.
+   * Return the CSS styles as a key value associative array.
    *
    * @return array
+   *   Keys are the style names, values are the values.
    */
   public function getStyle() {
     if (!($style = $this->offsetGet('style'))
@@ -65,41 +77,62 @@ class Attribute extends CoreAttribute {
   }
 
   /**
-   * Sets (replaces) the style tag using a key/value array
+   * Sets (replaces) the style tag using a key/value array.
    *
    * @param array $style
+   *   An array of name/values to set into the style attribute.  The array is
+   *   concantenated using ';', as you might expect.
    *
-   * @see getStyle().
+   * @see \Drupal\loft_core\Attribute::getStyle
    */
   public function setStyle(array $style) {
     if (empty($style)) {
       $this->removeAttribute('style');
     }
-    else if ($style = $this->contractStyle($style)) {
+    elseif ($style = $this->contractStyle($style)) {
       $this->setAttribute('style', $style);
     }
   }
 
-  protected function contractStyle(array $cssStyleValue) {
+  /**
+   * Contracts (implodes) a style key/value array into a string.
+   *
+   * @param array $style_attribute_array
+   *   The style name/value array.
+   *
+   * @return string
+   *   A string concantenated by ';'.
+   */
+  protected function contractStyle(array $style_attribute_array) {
     $style = array();
-    foreach ($cssStyleValue as $cssStyleName => $cssStyleValue) {
-      $style[] = $cssStyleName . ':' . $cssStyleValue;
+    foreach ($style_attribute_array as $style_name => $style_value) {
+      $style[] = $style_name . ':' . $style_value;
     }
 
     return implode(';', $style);
   }
 
-  protected function expandStyle($cssStyleValue) {
+  /**
+   * Expand a string style attribute value into an array.
+   *
+   * @param string $style_attribute_string
+   *   The value of a style tag, e.g., "color: red; font-size: 14px".
+   *
+   * @return array
+   *   Keys are the style names, values the values.
+   */
+  protected function expandStyle($style_attribute_string) {
     $expanded = array();
-    if ($cssStyleValue) {
-      $cssStyleValue = array_filter(explode(';', $cssStyleValue));
+    if ($style_attribute_string) {
+      $style_value = array_filter(explode(';', $style_attribute_string));
       $expanded = array();
-      foreach ($cssStyleValue as $css) {
-        $parts = explode(':', $css);
-        $expanded[$parts[0]] = $parts[1];
+      foreach ($style_value as $declaration) {
+        list($name, $value) = explode(':', $declaration);
+        $expanded[$name] = $value;
       }
     }
 
     return $expanded;
   }
+
 }

@@ -6,24 +6,26 @@ use AKlump\Data\DataInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\data_api\DataTrait;
 
+/**
+ * Abstract class to use for a custom module's "Core" class.
+ */
 abstract class CoreBase implements CoreInterface {
 
   use StringTranslationTrait;
   use DataTrait;
 
+  /**
+   * CoreBase constructor.
+   *
+   * @param \AKlump\Data\DataInterface $dataApiData
+   *   An instance of DataInterface.
+   */
   public function __construct(DataInterface $dataApiData) {
     $this->setDataApiData($dataApiData);
   }
 
   /**
-   * Return the render array for a block by id.
-   *
-   * This is used to insert block content into forms, or other renderables.
-   *
-   * @param int   $bid
-   * @param array $tvars
-   *
-   * @return array
+   * {@inheritdoc}
    */
   public function getBlockRenderable($bid, array $tvars = array()) {
     $g = data_api();
@@ -59,18 +61,7 @@ abstract class CoreBase implements CoreInterface {
   }
 
   /**
-   * Return the content of a block run through $this->t() with tvars.
-   *
-   * This is used to insert block content into forms, or other renderables.
-   *
-   * @param int   $bid
-   * @param array $tvars
-   * @param bool  $use_block_theme    Defaults to true.  Set to false and
-   *                                  only the content will be rendered, set
-   *                                  to true and the entire block will be,
-   *                                  with title and block markup.
-   *
-   * @return mixed|null|string
+   * {@inheritdoc}
    */
   public function getBlockTranslation($bid, array $tvars = array(), $use_block_theme = TRUE) {
     $build = $this->getBlockRenderable($bid, $tvars);
@@ -83,11 +74,7 @@ abstract class CoreBase implements CoreInterface {
   }
 
   /**
-   * Get a block's title as entered in the UI.
-   *
-   * @param mixed $bid
-   *
-   * @return mixed
+   * {@inheritdoc}
    */
   public function getBlockTitle($bid) {
     $g = $this->g;

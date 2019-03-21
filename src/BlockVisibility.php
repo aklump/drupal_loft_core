@@ -1,22 +1,21 @@
 <?php
 
 /**
- * Class BlockVisibility
- *
- * Advanced block visibility for Drupal.
+ * Advanced block visibility helper class.
  */
 class BlockVisibility {
 
-  public $default, $path;
+  public $default;
+
+  public $path;
 
   /**
    * BlockVisibility constructor.
    *
-   * @param bool $default Optional, to set the default visibility of the block.
-   * @param null $path    Optional, to inject the path for the current
-   *                      page/test.
-   * @param null $alias   Optional, to inject the alias for the current
-   *                      page/test.
+   * @param null $path
+   *   Optional, to inject the path for the current page/test.
+   * @param null $alias
+   *   Optional, to inject the alias for the current page/test.
    */
   public function __construct($path = NULL, $alias = NULL) {
     $this->default = NULL;
@@ -102,4 +101,5 @@ class BlockVisibility {
 
     return (bool) $result;
   }
+
 }
