@@ -58,10 +58,12 @@
     DRUPAL_ENV_DEV
     
 ## Available in JS as
-    
-    Drupal.settings.DrupalEnv
-    Drupal.settings.DrupalEnvRole
 
-    Drupal.settings.DrupalEnvProd
-    Drupal.settings.DrupalEnvStaging
-    Drupal.settings.DrupalEnvDev
+There must be at least on library using the dependeny of _core/drupalSettings_ for these to appear on the page.
+    
+    drupalSettings.env.env
+    drupalSettings.env.role
+
+    drupalSettings.env.prod
+    drupalSettings.env.staging
+    drupalSettings.env.dev

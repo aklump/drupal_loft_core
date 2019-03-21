@@ -157,7 +157,7 @@ function loft_core_form_hide_elements(array &$form, array $paths) {
 function loft_core_get_form_during_ajaxing($form_id) {
   $stash = $_POST;
   $_POST = array();
-  $form = drupal_get_form($form_id);
+  $form = \Drupal::formBuilder()->getForm($form_id);
   $_POST = $stash;
 
   return $form;
@@ -172,13 +172,17 @@ function loft_core_get_form_during_ajaxing($form_id) {
  * @see loft_core_mail_alter
  */
 function loft_core_form_user_admin_settings_alter(&$form, &$form_state, $form_id) {
-  $form['registration_cancellation']['loft_core_mail_registration_from'] = array(
+  // @FIXME
+// Could not extract the default value because it is either indeterminate, or
+// not scalar. You'll need to provide a default value in
+// config/install/loft_core.settings.yml and config/schema/loft_core.schema.yml.
+$form['registration_cancellation']['loft_core_mail_registration_from'] = array(
     '#weight' => -1,
-    '#type' => module_exists('emailfield') ? 'emailfield' : 'textfield',
+    '#type' => \Drupal::moduleHandler()->moduleExists('emailfield') ? 'emailfield' : 'textfield',
     '#title' => t('Send registration emails from'),
     '#description' => t('This value will override the site\'s <a href="!url">default <em>From</em> address</a> for registration emails only.', array(
-      '!url' => url('admin/config/system/site-information'),
+      '!url' => \Drupal\Core\Url::fromRoute('system.site_information_settings'),
     )),
-    '#default_value' => variable_get('loft_core_mail_registration_from', variable_get('site_mail')),
+    '#default_value' => \Drupal::config('loft_core.settings')->get('loft_core_mail_registration_from'),
   );
 }

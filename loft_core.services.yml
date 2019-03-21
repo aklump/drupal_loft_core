@@ -1,0 +1,5 @@
+services:
+  exit_subscriber:
+    class: Drupal\loft_core\EventSubscriber\ExitSubscriber
+    tags:
+      - name: event_subscriber

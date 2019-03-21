@@ -31,7 +31,7 @@ abstract class CoreBase implements CoreInterface {
     $g = data_api();
     $info = &drupal_static(__CLASS__ . '::' . __FUNCTION__, []);
     if (empty($info)) {
-      $info = module_invoke('block', 'block_info', $bid);
+      $info = \Drupal::moduleHandler()->invoke('block', 'block_info', [$bid]);
     }
     $block = [];
     if (!empty($info[$bid])) {
@@ -44,7 +44,7 @@ abstract class CoreBase implements CoreInterface {
           ) + $info[$bid]),
       );
       $block = _block_get_renderable_array(_block_render_blocks($list));
-      if (count(element_children($block)) > 0) {
+      if (count(\Drupal\Core\Render\Element::children($block)) > 0) {
         $block = reset($block);
       }
       // Keep the build array so we get the contextual links.
@@ -70,7 +70,7 @@ abstract class CoreBase implements CoreInterface {
       $build['#theme_wrappers'] = $build['#_theme_wrappers'];
     }
 
-    return drupal_render($build);
+    return \Drupal::service("renderer")->render($build);
   }
 
   /**

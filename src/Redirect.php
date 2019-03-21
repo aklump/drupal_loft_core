@@ -38,7 +38,7 @@ class Redirect {
    * @return array|null
    */
   public static function getNodeMenuObjectRedirect($op = 'view', $path = NULL) {
-    $path = empty($path) ? current_path() : $path;
+    $path = empty($path) ? \Drupal\Core\Url::fromRoute("<current>")->toString() : $path;
 
     if (strpos($path, 'node/') === 0) {
 
@@ -58,7 +58,7 @@ class Redirect {
       if (preg_match($regex, $path)
 
         // finally get the node.  Of course this approach will not work if the standard node view pages have changed, in which case such a custom module needs to do something else like this.
-        && ($node = menu_get_object('node', 1, $path))
+        && ($node = \Drupal::routeMatch()->getParameter('node', 1, $path))
       ) {
         return Redirect::getNodeRedirect($node, $op);
       }
@@ -134,7 +134,7 @@ class Redirect {
   }
 
   protected static function getImplementingModuleName($bundle, $op) {
-    $modules = module_implements(static::getHook($bundle, $op));
+    $modules = \Drupal::moduleHandler()->getImplementations(static::getHook($bundle, $op));
 
     // For performance, only the last module hook will be used.  If you need to, set the weight of your module high so it becomes the last.
     return end($modules);

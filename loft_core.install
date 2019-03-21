@@ -168,12 +168,12 @@ function loft_core_update__delete_content_and_entity_definition(array &$sandbox,
   if ($sandbox['#finished'] === 1) {
     if ($sandbox['total']) {
       $output[] = t('!entities of content have been deleted', [
-        '!entities' => format_plural($sandbox['total'], '1 piece', '@count pieces'),
+        '!entities' => \Drupal::translation()->formatPlural($sandbox['total'], '1 piece', '@count pieces'),
       ]);
     }
 
     // Delete bundle's fields.
-    field_attach_delete_bundle($entity_type, $bundle);
+    \Drupal::entityManager()->onBundleDelete($entity_type, $bundle);
 
     // Delete the entity type.
 
@@ -231,7 +231,7 @@ function loft_core_update__delete_content_and_entity_definition(array &$sandbox,
     db_delete('node_type')
       ->condition('type', $bundle)
       ->execute();
-    module_invoke_all('node_type_delete', $info);
+    \Drupal::moduleHandler()->invokeAll('node_type_delete', [$info]);
 
     // Clear the node type cache.
     node_type_cache_reset();
@@ -242,11 +242,13 @@ function loft_core_update__delete_content_and_entity_definition(array &$sandbox,
     menu_rebuild();
 
     if ($known_variables) {
-      if ($count = db_delete('variable')
-        ->condition('name', $known_variables, 'IN')
-        ->execute()) {
-        $output[] = format_plural($count, '1 variable deleted', '@count variables deleted.');
-      };
+      // @FIXME
+// if ($count = db_delete('variable')
+//         ->condition('name', $known_variables, 'IN')
+//         ->execute()) {
+//         $output[] = \Drupal::translation()->formatPlural($count, '1 variable deleted', '@count variables deleted.');
+//       }
+;
     }
 
 
@@ -288,7 +290,14 @@ function loft_core_update__delete_entity_fields($entity_type, $bundle, array $fi
 
     foreach ($field_names as $field_name) {
       $instance = field_info_instance($entity_type, $field_name, $bundle);
-      field_delete_instance($instance);
+      // @FIXME
+// Fields and field instances are now exportable configuration entities, and
+// the Field Info API has been removed.
+// 
+// 
+// @see https://www.drupal.org/node/2012896
+// field_delete_instance($instance);
+
     }
     field_purge_batch(500);
 
@@ -369,11 +378,13 @@ function loft_core_update__delete_bundle($node_type) {
   menu_rebuild();
 
   $output = [];
-  if ($count = db_delete('variable')
-    ->condition('name', $known_variables, 'IN')
-    ->execute()) {
-    $output[] = format_plural($count, '1 variable deleted', '@count variables deleted.');
-  };
+  // @FIXME
+// if ($count = db_delete('variable')
+//     ->condition('name', $known_variables, 'IN')
+//     ->execute()) {
+//     $output[] = \Drupal::translation()->formatPlural($count, '1 variable deleted', '@count variables deleted.');
+//   }
+;
 
   $output[] = t('Node type %node_type deleted.', ['%node_type' => $node_type]);
 

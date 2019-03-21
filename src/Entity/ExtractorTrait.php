@@ -259,7 +259,7 @@ trait ExtractorTrait {
       }
 
       return $item;
-    }, entity_load($metadata[$field_name]['target_type'], $entity_ids));
+    }, \Drupal::entityManager()->getStorage($metadata[$field_name]['target_type']));
   }
 
   /**

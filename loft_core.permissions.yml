@@ -1,0 +1,4 @@
+'access raw static content':
+  'restrict access': true
+  title: 'Access raw static content'
+  description: 'Allow user to access static content files directly.'

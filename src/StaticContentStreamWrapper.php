@@ -22,7 +22,7 @@ class StaticContentStreamWrapper extends DrupalLocalStreamWrapper {
   const URL_BASE = 'system/content';
 
   /**
-   * The default system path to static content files relative to DRUPAL_ROOT.
+   * The default system path to static content files relative to \Drupal::root().
    *
    * @var string
    */
@@ -32,7 +32,12 @@ class StaticContentStreamWrapper extends DrupalLocalStreamWrapper {
    * {@inheritdoc}
    */
   public function getDirectoryPath() {
-    return rtrim(variable_get('file_static_content_path', DRUPAL_ROOT . '/' . self::DEFAULT_PATH), '/') . '/';
+    // @FIXME
+// // @FIXME
+// // This looks like another module's variable. You'll need to rewrite this call
+// // to ensure that it uses the correct configuration object.
+// return rtrim(variable_get('file_static_content_path', \Drupal::root() . '/' . self::DEFAULT_PATH), '/') . '/';
+
   }
 
   /**
@@ -41,7 +46,10 @@ class StaticContentStreamWrapper extends DrupalLocalStreamWrapper {
   public function getExternalUrl() {
     $path = str_replace('\\', '/', $this->getTarget());
 
-    return url(self::URL_BASE . "/$path", array('absolute' => TRUE));
+    // @FIXME
+// url() expects a route name or an external URI.
+// return url(self::URL_BASE . "/$path", array('absolute' => TRUE));
+
   }
 
 }

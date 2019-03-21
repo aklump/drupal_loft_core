@@ -1,0 +1,7 @@
+core:
+  js:
+    loft_core.js: {}
+  dependencies:
+    - core/drupal
+    - core/drupalSettings
+    - core/jquery
