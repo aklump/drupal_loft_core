@@ -7,9 +7,9 @@
  * @{
  */
 
-use Drupal\loft_core\Attribute;
 use Drupal\loft_core\Redirect;
 use Drupal\loft_core\StaticContentStreamWrapper;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 // By default we will assume production environment.  To control or override this behavior see the documentation regarding these constants, e.g. settings.env.php, etc.
 if (!defined('DRUPAL_ENV')) {
@@ -31,7 +31,47 @@ if (!defined('DRUPAL_ENV_DEV')) {
 }
 
 require_once dirname(__FILE__) . '/includes/loft_core.forms.inc';
+require_once dirname(__FILE__) . '/includes/loft_core.ajax.inc';
+require_once dirname(__FILE__) . '/includes/loft_core.utilities.inc';
 
+/**
+ * Test if a feature is live.
+ *
+ * If $feature is not registered it defaults to live.
+ *
+ * @param string $feature The id of the feature as declared by
+ *                        HOOK_loft_core_features_switch().
+ *
+ * @return bool
+ */
+function is_live($feature) {
+  static $features = NULL;
+  if (is_null($features)) {
+    $features = \Drupal::moduleHandler()
+      ->invokeAll('loft_core_code_release_info');
+    $features[$feature]['is_live'] = isset($features[$feature]) ? $features[$feature]['is_live'] : TRUE;
+  }
+
+  return $features[$feature]['is_live'];
+}
+
+/**
+ * Provides a test css class when environment is not prod.
+ *
+ * @param string $class
+ *
+ * @return string
+ */
+function loft_core_test_class(string $class): string {
+  static $testing;
+  if ($testing || (defined('DRUPAL_ENV_ROLE') && strpos(DRUPAL_ENV_ROLE,
+        'prod') !== 0) || (!empty($_COOKIE['loft_core_testing']) && $_COOKIE['loft_core_testing'] === \Drupal::request()
+        ->getClientIp())) {
+    $testing = TRUE;
+
+    return 't-' . $class;
+  }
+}
 
 /**
  * Implements hook_page_attachments_alter().
@@ -47,6 +87,17 @@ function loft_core_page_attachments_alter(&$attachments) {
     'dev' => DRUPAL_ENV_DEV,
   ];
 }
+
+//
+// ANYTHING ABOVE HERE HAS BEEN PORTED TO D8.
+//
+//
+//
+//
+//
+//
+//
+//
 
 /**
  * Implements hook_preprocess_html().
@@ -117,18 +168,7 @@ EOD;
  * and linking systems, see
  *   https://api.drupal.org/api/drupal/core%21includes%21menu.inc/group/menu/8
  */
-
-
 function loft_core_menu() {
-  $items['loft-core/testing/enable/%'] = [
-    'type' => MENU_CALLBACK,
-    'title' => 'Enable test mode',
-    'page callback' => 'loft_core_test_mode',
-    'page arguments' => [TRUE],
-    'access callback' => 'loft_core_test_mode_access',
-    'access arguments' => [3],
-  ];
-
   $items[StaticContentStreamWrapper::URL_BASE] = [
     'type' => MENU_CALLBACK,
     'title' => 'Raw static content',
@@ -139,23 +179,6 @@ function loft_core_menu() {
   return $items;
 }
 
-/**
- * Determine if the user has access to test mode.
- *
- * @param string $token
- *   The public access token for test access.
- *
- * @return bool
- *   True if access should be granted.
- */
-function loft_core_test_mode_access($token) {
-  if (!($control = \Drupal::config('loft_core.settings')
-    ->get('loft_core_testing_key'))) {
-    throw new \RuntimeException("You must set a value for \$conf['loft_core_testing_key'] in your settings.php file.");
-  }
-
-  return $token === $control;
-}
 
 /**
  * Stream a static-content file.
@@ -174,30 +197,6 @@ function loft_core_static_content_stream($target) {
     drupal_not_found();
   }
   drupal_exit();
-}
-
-/**
- * Page callback to
- *
- * @param $state
- */
-function loft_core_test_mode($state) {
-  if ($state) {
-    $min = 15;
-    setrawcookie('loft_core_testing', \Drupal::request()
-      ->getClientIp(), REQUEST_TIME + $min * 60, '/');
-    $message = 'Test mode enabled for @minutes.';
-  }
-  else {
-    setrawcookie('loft_core_testing', '', REQUEST_TIME - 3600, '/');
-    $message = 'Test mode disabled.';
-  }
-  drupal_set_message(t($message, [
-    '@minutes' => \Drupal::translation()
-      ->formatPlural($min, '1 minute', '@count minutes'),
-  ]), 'status', FALSE);
-
-  drupal_goto();
 }
 
 /**
@@ -345,47 +344,6 @@ function loft_core_element_info() {
   return $types;
 }
 
-/**
- * Return the maximum weight in a render array,
- * top level only.
- *
- * @param $render_array
- *
- * @return int
- */
-function loft_core_max_weight($render_array) {
-  $max = 0;
-  array_walk($render_array,
-    function ($value) use (&$max) {
-      $max = max($max,
-        data_api()->get($value,
-          '#weight',
-          0));
-    });
-
-  return $max;
-}
-
-/**
- * Return the minimum weight in a render array,
- * top level only.
- *
- * @param $render_array
- *
- * @return int
- */
-function loft_core_min_weight($render_array) {
-  $min = 0;
-  array_walk($render_array,
-    function ($value) use (&$min) {
-      $min = min($min,
-        data_api()->get($value,
-          '#weight',
-          0));
-    });
-
-  return $min;
-}
 
 function loft_core_theme($existing, $type, $theme, $path) {
   return [
@@ -432,52 +390,6 @@ function theme_form_help($vars) {
   return '<blockquote' . $attributes . '>' . $element['#message'] . $element['#children'] . '</blockquote>';
 }
 
-/**
- * Callback for #post_render to add a cache-busting token to image derivatives.
- *
- * This example shows how to add a cache buster to a certain node image field
- * when the user is logged in to the website.
- *
- * @code
- *   function HOOK_node_view_alter(&$build)
- *   {
- *       if (!empty($build['product:field_image']) && user_is_logged_in()) {
- *           $build['product:field_image']['#post_render'][] =
- *           'loft_core_image_src_itok_cache_buster';
- *       }
- *   }
- * @endcode
- *
- * @param string $html Expecting to contain ?itok=123"
- * @param array $build Expecting to find:
- *                      - #object->changed
- *
- * @return string The modified html
- */
-function loft_core_image_src_itok_cache_buster($html, $build) {
-  $user = \Drupal::currentUser();
-  $buster = [
-    0 => \Drupal::config('loft_core.settings')
-      ->get('loft_core_cache_bust_token'),
-    1 => NULL,
-  ];
-  if ((!empty($build['#object']->changed))) {
-    $buster[1] = $build['#object']->changed;
-  }
-  elseif ((!empty($user->access))) {
-    $buster[1] = $user->access;
-  }
-  else {
-    $buster[1] = time();
-  }
-  $regex = '/' . preg_quote(IMAGE_DERIVATIVE_TOKEN) . '[^"]+/';
-  $html = preg_replace($regex,
-    '$0&' . implode('=',
-      $buster),
-    $html);
-
-  return $html;
-}
 
 /**
  * Invokes a hook on the default them if that implements it.
@@ -524,150 +436,6 @@ function loft_core_image_src_itok_cache_buster($html, $build) {
 //    return $return;
 //}
 
-/**
- * Test if a feature is live.
- *
- * If $feature is not registered it defaults to live.
- *
- * @param string $feature The id of the feature as declared by
- *                        HOOK_loft_core_features_switch().
- *
- * @return bool
- */
-function is_live($feature) {
-  static $features = NULL;
-  if (is_null($features)) {
-    $features = \Drupal::moduleHandler()
-      ->invokeAll('loft_core_code_release_info');
-    $features[$feature]['is_live'] = isset($features[$feature]) ? $features[$feature]['is_live'] : TRUE;
-  }
-
-  return $features[$feature]['is_live'];
-}
-
-
-/**
- * Provides a test css class when environment is not prod.
- *
- * @param string $class
- *
- * @return string
- */
-function loft_core_test_class($class) {
-  static $testing;
-  if ($testing || (defined('DRUPAL_ENV_ROLE') && strpos(DRUPAL_ENV_ROLE,
-        'prod') !== 0) || (!empty($_COOKIE['loft_core_testing']) && $_COOKIE['loft_core_testing'] === \Drupal::request()
-        ->getClientIp())) {
-    $testing = TRUE;
-
-    return 't-' . $class;
-  }
-}
-
-/**
- * Send an ajax command to fire off trackjs.console.
- *
- * @param $severity One of 'log',
- *                  'debug',
- *                  'info',
- *                  'warn',
- *                  'error'
- * @param $message
- *
- * @return array
- *
- * @see  Drupal.ajax.prototype.commands.loftCoreTrackJsConsole().
- * @link http://docs.trackjs.com/tracker/top-level-api#trackjsconsole
- *
- * @throws InvalidArgumentException if $severity is not valid.
- */
-function loft_core_ajax_command_trackjs_console($severity,
-                                                $message
-) {
-  $valid = ['log', 'debug', 'info', 'warn', 'error'];
-  if (!in_array($severity, $valid)
-  ) {
-    throw new \InvalidArgumentException("$severity must be one of: " . implode(',',
-        $valid));
-  }
-
-  return [
-    'command' => 'loftCoreTrackJsConsole',
-    'data' => [
-      'severity' => $severity,
-      'message' => $message,
-    ],
-  ];
-}
-
-
-function loft_core_ajax_command_bbq_push_state($hash_string) {
-  return [
-    'command' => 'loftCoreAjaxBbqPushState',
-    'data' => [
-      'hash' => '#' . ltrim($hash_string, '#'),
-    ],
-  ];
-}
-
-/**
- * @param string $selector jQuery selector of the element to replace
- * @param string $content
- * @param int $duration Milliseconds for the fade to last.
- * @param int $delay Milliseconds before fade out commences.
- * @param string $css_prefix A means to custom or remove the css class prefix
- *                           on the fade classes.
- *
- * @return array
- */
-function loft_core_ajax_command_html_and_fade($selector, $content, $duration = 800, $delay = 2200, $css_prefix = 'lc-') {
-  return [
-    'command' => 'loftCoreAjaxHtmlAndFade',
-    'data' => [
-      'selector' => $selector,
-      'content' => $content,
-      'duration' => $duration,
-      'delay' => $delay,
-      'cssPrefix' => $css_prefix,
-    ],
-  ];
-}
-
-/**
- * Add the data-data-time value to an Attributes instance.
- *
- * @param \Drupal\loft_core\Attribute $attributes
- *   The attributes instance.
- */
-function loft_core_add_data_refresh(Attribute $attributes) {
-  static $microtime = NULL;
-  if (is_null($microtime)) {
-    $microtime = microtime(TRUE);
-  }
-  $attributes->setAttribute('data-data-time', $microtime);
-}
-
-/**
- * Update the data-data-time attribute of an element.
- *
- * @param string $selector
- *   The CSS selector of the element with data-data-time.
- *
- * @return array
- */
-function loft_core_ajax_command_update_data_refresh($selector) {
-  static $microtime = NULL;
-  if (is_null($microtime)) {
-    $microtime = microtime(TRUE);
-  }
-
-  return [
-    'command' => 'update_data_refresh',
-    'selector' => $selector,
-    'value' => $microtime,
-
-  ];
-}
 
 /**
  * Adds commands echoing all drupal messages to trackjs
@@ -710,71 +478,6 @@ function loft_core_trackjs_echo_drupal_messages(array &$commands, array $severit
   }
 }
 
-/**
- * Return a function to use for SMACSS classes
- *
- * @code
- * $cl = loft_core_cl('my-base');
- * $class = $cl('title');
- *
- * $class === 'my-base__title';
- * @endcode
- *
- * @param string $base The BEM module name
- * @param bool $pass_through Set this to true and $base will not be filtered
- *   for invalid chars.  Set it to false and spaces and underscores will be
- *   converted to hyphens.
- *
- * @return callable
- *
- * @deprecated Use loft_core_bem() instead.
- */
-function loft_core_cl($base, $pass_through = FALSE) {
-  if (!$pass_through) {
-    $base = preg_replace('/[_ ]/', '-', $base);
-  }
-
-  return function ($name = '', $isComponent = TRUE) use ($base) {
-    $names = is_array($name) ? $name : [$name];
-    $glue = $isComponent ? '_' : '-';
-    $classes = [];
-    foreach ($names as $name) {
-      $classes[] = $base . ($name ? str_repeat($glue, 2) . $name : '');
-    }
-
-    return implode(' ', $classes);
-  };
-}
-
-/**
- * Return callbacks to use for generating BEM element and modifier classes.
- *
- * @param string $block
- *   The block name.
- *
- * @return array
- *   - 0 Callback taking element and returning the full BEM element class.
- *   - 1 Callback taking modifier and returning the full BEM modifier class.
- * @code
- *   list($bem, $bem_mod) = loft_core_bem('resource-hero');
- * @endcode
- */
-function loft_core_bem($block) {
-
-  // Single underscores should not exist in a block name.
-  if (preg_match('/[^_]_[^_]/', $block)) {
-    throw new \InvalidArgumentException("This BEM block name contains invalid characters: \"$block\".");
-  }
-
-  return [
-    function ($element = '') use ($block) {
-      return $element ? $block . '__' . $element : $block;
-    },
-    function ($modifier = '') use ($block) {
-      return $modifier ? $block . '--' . $modifier : $block;
-    },
-  ];
-}
 
 /**
  * Stash or unstash a user.
@@ -865,36 +568,6 @@ function loft_core_mail_alter(&$message) {
   }
 }
 
-
-/**
- * Return a build array for a div, optionally wrapping another build array.
- *
- * @param string|array $class One or more classes to add to the div.
- * @param array $element Optional, the build array which you will wrap
- *                              with the div.
- *
- * @return array The wrapped element.
- * The wrapped element.
- */
-function div($class, $element = NULL) {
-  $attr = '';
-  if ($class) {
-    $class = is_array($class) ? $class : [$class];
-    $attr = drupal_attributes(['class' => $class]);
-  }
-
-  $div = [
-    '#prefix' => '<div' . $attr . '>',
-    '#suffix' => "</div>",
-    0 => $element,
-  ];
-  if ($element) {
-    $div[0] = $element;
-  }
-
-  return $div;
-}
-
 /**
  * Implements hook_preprocess_status_report().
  */
@@ -938,51 +611,6 @@ function loft_core_preprocess_status_report(&$vars) {
   }
 }
 
-/**
- * Returns a relative path from an absolute path that points to this site.
- *
- * For www.mysite.com if $path = 'http://www.mysite.com/node/21', '/node/21'
- * will be returned.  See the variable
- * 'loft_core_smart_url' for how we determine what paths are part of the site.
- *
- * @param string $path
- * @param array $options These are the same as for url().  You might want to
- *   use alias = true.
- *
- * @return bool|false|int|string
- *
- * You may want to add something like this to your website
- * @code
- *  $conf['loft_core_smart_url'] = '/globalonenessproject.(?:org|loft)$/i';
- * @endcode
- */
-function loft_core_smart_url($path, array $options = []) {
-  $parts = parse_url($path);
-  if (!empty($parts['host'])) {
-
-    // Determine the match regex.
-    // @FIXME
-    // url() expects a route name or an external URI.
-    // $regex = '/' . preg_quote(parse_url(url('/', ['absolute' => TRUE]), PHP_URL_HOST)) . '$/i';
-
-    // @FIXME
-    // Could not extract the default value because it is either indeterminate, or
-    // not scalar. You'll need to provide a default value in
-    // config/install/loft_core.settings.yml and config/schema/loft_core.schema.yml.
-    $regex = \Drupal::config('loft_core.settings')->get('loft_core_smart_url');
-
-    if (preg_match($regex, $parts['host'])) {
-      // This url points to something at this website.
-      $path = drupal_get_normal_path(trim($parts['path'], '/'));
-      // @FIXME
-      // url() expects a route name or an external URI.
-      // $path = url($path, $options);
-
-    }
-  }
-
-  return $path;
-}
 
 /**
  * Load (shadow) entities.
@@ -1014,197 +642,9 @@ function loft_core_shadow_entity_load($entity_type, array $entity_ids) {
 }
 
 /**
- * Remove all null values from an array.
- *
- * @param $array
- *
- * @return array
- */
-function null_filter($array) {
-  return array_filter($array, function ($item) {
-    return !is_null($item);
-  });
-}
-
-/**
- * Make a css safe class or id
- *
- * @param      string or array $input
- *                    The string will be made css safe; array values will be
- *                    made css safe
- * @param bool $flatten
- *                    Optional.  Set to TRUE to flatten arrays into space
- *                    separated strings
- *
- * @return string or array
- */
-function loft_core_css_safe($input, $flatten = FALSE) {
-  if (is_array($input)) {
-    $function = __FUNCTION__;
-    foreach ($input as $key => $value) {
-      $input[$key] = $this->$function($value);
-    }
-
-    return $flatten ? trim(implode(' ', $input)) : $input;
-  }
-  elseif ($input == ($strung = strval($input))) {
-    $input = trim(strtolower(preg_replace('/[\W_]{1}/', '-', $strung)), '-');
-    if (preg_match('/^(\d)(.*)/', $input, $found)) {
-      $word = [
-        'zero',
-        'one',
-        'two',
-        'three',
-        'four',
-        'five',
-        'six',
-        'seven',
-        'eight',
-        'nine',
-      ];
-      $input = $word[$found[1]] . $found[2];
-    }
-  }
-
-  return $input;
-}
-
-/**
- * Builds a list of all token-like patterns that appear in the text.
- *
- * @param $text
- *   The text to be scanned for possible tokens.
- *
- * @return
- *   An associative array of discovered tokens, grouped by type.
- */
-function loft_core_twiglike_token_scan($text) {
-  // Matches tokens with the following pattern: [$type:$name]
-  // $type and $name may not contain  [ ] characters.
-  // $type may not contain : or whitespace characters, but $name may.
-  preg_match_all('/
-    \{\{\s*([^.]*?)(?:\.(.*?))?\s*\}\}
-    /x', $text, $matches);
-
-  $types = $matches[1];
-  $tokens = $matches[2];
-
-  // Iterate through the matches, building an associative array containing
-  // $tokens grouped by $types, pointing to the version of the token found in
-  // the source text. For example, $results['node']['title'] = '[node:title]';
-  $results = [];
-  for ($i = 0; $i < count($tokens); $i++) {
-    //    if (empty($matches[2][$i])) {
-    //      $results['tokens'][$types[$i]] = $drupal = '[' . $matches[1][$i] . ']';
-    //    }
-    //    else {
-    $results['tokens'][$types[$i]][$tokens[$i]] = $drupal = '[' . $matches[1][$i] . ':' . $matches[2][$i] . ']';
-    //    }
-    $results['map'][$drupal] = $matches[0][$i];
-  }
-
-  return $results;
-}
-
-
-/**
- * This function replaces twig-like tokens with values in $data
- *
- * Tokens must be {{ TYPE.KEY }} format.
- *
- * This is not for use with the token module.
- *
- * @see loft_core_twiglike_token_replace for Token module usage.
- *
- * @param string $text Should contain something like {{ sender.name }}
- * @param array $data Should be like ['sender'=>['name'=>'Paul']]
- *
- * @return string
- */
-function loft_core_twiglike_replace($text, array $data = []) {
-  $g = data_api();
-  $token_data = loft_core_twiglike_token_scan($text);
-  foreach ($token_data['tokens'] as $type => $items) {
-    foreach ($items as $key => $drupal) {
-      if ($replace = $g->get($data, [$type, $key], '')) {
-        $text = str_replace($token_data['map'][$drupal], $replace, $text);
-      }
-    }
-  }
-
-  return $text;
-}
-
-/**
- * Replace twig like tokens in a chunk of text.
- *
- * Only use this if your tokens are generated by hook_tokens().
- *
- * @param string $text
- * @param array $data
- * @param array $options
- *
- * @return mixed
- *
- * @see token_replace().
- */
-function loft_core_twiglike_token_replace($text, array $data = [], array $options = []) {
-  list($tokens, $values) = loft_core_twiglike_tokens_get($text, $data, $options);
-
-  return $tokens ? str_replace($tokens, $values, $text) : $text;
-}
-
-/**
- * Get the tokens and values for a chunk of text.
- *
- * @param string $text
- * @param array $data
- * @param array $options
- *
- * @return array
- *
- * @code
- *   list($tokens, $values) = loft_core_twiglike_token_get(...
- * @endcode
- */
-function loft_core_twiglike_tokens_get($text, array $data = [], array $options = []) {
-  $token_data = loft_core_twiglike_token_scan($text);
-  if (empty($token_data)) {
-    return [[], []];
-  }
-  $text_tokens = $token_data['tokens'];
-
-  $replacements = [];
-  foreach ($text_tokens as $type => $tokens) {
-    $replacements += \Drupal::token()
-      ->generate($type, $tokens, $data, $options);
-    if (!empty($options['clear'])) {
-      $replacements += array_fill_keys($tokens, '');
-    }
-  }
-
-  // Optionally alter the list of replacement values.
-  if (!empty($options['callback']) && function_exists($options['callback'])) {
-    $function = $options['callback'];
-    $function($replacements, $data, $options);
-  }
-
-  $tokens = [];
-  foreach ($replacements as $find => $replace) {
-    $tokens[$token_data['map'][$find]] = $replace;
-  }
-  $values = array_map(function ($item) {
-    return strval($item);
-  }, array_values($tokens));
-  $tokens = array_keys($tokens);
-
-  return [$tokens, $values];
-
-}
-
-
-/**
  * Implements hook_twiggy_twig_alter().
+ *
+ * @todo make this work with core twig
  */
 function loft_core_twiggy_twig_alter($twig) {
   $twig->addFunction(new \Twig_SimpleFunction('splitBy', [
@@ -1214,38 +654,6 @@ function loft_core_twiggy_twig_alter($twig) {
   $twig->addFunction(new \Twig_SimpleFunction('loft_core_test_class', 'loft_core_test_class'));
 }
 
-/**
- * Return an array of taxony items filtered to unique.
- *
- * @param array $items
- *
- * @return array
- */
-function loft_core_taxonomy_unique(array $items) {
-  $index = [];
-
-  return array_filter($items, function ($item) use (&$index) {
-    $item = (array) $item;
-    $allow = !in_array($item['tid'], $index);
-    $index[] = $item['tid'];
-
-    return $allow;
-  });
-}
-
-/**
- * Return $element with all children keys turned into property keys (prepend
- * '#')
- *
- * @param $element
- *
- * @return array
- */
-function loft_core_element_children_to_properties($element) {
-  return array_combine(array_map(function ($item) {
-    return '#' . $item;
-  }, array_keys($element)), array_values($element));
-}
 
 /**
  * Implements hook_stream_wrappers().

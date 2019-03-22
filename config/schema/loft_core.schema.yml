@@ -4,11 +4,13 @@ loft_core.settings:
   mapping:
     loft_core_trackjs_token:
       type: 'NULL'
-    loft_core_testing_key:
+    test_mode_url_token:
       type: 'NULL'
     loft_core_node_redirects:
       type: boolean
     loft_core_cache_bust_token:
       type: string
     loft_core_mail_registration_from:
+      type: string
+    smart_url_regex:
       type: string
