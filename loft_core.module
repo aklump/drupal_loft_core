@@ -9,7 +9,6 @@
 
 use Drupal\loft_core\Redirect;
 use Drupal\loft_core\StaticContentStreamWrapper;
-use Symfony\Component\HttpFoundation\JsonResponse;
 
 // By default we will assume production environment.  To control or override this behavior see the documentation regarding these constants, e.g. settings.env.php, etc.
 if (!defined('DRUPAL_ENV')) {

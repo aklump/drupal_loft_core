@@ -9,7 +9,7 @@
 
 <body class="page--smart_url">
 <header>
-  <div class="pager"><a href="remember_users.html" class="prev remember_users">&laquo;Remember Usernames in Login Form</a><a href="index.html" class="index pager__book-title">Loft Drupal Core</a><a href="static_content.html" class="next static_content">Stream wrapper &quot;static-content://&quot;&raquo;</a></div></header>
+  <div class="pager"><a href="ROADMAP.html" class="prev ROADMAP">&laquo;Roadmap and Todo List</a><a href="index.html" class="index pager__book-title">Loft Drupal Core</a><a href="static_content.html" class="next static_content">Stream wrapper &quot;static-content://&quot;&raquo;</a></div></header>
 <section class="sub-header">
   <div class="breadcrumbs"><a href="index.html">Index</a>
          &raquo
@@ -25,6 +25,12 @@
 
 <section>
 
+<ul>
+<li><p>User enters: <code>http://www.mysite.com/some-cool-aliased-title</code></p></li>
+<li><p>You want: <code>/node/123</code></p></li>
+<li><p>Use <code>loft_core_smart_url</code></p></li>
+</ul>
+
 <p>Imagine an admin entering a link to the site.  As developer want the unaliased relative path, as the admin, they copy and past the absolute aliased path.  It's a pain to explain to theme that they have to convert it to the way you want it, so you give up.  But that's where <code>loft_core_smart_url()</code> comes in.  Hand it the url they entered, and it will give you the url you want.</p>
 
 <p>Add this to a presave hook after collection an url in a node form.</p>
@@ -32,6 +38,13 @@
 <p>Add this to a filter that can then convert the bad urls to good urls.</p>
 
 <p>Rock.</p>
+
+<h2>Configuration</h2>
+
+<p>This should work out of the box, but to fine tune it add something like the following to <em>settings.php</em>.</p>
+
+<pre><code>$config['loft_core.settings']['smart_url_regex'] = '/mysite.(?:org|loft)$/i';
+</code></pre>
 </section>
 
 <div class="search__results">
@@ -39,9 +52,9 @@
 </div>
 
 <footer>
-  <div class="pager"><a href="remember_users.html" class="prev remember_users">&laquo;Remember Usernames in Login Form</a><a href="index.html" class="index pager__book-title">Loft Drupal Core</a><a href="static_content.html" class="next static_content">Stream wrapper &quot;static-content://&quot;&raquo;</a></div>  
+  <div class="pager"><a href="ROADMAP.html" class="prev ROADMAP">&laquo;Roadmap and Todo List</a><a href="index.html" class="index pager__book-title">Loft Drupal Core</a><a href="static_content.html" class="next static_content">Stream wrapper &quot;static-content://&quot;&raquo;</a></div>  
   <div id="footer-legaleeze">
-    <p class="legaleeze center">Version: 7.x-1.0 &bull; Last Updated: Thu, 21 Mar 2019 15:38:44 -0700</p>
+    <p class="legaleeze center">Version: 1.0 &bull; Last Updated: Thu, 21 Mar 2019 18:08:22 -0700</p>
   </div>
 </footer>
 

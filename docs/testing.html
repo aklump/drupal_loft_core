@@ -33,15 +33,15 @@
 
 <p>In order to test against a production environment you need to enable test mode using an endpoint.  You must set up the endpoint with an access key in your settings.php like this:</p>
 
-<pre><code>$conf['loft_core_testing_key'] = '{some obscure public key that will appear in your url}';
+<pre><code>$config['loft_core.settings']['test_mode_url_token'] = '{some obscure public key that will appear in your url}';
 </code></pre>
 
 <p>When you visit the url endpoint, include the testing key like so:</p>
 
-<pre><code>/loft-core/testing/enable/{testing key}
+<pre><code>/loft-core/testing/enable/{test_mode_url_token}
 </code></pre>
 
-<p>This will enable the test mode for a short duration and cause test classes to appear on production, for your IP only.</p>
+<p>This will enable the test mode for a short duration and cause test classes to appear on production, for your IP only.  The response is JSON and contains the expiry timestamp.</p>
 </section>
 
 <div class="search__results">
@@ -51,7 +51,7 @@
 <footer>
   <div class="pager"><a href="static_content.html" class="prev static_content">&laquo;Stream wrapper &quot;static-content://&quot;</a><a href="index.html" class="index pager__book-title">Loft Drupal Core</a><a href="entities.html" class="next entities">Working With Entities Cheat Sheet&raquo;</a></div>  
   <div id="footer-legaleeze">
-    <p class="legaleeze center">Version: 7.x-1.0 &bull; Last Updated: Thu, 21 Mar 2019 15:38:44 -0700</p>
+    <p class="legaleeze center">Version: 1.0 &bull; Last Updated: Thu, 21 Mar 2019 18:08:22 -0700</p>
   </div>
 </footer>
 
