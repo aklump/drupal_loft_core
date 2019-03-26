@@ -1013,13 +1013,13 @@ function loft_core_css_safe($input, $flatten = FALSE) {
   if (is_array($input)) {
     $function = __FUNCTION__;
     foreach ($input as $key => $value) {
-      $input[$key] = $this->$function($value);
+      $input[$key] = $function($value);
     }
 
     return $flatten ? trim(implode(' ', $input)) : $input;
   }
-  elseif ($input == ($strung = strval($input))) {
-    $input = trim(strtolower(preg_replace('/[\W_]{1}/', '-', $strung)), '-');
+  elseif ($input == ($string = strval($input))) {
+    $input = trim(strtolower(preg_replace('/[\W_]{1}/', '-', $string)), '-');
     if (preg_match('/^(\d)(.*)/', $input, $found)) {
       $word = array(
         'zero',
@@ -1044,7 +1044,8 @@ function loft_core_css_safe($input, $flatten = FALSE) {
  * Builds a list of all token-like patterns that appear in the text.
  *
  * @param $text
- *   The text to be scanned for possible tokens.
+ *   The text to be scanned for possible tokens.  We are expecting tokens that
+ *   look like this: "{{ type:name }}" and {{ type:name:sub:thing }}.
  *
  * @return
  *   An associative array of discovered tokens, grouped by type.
@@ -1062,15 +1063,11 @@ function loft_core_twiglike_token_scan($text) {
 
   // Iterate through the matches, building an associative array containing
   // $tokens grouped by $types, pointing to the version of the token found in
-  // the source text. For example, $results['node']['title'] = '[node:title]';
+  // the source text. For example, $results['node']['title'] = '[node:title]'.
   $results = array();
   for ($i = 0; $i < count($tokens); $i++) {
-    //    if (empty($matches[2][$i])) {
-    //      $results['tokens'][$types[$i]] = $drupal = '[' . $matches[1][$i] . ']';
-    //    }
-    //    else {
-    $results['tokens'][$types[$i]][$tokens[$i]] = $drupal = '[' . $matches[1][$i] . ':' . $matches[2][$i] . ']';
-    //    }
+    $drupal = $drupal = '[' . trim($matches[1][$i] . ':' . $matches[2][$i], ':') . ']';
+    $results['tokens'][$types[$i]][$tokens[$i]] = $drupal;
     $results['map'][$drupal] = $matches[0][$i];
   }
 
