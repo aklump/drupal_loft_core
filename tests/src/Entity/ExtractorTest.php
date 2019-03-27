@@ -4,7 +4,7 @@ namespace Drupal\loft_core;
 
 use AKlump\LoftLib\Testing\PhpUnitTestCase;
 use Drupal\d8now\Drupal7Mock;
-use Drupal\d8now\Entity\HasEntityTrait;
+use Drupal\loft_core\Entity\HasEntityTrait;
 use Drupal\d8now\Mock;
 use Drupal\data_api\Data as Data;
 use Drupal\data_api\DataMock;

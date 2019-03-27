@@ -308,7 +308,7 @@ function loft_core_image_src_itok_cache_buster($html, $build) {
  * @return array The wrapped element.
  * The wrapped element.
  */
-function div(string $class, array $element = []): array {
+function div($class, array $element = []): array {
   $attributes = new Attribute(['class' => $class]);
   $div = [
     '#prefix' => '<div' . $attributes . '>',
@@ -329,7 +329,7 @@ function div(string $class, array $element = []): array {
  */
 function loft_core_element_children_to_properties($element) {
   return array_combine(array_map(function ($item) {
-    return '#' . $item;
+    return '#' . ltrim($item, '#');
   }, array_keys($element)), array_values($element));
 }
 

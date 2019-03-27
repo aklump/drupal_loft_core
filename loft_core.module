@@ -73,12 +73,10 @@ function loft_core_test_class(string $class): string {
 }
 
 /**
- * Implements hook_page_attachments_alter().
- *
- * Add our the environment constants.
+ * Implements hook_js_settings_build().
  */
-function loft_core_page_attachments_alter(&$attachments) {
-  $attachments['#attached']['drupalSettings']['env'] = [
+function loft_core_js_settings_build(array &$settings, \Drupal\Core\Asset\AttachedAssetsInterface $assets) {
+  $settings['env'] = [
     'env' => DRUPAL_ENV,
     'role' => DRUPAL_ENV_ROLE,
     'prod' => DRUPAL_ENV_PROD,

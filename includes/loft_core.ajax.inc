@@ -5,6 +5,8 @@
  * Add in AJAX helpers.
  */
 
+use Drupal\Core\Template\Attribute;
+
 /**
  * Send an ajax command to fire off trackjs.console.
  *
