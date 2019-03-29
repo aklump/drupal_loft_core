@@ -13,15 +13,12 @@
         "sunra/php-simple-html-dom-parser": "^1.5",
         "aklump/loft-lib": "~1.0.18"
     },
-    "autoload": {
-        "psr-4": {
-            "": "src",
-            "Drupal\\loft_core\\": "src/Drupal/loft_core"
-        }
-    },
     "autoload-dev": {
         "psr-4": {
-            "Drupal\\loft_core\\": "tests/src/Drupal/loft_core"
+            "Drupal\\loft_core\\": [
+                "src/",
+                "tests/src/"
+            ]
         }
     }
 }
