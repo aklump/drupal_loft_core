@@ -3,3 +3,7 @@ services:
     class: Drupal\loft_core\EventSubscriber\ExitSubscriber
     tags:
       - name: event_subscriber
+  loft_core.twig.extension:
+    class: Drupal\loft_core\Template\TwigExtension
+    tags:
+      - { name: twig.extension }

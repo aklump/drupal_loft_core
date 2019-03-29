@@ -639,20 +639,6 @@ function loft_core_shadow_entity_load($entity_type, array $entity_ids) {
 }
 
 /**
- * Implements hook_twiggy_twig_alter().
- *
- * @todo make this work with core twig
- */
-function loft_core_twiggy_twig_alter($twig) {
-  $twig->addFunction(new \Twig_SimpleFunction('splitBy', [
-    '\AKlump\LoftLib\Code\Strings',
-    'splitBy',
-  ]));
-  $twig->addFunction(new \Twig_SimpleFunction('loft_core_test_class', 'loft_core_test_class'));
-}
-
-
-/**
  * Implements hook_stream_wrappers().
  */
 function loft_core_stream_wrappers() {
