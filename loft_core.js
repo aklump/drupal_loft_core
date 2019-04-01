@@ -125,7 +125,7 @@ var trackJS = trackJS || null;
       }
 
       // Write the ajax error to the console.
-      if (Drupal.settings.DRUPAL_ENV_ROLE !== 'prod') {
+      if (drupalSettings.DRUPAL_ENV_ROLE !== 'prod') {
         console.log(message);
       }
     }
