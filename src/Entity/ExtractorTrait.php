@@ -2,6 +2,8 @@
 
 namespace Drupal\loft_core\Entity;
 
+use Drupal\field\Entity\FieldStorageConfig;
+
 /**
  * A trait for obtaining entity data using convenient/safe methods.
  *
@@ -122,7 +124,7 @@ trait ExtractorTrait {
       return $items[$delta];
     }
 
-    return isset($items[$delta][$column]) ? $items[$delta][$column] : $default;
+    return $items[$delta][$column] ?? $default;
   }
 
   /**
@@ -165,17 +167,15 @@ trait ExtractorTrait {
    */
   public function items($field_name, array $default = []) {
     $entity = $this->getEntity();
+    $items = $default;
     if (isset($entity->{$field_name})) {
-      $lang = isset($entity->language) ? $entity->language : 'und';
-      if (isset($entity->{$field_name}[$lang])) {
-        return $entity->{$field_name}[$lang];
-      }
-      elseif (isset($entity->{$field_name}['und'])) {
-        return $entity->{$field_name}['und'];
+      $items = [];
+      foreach ($entity->get($field_name) as $item) {
+        $items[] = $item->getValue();
       }
     }
 
-    return $default;
+    return $items;
   }
 
   /**
@@ -259,7 +259,8 @@ trait ExtractorTrait {
       }
 
       return $item;
-    }, \Drupal::entityManager()->getStorage($metadata[$field_name]['target_type']));
+    }, \Drupal::entityManager()
+      ->getStorage($metadata[$field_name]['target_type']));
   }
 
   /**
@@ -320,13 +321,13 @@ trait ExtractorTrait {
   /**
    * Ensure that $this->entity is not a shadow entity.
    *
-   * @see loft_core_shadow_entity_load()
-   *
    * @return array
    *   - entity_type
    *   - entity
    *   - bundle_type
    *   - entity_id
+   * @see loft_core_shadow_entity_load()
+   *
    */
   protected function ensureEntityIsLoaded() {
     list($entity_type, $entity, $bundle, $entity_id) = $this->validateEntity();
@@ -363,8 +364,13 @@ trait ExtractorTrait {
       }
       $field_name = array_shift($args);
       $delta = $column = NULL;
-      $info = (array) $this->d7->field_info_field($field_name);
-      $is_field = !empty($info);
+      try {
+        FieldStorageConfig::loadByName($this->getEntityTypeId(), $field_name);
+        $is_field = TRUE;
+      }
+      catch (\Exception $exception) {
+        $is_field = FALSE;
+      }
       if (!$is_field && $num_args > 1) {
         throw new \InvalidArgumentException("Non-field with field name = \"$field_name\" does not have \$delta or \$column values.");
       }

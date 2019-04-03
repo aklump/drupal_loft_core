@@ -88,7 +88,8 @@ trait HasEntityTrait {
     if (!($entityTypeId = $this->getEntityTypeId())) {
       throw new \RuntimeException("Missing entity type.");
     }
-    list($entityId, , $bundleType) = $this->d7->entity_extract_ids($entityTypeId, $entity);
+    $entityId = $entity->id();
+    $bundleType = $entity->getType();
     if ($validateBundleType && $bundleType !== $validateBundleType) {
       throw new \RuntimeException("Entity type must be $validateBundleType");
     }
