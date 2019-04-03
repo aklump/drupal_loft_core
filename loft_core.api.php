@@ -1,30 +1,54 @@
 <?php
 
 /**
+ * @file
+ * Defines the API interfaces for loft_core module.
+ */
+
+use Drupal\Core\Url;
+
+/**
  * Implements HOOK_loft_core_redirect_node_BUNDLE_TYPE()_view.
  *
- * This hook allows your module to register redirects based on node bundles.
- * This hook is fired when the menu caches are cleared as part of
- * HOOK_menu_alter.  So be sure to clear you menu cache after making changes.
+ * This hook allows you to easily alter what happens when a user visits the
+ * canonical path of a given node bundle.
  *
- * @param object $node The node object in question.
+ * @param object $node
+ *   The node object being looked at.
  *
- * @return string|array|int   The return value should be the arguments for
- *                            drupal_goto.  If you do not need the $options
- *                            array, you may simply return a string, which is
- *                            the path. Unless you specify a redirect code, 301
- *                            will be used.  TAKE NOTE THIS IS NOT THE DEFAULT
- *                            FOR drupal_goto.  You may also return
- *                            MENU_ACCESS_DENIED or MENU_NOT_FOUND if you wish
- *                            and the appropriate action will be taken.
- *                            Finally, if you return FALSE, no redirect will
- *                            take place.
+ * @return string|array|int|\Drupal\Core\Url
+ *   - A string response should begin with /,#,? and will be run through
+ *   Url::fromUserInput(), then redirected.
+ *   - An instance of Drupal\Core\Url is taken as a redirect.
+ *   - To indicate a redirect code other than 301, return an array where:
+ *     - The first value is one of the above
+ *     - The second value is an integer with the response code.
+ *   - Throw exceptions for 403 and 404.
+ *   - Return an empty value the default core action will occur, e.g., no
+ *   redirection will take place.
+ *
+ * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+ *   To return a 404 page to the user.
+ * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+ *   To return a 403 page to the user.
  */
 function HOOK_loft_core_redirect_node_BUNDLE_TYPE_view($node) {
-  return array(
-    'node/' . BLOG_PAGE_NID,
-    array('fragment' => 'm[]=modal,blog_entry__' . $node->nid),
-  );
+
+  return '<front>';
+
+  return '/node/' . BLOG_PAGE_NID . '#m[]=modal,blog_entry__' . $node->nid;
+
+  return '/node/4384';
+
+  return ['/node/4384', 302];
+
+  return Url::fromUri('entity:node/4384');
+
+  return [Url::fromUri('entity:node/4384'), 302];
+
+  throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException();
+
+  throw new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException();
 }
 
 /**
@@ -33,7 +57,9 @@ function HOOK_loft_core_redirect_node_BUNDLE_TYPE_view($node) {
 function HOOK_loft_core_redirect_node_BUNDLE_TYPE_edit($node) {
   // Only allow admins to edit, otherwise deny access.  This overrides the
   // normal access check of node_access('update'...
-  return user_is_admin() ? FALSE : MENU_ACCESS_DENIED;
+  if (!user_is_admin) {
+    throw new AccessDeniedHttpException();
+  }
 }
 
 /**
@@ -112,11 +138,11 @@ function hook_loft_core_code_release_info() {
  * @link http://docs.trackjs.com/tracker/configuration
  * @link http://docs.trackjs.com/tracker/top-level-api
  */
-function HOOK_loft_core_trackjs_alter(&$config) {
+function HOOK_loft_core_trackjs_alter(array &$config) {
   // Set the application.
   $config['config']['application'] = 'my_first_app';
 
-  // Add some metadata
+  // Add some metadata.
   $config['metadata']['do'] = 're';
 }
 

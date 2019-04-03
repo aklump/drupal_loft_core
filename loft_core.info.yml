@@ -8,4 +8,5 @@ homepage: 'http://www.intheloftstudios.com/packages/drupal/drupal_loft_core'
 author: aklump
 dependencies:
   data_api: 'drupal:data_api'
+  rabbit_hole: 'drupal:rabbbit_hole'
 type: module

@@ -1,10 +1,10 @@
 # Redirects
 
-> Consider using the [Rabbit Hole](https://www.drupal.org/project/rabbit_hole) module instead.
+Loft Core gives you access to [Rabbit Hole](https://www.drupal.org/project/rabbit_hole) redirects via hook functions.
 
 **In order to use this feature you must add the following to `settings.php`**
 
-    $conf['loft_core_node_redirects'] = true;
+    $config['loft_core.settings']['use_redirect_api'] = TRUE;
 
 ## To redirect by node type
 

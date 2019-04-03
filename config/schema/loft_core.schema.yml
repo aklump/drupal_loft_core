@@ -6,7 +6,7 @@ loft_core.settings:
       type: 'NULL'
     test_mode_url_token:
       type: 'NULL'
-    loft_core_node_redirects:
+    use_redirect_api:
       type: boolean
     loft_core_cache_bust_token:
       type: string
