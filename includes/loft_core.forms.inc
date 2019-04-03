@@ -5,6 +5,7 @@
  * Provides extra form functionality.
  */
 
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\loft_core\Attribute;
 use Drupal\loft_core\Redirect;
 
@@ -15,29 +16,35 @@ use Drupal\loft_core\Redirect;
  *
  * @param array $form
  *   The form definition.
- * @param array $form_state
+ * @param Drupal\Core\Form\FormStateInterface $form_state
  *   The state of the form.
+ *
+ * @d8
  */
-function loft_core_form_node_form_alter(array &$form, array &$form_state) {
-  if (Redirect::isNodeRedirected($form_state['node'], 'view')) {
+function loft_core_form_node_form_alter(array &$form, FormStateInterface $form_state) {
+  $node = $form_state->getFormObject()->getEntity();
+  if (Redirect::isNodeRedirected($node, 'view')) {
+    $form_state->set('loft_core.redirect_form', TRUE);
     $form['actions']['submit']['#submit'][] = '_loft_core_node_form_submit_redirect_handler';
   }
 }
 
 /**
- * Handle post edit node redirect.
+ * Handle a form reload on save of redirected node.
  *
- * Redirect a node form to the edit page, or the view page as normal.
+ * If a node is being edited and it's been redirected by our hooks, then we
+ * want to reload the edit form on save.
  *
  * @param array $form
  *   The form definition.
- * @param array $form_state
+ * @param Drupal\Core\Form\FormStateInterface $form_state
  *   The state of the form.
+ *
+ * @d8
  */
-function _loft_core_node_form_submit_redirect_handler(array $form, array &$form_state) {
-  if (!empty($form_state['redirect']) && $form_state['nid']) {
-    $form_state['redirect'] = node_access('update',
-      $form_state['nid']) ? 'node/' . $form_state['nid'] . '/edit' : '<front>';
+function _loft_core_node_form_submit_redirect_handler(array $form, FormStateInterface $form_state) {
+  if ($form_state->get('loft_core.redirect_form')) {
+    $form_state->setRedirect('entity.node.edit_form', ['node' => $form_state->get('nid')]);
   }
 }
 
@@ -173,16 +180,18 @@ function loft_core_get_form_during_ajaxing($form_id) {
  */
 function loft_core_form_user_admin_settings_alter(&$form, &$form_state, $form_id) {
   // @FIXME
-// Could not extract the default value because it is either indeterminate, or
-// not scalar. You'll need to provide a default value in
-// config/install/loft_core.settings.yml and config/schema/loft_core.schema.yml.
-$form['registration_cancellation']['loft_core_mail_registration_from'] = array(
+  // Could not extract the default value because it is either indeterminate, or
+  // not scalar. You'll need to provide a default value in
+  // config/install/loft_core.settings.yml and config/schema/loft_core.schema.yml.
+  $form['registration_cancellation']['loft_core_mail_registration_from'] = array(
     '#weight' => -1,
-    '#type' => \Drupal::moduleHandler()->moduleExists('emailfield') ? 'emailfield' : 'textfield',
+    '#type' => \Drupal::moduleHandler()
+      ->moduleExists('emailfield') ? 'emailfield' : 'textfield',
     '#title' => t('Send registration emails from'),
     '#description' => t('This value will override the site\'s <a href="!url">default <em>From</em> address</a> for registration emails only.', array(
       '!url' => \Drupal\Core\Url::fromRoute('system.site_information_settings'),
     )),
-    '#default_value' => \Drupal::config('loft_core.settings')->get('loft_core_mail_registration_from'),
+    '#default_value' => \Drupal::config('loft_core.settings')
+      ->get('loft_core_mail_registration_from'),
   );
 }
