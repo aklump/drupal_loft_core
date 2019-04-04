@@ -2,6 +2,8 @@
 
 namespace Drupal\loft_core\Entity;
 
+use Drupal\Core\Session\AccountInterface;
+
 /**
  * Adds functionality if an object needs to work with an account entity.
  *
@@ -12,20 +14,25 @@ trait HasUserTrait {
   private $account;
 
   /**
-   * @return object
+   * Get the user.
+   *
+   * @return \Drupal\Core\Session\AccountInterface
+   *   The user object.
    */
-  public function getUser() {
+  public function getUser(): AccountInterface {
     return $this->account;
   }
 
   /**
-   * Sets the user entity object
+   * Set the user object.
    *
-   * @param object $account
+   * @param \Drupal\Core\Session\AccountInterface $account
+   *   The user instance.
    *
-   * @return $this
+   * @return \Drupal\loft_core\Entity\HasUserTrait
+   *   Self for chaining.
    */
-  public function setUser($account) {
+  public function setUser(AccountInterface $account): HasUserTrait {
     $this->account = $account;
 
     return $this;

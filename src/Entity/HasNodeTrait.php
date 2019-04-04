@@ -3,26 +3,35 @@
 namespace Drupal\loft_core\Entity;
 
 use AKlump\LoftLib\Code\Cache;
+use Drupal\node\NodeInterface;
 
+/**
+ * Trait HasNodeTrait for classes handling a single node object.
+ *
+ * @package Drupal\loft_core\Entity
+ */
 trait HasNodeTrait {
 
-  use HasEntityTrait;
-
   /**
-   * @return object
+   * Return the node.
+   *
+   * @return \Drupal\node\NodeInterface
+   *   A node instance.
    */
-  public function getNode() {
+  public function getNode(): NodeInterface {
     return $this->getEntity();
   }
 
   /**
-   * Sets the entity type and object
+   * Set the node.
    *
-   * @param object $node
+   * @param \Drupal\node\NodeInterface $node
+   *   The node instance.
    *
-   * @return $this
+   * @return \Drupal\loft_core\Entity\HasNodeTrait
+   *   Self for chaining.
    */
-  public function setNode($node) {
+  public function setNode(NodeInterface $node) {
     return $this->setEntity('node', $node);
   }
 

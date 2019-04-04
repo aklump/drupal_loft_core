@@ -2,6 +2,13 @@
 
 namespace Drupal\loft_core\Entity;
 
+use Drupal\Core\Entity\EntityInterface;
+
+/**
+ * Trait HasNodeTrait for classes handling a single entity object.
+ *
+ * @package Drupal\loft_core\Entity
+ */
 trait HasEntityTrait {
 
   protected $entityTypeId;
@@ -9,42 +16,46 @@ trait HasEntityTrait {
   protected $entity;
 
   /**
-   * @return mixed
+   * Get the entity instance.
+   *
+   * @return \Drupal\Core\Entity\EntityInterface
+   *   The entity instance.
    */
-  public function getEntity() {
+  public function getEntity(): EntityInterface {
     return $this->entity;
   }
 
   /**
-   * Sets the entity type and object
+   * Sets the entity type and object.
    *
    * @param string $entityTypeId
-   * @param Entity|int|object $entity
+   *   The entity type id.
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity instance.
    *
    * @return $this
    */
-  public function setEntity($entityTypeId, $entity) {
+  public function setEntity(string $entityTypeId, EntityInterface $entity) {
     if (is_numeric($entity)) {
       $entities = entity_load($entityTypeId, [$entity]);
       $entity = reset($entities);
     }
-
-    if (!is_null($entity) && !is_object($entity)) {
+    if (!$entity instanceof EntityInterface) {
       throw new \InvalidArgumentException("entity must be an object");
     }
-
     $this->setEntityTypeId($entityTypeId);
-
-    // Prevent a wrapper inside of a wrapper.
-    $this->entity = $entity instanceof Entity ? $entity->getEntity() : $entity;
+    $this->entity = $entity;
 
     return $this;
   }
 
   /**
-   * @return mixed
+   * Return the entity type id.
+   *
+   * @return string
+   *   The entity type id.
    */
-  public function getEntityTypeId() {
+  public function getEntityTypeId(): string {
     return $this->entityTypeId;
   }
 
