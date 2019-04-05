@@ -11,9 +11,14 @@ use Drupal\Core\Entity\EntityInterface;
  */
 trait HasEntityTrait {
 
-  protected $entityTypeId;
-
-  protected $entity;
+  /**
+   * Holds the object instance.
+   *
+   * @var \Drupal\Core\Entity\EntityInterface
+   *
+   * phpcs:disable Drupal.NamingConventions.ValidVariableName.LowerCamelName
+   */
+  private $_entity;
 
   /**
    * Get the entity instance.
@@ -22,7 +27,7 @@ trait HasEntityTrait {
    *   The entity instance.
    */
   public function getEntity(): EntityInterface {
-    return $this->entity;
+    return $this->_entity;
   }
 
   /**
@@ -43,8 +48,7 @@ trait HasEntityTrait {
     if (!$entity instanceof EntityInterface) {
       throw new \InvalidArgumentException("entity must be an object");
     }
-    $this->setEntityTypeId($entityTypeId);
-    $this->entity = $entity;
+    $this->_entity = $entity;
 
     return $this;
   }
@@ -56,25 +60,7 @@ trait HasEntityTrait {
    *   The entity type id.
    */
   public function getEntityTypeId(): string {
-    return $this->entityTypeId;
-  }
-
-  /**
-   * @param mixed $entityTypeId
-   *
-   * @return $this
-   *
-   * I don't think we should expose this, force them to go through
-   * setEntity(), so there is no chance to mismatch things.
-   * 2016-10-01T07:29, aklump
-   */
-  protected function setEntityTypeId($entityTypeId) {
-    if (method_exists($this, 'getDataApiData')) {
-      $this->e = $this->getDataApiData($entityTypeId);
-    }
-    $this->entityTypeId = $entityTypeId;
-
-    return $this;
+    return $this->_entity->getEntityTypeId();
   }
 
   /**
@@ -99,7 +85,7 @@ trait HasEntityTrait {
     catch (\Error $error) {
       throw new \RuntimeException("Missing entity.");
     }
-    if (!($entityTypeId = $this->getEntityTypeId())) {
+    if (!($entityTypeId = $entity->getEntityTypeId())) {
       throw new \RuntimeException("Missing entity type.");
     }
     $entityId = $entity->id();

@@ -76,9 +76,11 @@ trait EntityDataAccessorTrait {
    *   A datetime object IN THE TIMEZONE OF THE CURRENT USER per Drupal
    *   settings, represented by $field_name. On this return value use
    *   ->getPhpDateTime to get a standard PHP \DateTime object.
+   *
+   * @d8
    */
   public function date(string $field_name, $default = 'now'): DrupalDateTime {
-    $field_item = $this->entity->get($field_name)->get(0);
+    $field_item = $this->getEntity()->get($field_name)->get(0);
     if ($field_item instanceof DateTimeItem) {
       $date = new DrupalDateTime($field_item->value, 'UTC');
     }
@@ -111,6 +113,30 @@ trait EntityDataAccessorTrait {
   /**
    * Return data from an entity field in the entity's language.
    *
+   * Examples of how to use:
+   *
+   * @code
+   *   // All of these will return field_pull_quote.0.value:
+   *   $extract->f('lorem', 'field_pull_quote');
+   *   $extract->f('lorem', 'field_pull_quote', 'value');
+   *   $extract->f('lorem', 'field_pull_quote', 'value', 0);
+   *
+   *   // To get field_pull_quote.0, an array:
+   *   $extract->f('lorem', 'field_pull_quote', 0);
+   *
+   *   // Note: To get all items use ::items.
+   *
+   *   // Other configurations; notice order doesn't matter.
+   *   $extract->f('lorem', 'field_pull_quote', 0, 'value');
+   *   $extract->f('lorem', 'field_pull_quote', 1, 'value');
+   *   $extract->f('lorem', 'field_pull_quote', 'value', 1);
+   *   $extract->f('lorem', 'field_pull_quote', 'target_id');
+   *   $extract->f('lorem', 'field_pull_quote', 'target_id', 0);
+   *   $extract->f('lorem', 'field_pull_quote', 0, 'target_id');
+   *   $extract->f('lorem', 'field_pull_quote', 'target_id', 1);
+   *   $extract->f('lorem', 'field_pull_quote', 1, 'target_id');
+   * @endcode
+   *
    * @param mixed $default
    *   The default value if non-existant.
    * @param string $field_name
@@ -121,28 +147,6 @@ trait EntityDataAccessorTrait {
    *
    * @throws \InvalidArgumentException
    *   When $key is not a valid column for $field_name.
-   *
-   * Examples of how to use:
-   * @code
-   *
-   *   // All of these will return field_pull_quote.0.value:
-   *   $extract->f('lorem', 'field_pull_quote');
-   *   $extract->f('lorem', 'field_pull_quote', 'value');
-   *   $extract->f('lorem', 'field_pull_quote', 'value', 0);
-   *
-   *   // To get field_pull_quote.0, an array:
-   *   // To get all items use ::items.
-   *   $extract->f('lorem', 'field_pull_quote', 0);
-   *
-   *   $extract->f('lorem', 'field_pull_quote', 0, 'value');
-   *   $extract->f('lorem', 'field_pull_quote', 1, 'value');
-   *   $extract->f('lorem', 'field_pull_quote', 'value', 1);
-   *   $extract->f('lorem', 'field_pull_quote', 'target_id');
-   *   $extract->f('lorem', 'field_pull_quote', 'target_id', 0);
-   *   $extract->f('lorem', 'field_pull_quote', 0, 'target_id');
-   *   $extract->f('lorem', 'field_pull_quote', 'target_id', 1);
-   *   $extract->f('lorem', 'field_pull_quote', 1, 'target_id');
-   * @endcode
    */
   public function f($default, $field_name) {
     try {
@@ -338,7 +342,7 @@ trait EntityDataAccessorTrait {
   }
 
   /**
-   * Ensure that $this->entity is not a shadow entity.
+   * Ensure the entity is not a not a Loft Shadow Entity.
    *
    * @return array
    *   - entity_type
