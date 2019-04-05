@@ -213,7 +213,7 @@ trait EntityDataAccessorTrait {
    *   The entity reference field_name.
    *
    * @return array
-   *   An array of entities instances.  Keys are irrelevant.
+   *   An array of entities instances.  Keys are entity ids.
    */
   public function entities(string $field_name): array {
     $entities = [];
@@ -231,9 +231,9 @@ trait EntityDataAccessorTrait {
         $field_definition = $fields[$field_name]->getItemDefinition();
         $target_type = $field_definition->getSetting('target_type');
         $storage = \Drupal::entityTypeManager()->getStorage($target_type);
-        $entities = array_map(function ($item) use ($storage, $target_type) {
-          return $storage->load($item['target_id']);
-        }, $entities);
+        $entities = $storage->loadMultiple(array_map(function ($item) {
+          return $item['target_id'];
+        }, $entities));
       }
     }
     catch (\Exception $exception) {
