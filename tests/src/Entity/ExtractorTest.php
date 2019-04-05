@@ -10,7 +10,7 @@ use Drupal\data_api\Data as Data;
 use Drupal\data_api\DataMock;
 use Drupal\data_api\DataTrait;
 use Drupal\loft_core\Entity\Extractor;
-use Drupal\loft_core\Entity\ExtractorTrait;
+use Drupal\loft_core\Entity\EntityDataAccessorTrait;
 
 /**
  * @coversDefaultClass Drupal\loft_core\Entity\Extractor
@@ -197,7 +197,7 @@ class ExtractorTest extends PhpUnitTestCase {
 
 class TestableExtractor {
 
-  use ExtractorTrait;
+  use EntityDataAccessorTrait;
   use HasEntityTrait;
   use DataTrait;
 

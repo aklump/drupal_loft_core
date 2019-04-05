@@ -93,7 +93,10 @@ trait HasEntityTrait {
    * throws RuntimeException
    */
   public function validateEntity($validateBundleType = NULL) {
-    if (!($entity = $this->getEntity())) {
+    try {
+      $entity = $this->getEntity();
+    }
+    catch (\Error $error) {
       throw new \RuntimeException("Missing entity.");
     }
     if (!($entityTypeId = $this->getEntityTypeId())) {

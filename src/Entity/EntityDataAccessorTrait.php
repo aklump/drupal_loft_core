@@ -2,6 +2,7 @@
 
 namespace Drupal\loft_core\Entity;
 
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\field\Entity\FieldStorageConfig;
 
 /**
@@ -19,7 +20,9 @@ use Drupal\field\Entity\FieldStorageConfig;
  *
  * @package Drupal\loft_core\Entity
  */
-trait ExtractorTrait {
+trait EntityDataAccessorTrait {
+
+  use HasEntityTrait;
 
   /**
    * Holds the fallback safe markup handler.
@@ -71,10 +74,13 @@ trait ExtractorTrait {
    * @return string
    *   The local path to the entity.
    */
-  public function uri() {
-    list($entity_type, $entity) = $this->validateEntity();
-
-    return $this->d7->entity_uri($entity_type, $entity)['path'];
+  public function uri(): string {
+    try {
+      return $this->getEntity()->toUrl()->toString();
+    }
+    catch (\Exception $exception) {
+      return '';
+    }
   }
 
   /**
@@ -107,24 +113,29 @@ trait ExtractorTrait {
    * @endcode
    */
   public function f($default, $field_name) {
-    list(, $entity) = $this->ensureEntityIsLoaded();
-    $args = func_get_args();
-    $default = array_shift($args);
-    list($is_field, $field_name, $delta, $column) = $this->getFieldArgs($args, __METHOD__);
+    try {
+      list(, $entity) = $this->ensureEntityIsLoaded();
+      $args = func_get_args();
+      $default = array_shift($args);
+      list($is_field, $field_name, $delta, $column) = $this->getFieldArgs($args, __METHOD__);
 
-    if (!$is_field) {
-      return isset($entity->{$field_name}) ? $entity->{$field_name} : $default;
+      if (!$is_field) {
+        return isset($entity->{$field_name}) ? $entity->{$field_name} : $default;
+      }
+      $items = $this->items($field_name);
+
+      if (!isset($items[$delta])) {
+        return $default;
+      }
+      elseif (is_null($column)) {
+        return $items[$delta];
+      }
+
+      return $items[$delta][$column] ?? $default;
     }
-    $items = $this->items($field_name);
-
-    if (!isset($items[$delta])) {
+    catch (\Exception $exception) {
       return $default;
     }
-    elseif (is_null($column)) {
-      return $items[$delta];
-    }
-
-    return $items[$delta][$column] ?? $default;
   }
 
   /**
@@ -139,7 +150,7 @@ trait ExtractorTrait {
    * @see f()
    * @see field_view_field()
    */
-  public function safe($default, $field_name) {
+  public function safe($default, string $field_name) {
     $safeArgs = func_get_args();
     $default = array_shift($safeArgs);
     list($is_field, $field_name, $delta, $column) = $this->getFieldArgs($safeArgs, __METHOD__);
@@ -165,7 +176,7 @@ trait ExtractorTrait {
    *   An array of field items in the entity language, if defined, or 'und' if
    *   not.
    */
-  public function items($field_name, array $default = []) {
+  public function items(string $field_name, array $default = []) {
     $entity = $this->getEntity();
     $items = $default;
     if (isset($entity->{$field_name})) {
@@ -184,83 +195,52 @@ trait ExtractorTrait {
    * @param string $field_name
    *   This should field that references entities.
    *
-   * @return mixed
+   * @return \Drupal\Core\Entity\EntityInterface
+   *   The first loaded entity referenced by $field_name.
    *
-   * @see ::entities().
+   * @see ::entities()
    */
-  public function entity($field_name) {
+  public function entity(string $field_name): EntityInterface {
     $entities = $this->entities($field_name);
 
     return reset($entities);
   }
 
   /**
-   * Return an array of field-referenced entities.
-   *
-   * This has been tested with these modules:
-   * - node_reference
-   * - entityreference
-   * - paragraphs.
+   * Return an array of the loaded entities referenced by $field_name.
    *
    * @param string $field_name
-   *   This should field that references entities.
+   *   The entity reference field_name.
    *
    * @return array
-   *   An array of entities.
+   *   An array of entities instances.  Keys are irrelevant.
    */
-  public function entities($field_name) {
-    if (!($items = $this->items($field_name))) {
-      return [];
+  public function entities(string $field_name): array {
+    $entities = [];
+    try {
+      list($entity_type_id, , $bundle) = $this->validateEntity();
+      foreach ($this->getEntity()->get($field_name) as $item) {
+        $entities[] = $item->getValue();
+      }
+      if (!empty($entities)) {
+        $fields = \Drupal::service('entity_field.manager')
+          ->getFieldDefinitions($entity_type_id, $bundle);
+        if (!array_key_exists($field_name, $fields)) {
+          return $entities;
+        }
+        $field_definition = $fields[$field_name]->getItemDefinition();
+        $target_type = $field_definition->getSetting('target_type');
+        $storage = \Drupal::entityTypeManager()->getStorage($target_type);
+        $entities = array_map(function ($item) use ($storage, $target_type) {
+          return $storage->load($item['target_id']);
+        }, $entities);
+      }
+    }
+    catch (\Exception $exception) {
+      $entities = [];
     }
 
-    static $metadata = NULL;
-    if (!isset($metadata[$field_name])) {
-      $target_entity_type = NULL;
-      $field_info = $this->d7->field_info_field($field_name);
-      $field_type = $field_info['type'];
-      $field_type_info = $this->d7->field_info_field_types($field_type);
-
-      // How do I know the entity type being referenced by the field?
-      if (isset($field_info['settings']['target_type'])) {
-        $target_entity_type = $field_info['settings']['target_type'];
-      }
-      elseif (isset($field_type_info['property_type'])) {
-        $target_entity_type = $field_type_info['property_type'];
-      }
-
-      // How do I know entity id array key for the reference?
-      $value_key = 'value';
-      if (!empty($field_info['columns'])) {
-        $keys = array_keys($field_info['columns']);
-        $value_key = reset($keys);
-      }
-
-      if (!$target_entity_type
-        || !($type_info = $this->d7->entity_get_info($target_entity_type))
-        || empty($type_info['controller class'])) {
-        $target_entity_type = NULL;
-      }
-      $metadata[$field_name]['target_type'] = $target_entity_type;
-      $metadata[$field_name]['key'] = $value_key;
-    }
-
-    // Convert to an array of ids using $value_key.
-    $entity_ids = array_map(function ($item) use ($field_name, $metadata) {
-      return $item[$metadata[$field_name]['key']];
-    }, $items);
-
-    if (!$metadata[$field_name]['target_type']) {
-      return [];
-    }
-
-    return array_map(function ($item) {
-      if (method_exists($item, 'setHostEntity') && !$item->hostEntity()) {
-        $item->setHostEntity($this->getEntityTypeId(), $this->getEntity());
-      }
-
-      return $item;
-    }, \Drupal::entityManager()
-      ->getStorage($metadata[$field_name]['target_type']));
+    return $entities;
   }
 
   /**
@@ -326,10 +306,13 @@ trait ExtractorTrait {
    *   - entity
    *   - bundle_type
    *   - entity_id
-   * @see loft_core_shadow_entity_load()
    *
+   * @throws \RuntimeException
+   *   If the entity cannot validate.
+   *
+   * @see loft_core_shadow_entity_load()
    */
-  protected function ensureEntityIsLoaded() {
+  protected function ensureEntityIsLoaded(): array {
     list($entity_type, $entity, $bundle, $entity_id) = $this->validateEntity();
     if ($entity_id && property_exists($entity, 'loft_core_shadow') && $entity->loft_core_shadow === FALSE) {
       $entities = $this->d7->entity_load($entity_type, [$entity_id]);
