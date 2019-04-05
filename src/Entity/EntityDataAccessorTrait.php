@@ -2,7 +2,9 @@
 
 namespace Drupal\loft_core\Entity;
 
+use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\datetime\Plugin\Field\FieldType\DateTimeItem;
 use Drupal\field\Entity\FieldStorageConfig;
 
 /**
@@ -60,12 +62,35 @@ trait EntityDataAccessorTrait {
     }
   }
 
-  public function date($field_name, $default = 'now') {
-    return $this->e->getDate($this->getEntity(), [
-      $field_name,
-      0,
-      'value',
-    ], $default);
+  /**
+   * Return a DrupalDateTime in the current users's timezone.
+   *
+   * @param string $field_name
+   *   The field name of a date field or a field whose value can be understood
+   *   by date_create().
+   * @param string $default
+   *   The default value to pass to date_create(), when no value can be
+   *   determined by field.
+   *
+   * @return \Drupal\Core\Datetime\DrupalDateTime
+   *   A datetime object IN THE TIMEZONE OF THE CURRENT USER per Drupal
+   *   settings, represented by $field_name. On this return value use
+   *   ->getPhpDateTime to get a standard PHP \DateTime object.
+   */
+  public function date(string $field_name, $default = 'now'): DrupalDateTime {
+    $field_item = $this->entity->get($field_name)->get(0);
+    if ($field_item instanceof DateTimeItem) {
+      $date = new DrupalDateTime($field_item->value, 'UTC');
+    }
+    elseif (($value = $this->f(NULL, $field_name))
+      && (date_create($value))) {
+      $date = new DrupalDateTime($value);
+    }
+    else {
+      $date = new DrupalDateTime($default);
+    }
+
+    return $date->setTimezone(new \DateTimeZone(drupal_get_user_timezone()));
   }
 
   /**
@@ -99,9 +124,16 @@ trait EntityDataAccessorTrait {
    *
    * Examples of how to use:
    * @code
+   *
+   *   // All of these will return field_pull_quote.0.value:
    *   $extract->f('lorem', 'field_pull_quote');
    *   $extract->f('lorem', 'field_pull_quote', 'value');
    *   $extract->f('lorem', 'field_pull_quote', 'value', 0);
+   *
+   *   // To get field_pull_quote.0, an array:
+   *   // To get all items use ::items.
+   *   $extract->f('lorem', 'field_pull_quote', 0);
+   *
    *   $extract->f('lorem', 'field_pull_quote', 0, 'value');
    *   $extract->f('lorem', 'field_pull_quote', 1, 'value');
    *   $extract->f('lorem', 'field_pull_quote', 'value', 1);
@@ -179,11 +211,18 @@ trait EntityDataAccessorTrait {
   public function items(string $field_name, array $default = []) {
     $entity = $this->getEntity();
     $items = $default;
-    if (isset($entity->{$field_name})) {
-      $items = [];
+    $exists = FALSE;
+    try {
       foreach ($entity->get($field_name) as $item) {
+        if ($exists === FALSE) {
+          $items = [];
+          $exists = TRUE;
+        }
         $items[] = $item->getValue();
       }
+    }
+    catch (\Exception $exception) {
+      $items = $default;
     }
 
     return $items;
@@ -348,8 +387,7 @@ trait EntityDataAccessorTrait {
       $field_name = array_shift($args);
       $delta = $column = NULL;
       try {
-        FieldStorageConfig::loadByName($this->getEntityTypeId(), $field_name);
-        $is_field = TRUE;
+        $is_field = (bool) FieldStorageConfig::loadByName($this->getEntityTypeId(), $field_name);
       }
       catch (\Exception $exception) {
         $is_field = FALSE;
