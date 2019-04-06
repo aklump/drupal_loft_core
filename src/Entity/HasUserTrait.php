@@ -2,63 +2,64 @@
 
 namespace Drupal\loft_core\Entity;
 
-use Drupal\Core\Session\AccountInterface;
+use Drupal\user\UserInterface;
 
 /**
  * Adds functionality if an object needs to work with an account entity.
+ *
+ * When using this trait your class MUST:
+ * - use \Drupal\loft_core\Entity\HasEntityTrait
+ * - implement \Drupal\loft_core\Entity\HasUserInterface.
+ * Your class SHOULD:
+ * - make use of ::requireUser() inside of other methods.
  *
  * @package Drupal\loft_core\Trait
  */
 trait HasUserTrait {
 
-  private $account;
-
   /**
-   * Get the user.
-   *
-   * @return \Drupal\Core\Session\AccountInterface
-   *   The user object.
+   * {@inheritdoc}
    */
-  public function getUser(): AccountInterface {
-    return $this->account;
+  public function setUser(UserInterface $user): self {
+    return $this->setEntity($user);
   }
 
   /**
-   * Set the user object.
-   *
-   * @param \Drupal\Core\Session\AccountInterface $account
-   *   The user instance.
-   *
-   * @return \Drupal\loft_core\Entity\HasUserTrait
-   *   Self for chaining.
+   * {@inheritdoc}
    */
-  public function setUser(AccountInterface $account): HasUserTrait {
-    $this->account = $account;
-
-    return $this;
+  public function hasUser(): bool {
+    return $this->hasEntity('user');
   }
 
   /**
-   * Validate (or throw) and return type and entity.
+   * {@inheritdoc}
+   */
+  public function getUser(): UserInterface {
+    return $this->getEntity('user');
+  }
+
+  /**
+   * Require that a user be set or throw.
    *
-   * This should be used by public methods that will use the entity.
-   *
-   * @return array
-   *   - entity_type
-   *   - entity
+   * Use this inside of methods on this class to ensure that they can be run
+   * properly, when they require a user instance.
    *
    * @code
-   * list($entity_type, $entity) = $this->validateUser();
+   *  public function someClassMethod() {
+   *    list($user, $uid) = $this->requireUser();
+   *    ...
    * @endcode
    *
-   * throws RuntimeException
+   * @return array
+   *   The user entity and id as indexed array.
+   *
+   * @throws \Drupal\loft_core\Entity\MissingRequiredEntityException
+   *   If the user is not set.
    */
-  protected function validateUser() {
-    if (!($account = $this->getUser())) {
-      throw new \RuntimeException("Missing user object.");
-    }
+  protected function requireUser() {
+    $list = $this->requireEntity('user');
 
-    return ['user', $account];
+    return [$list[1], $list[3]];
   }
 
 }

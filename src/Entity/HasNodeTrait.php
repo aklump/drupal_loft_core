@@ -2,72 +2,70 @@
 
 namespace Drupal\loft_core\Entity;
 
-use AKlump\LoftLib\Code\Cache;
 use Drupal\node\NodeInterface;
 
 /**
  * Trait HasNodeTrait for classes handling a single node object.
+ *
+ * When using this trait your class MUST:
+ * - use \Drupal\loft_core\Entity\HasEntityTrait
+ * - implement \Drupal\loft_core\Entity\HasNodeInterface.
+ * Your class SHOULD:
+ * - make use of ::requireNode() inside of other methods.
  *
  * @package Drupal\loft_core\Entity
  */
 trait HasNodeTrait {
 
   /**
-   * Return the node.
-   *
-   * @return \Drupal\node\NodeInterface
-   *   A node instance.
-   */
-  public function getNode(): NodeInterface {
-    return $this->getEntity();
-  }
-
-  /**
-   * Set the node.
-   *
-   * @param \Drupal\node\NodeInterface $node
-   *   The node instance.
-   *
-   * @return \Drupal\loft_core\Entity\HasNodeTrait
-   *   Self for chaining.
+   * {@inheritdoc}
    */
   public function setNode(NodeInterface $node) {
-    return $this->setEntity('node', $node);
+    return $this->setEntity($node);
   }
 
   /**
-   * Return a string used for caching this instance in the database or in the
-   * SESSION, etc.
-   *
-   * You must implement a method on the class called `getNodeCacheConfig` that
-   * returns at least an empty array, if not meta data to further refine this
-   * cache string, beyond the node/{bundle}/{nid}.
-   *
-   * @return string
-   *  - If the entity is not set, you will get back the classname.
-   *   "Drupal\gop3_core\Entity\RelatedContent:"
-   *  - If the entity is set you will get back something like this, which
-   *   includes the nid and the configuration md5:
-   *  "Drupal\gop3_core\Entity\RelatedContent:3880:5d5a851aa176fff5a142c82555e69eae"
+   * {@inheritdoc}
    */
-  protected function getNodeCacheId() {
-    try {
-      $prefix = __CLASS__ . ':';
-      list($type, $node) = $this->validateEntity();
+  public function hasNode(): bool {
+    return $this->hasEntity('node');
+  }
 
-      $config = array_merge([
-        $type,
-        $node->type,
-        $this->getNode()->nid,
+  /**
+   * {@inheritdoc}
+   */
+  public function getNode(): NodeInterface {
+    return $this->getEntity('node');
+  }
 
-        // Any additional configuration options to make this cache id specific enough, should be returned from this method.
-      ], $this->getNodeCacheConfig());
+  /**
+   * Require that a node be set or throw.
+   *
+   * Use this inside of methods on this class to ensure that they can be run
+   * properly, when they require a node instance.  Optionally, you may specify
+   * one or more bundles that the node must be.
+   *
+   * @code
+   *  public function someClassMethod() {
+   *    list($node, $bundle, $nid) = $this->requireNode();
+   *    ...
+   * @endcode
+   *
+   * @param array $required_bundles
+   *   To allow all bundles leave these an empty array.  To require one or more
+   *   bundles, send those bundle ids as an indexed array.
+   *
+   * @return array
+   *   The node entity, bundle and it's id as indexed array.
+   *
+   * @throws \Drupal\loft_core\Entity\MissingRequiredEntityException
+   *   If the node is not set, or it it's not one of the required bundles.
+   */
+  protected function requireNode(array $required_bundles = []) {
+    $list = $this->requireEntity('node', $required_bundles);
+    array_shift($list);
 
-      return $prefix . $this->getNode()->nid . ':' . Cache::id($config);
-    }
-    catch (\Exception $exception) {
-      return $prefix;
-    }
+    return $list;
   }
 
 }
