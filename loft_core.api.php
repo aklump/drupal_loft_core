@@ -163,3 +163,16 @@ function HOOK_loft_core_suppress_messages() {
     ),
   );
 }
+
+/**
+ * Implements HOOK_loft_core_BUNDLE_node_form_alter().
+ *
+ * A form alter than runs for both node ADD and node EDIT forms.
+ *
+ * @param array $form
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
+ * @param string $form_id
+ */
+function HOOK_loft_core_BUNDLE_node_form_alter(array &$form, \Drupal\Core\Form\FormStateInterface $form_state, string $form_id) {
+
+}

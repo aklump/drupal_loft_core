@@ -10,7 +10,7 @@ use Drupal\loft_core\Attribute;
 use Drupal\loft_core\Redirect;
 
 /**
- * Implements hook_form_alter().
+ * Implements hook_form_BASE_FORM_ID_alter().
  *
  * Make sure we don't redirect admins after editing a "redirected" node.
  *
@@ -18,15 +18,23 @@ use Drupal\loft_core\Redirect;
  *   The form definition.
  * @param Drupal\Core\Form\FormStateInterface $form_state
  *   The state of the form.
+ * @param string $form_id
+ *   The form id.
  *
  * @d8
  */
-function loft_core_form_node_form_alter(array &$form, FormStateInterface $form_state) {
+function loft_core_form_node_form_alter(array &$form, FormStateInterface $form_state, string $form_id) {
   $node = $form_state->getFormObject()->getEntity();
   if (Redirect::isNodeRedirected($node, 'view')) {
     $form_state->set('loft_core.redirect_form', TRUE);
     $form['actions']['submit']['#submit'][] = '_loft_core_node_form_submit_redirect_handler';
   }
+
+  // Call our special combined hook.
+  $node = $form_state->getFormObject()->getEntity();
+  $hooks = ['loft_core_' . $node->bundle() . '_node_form'];
+  \Drupal::service('module_handler')
+    ->alter($hooks, $form, $form_state, $form_id);
 }
 
 /**

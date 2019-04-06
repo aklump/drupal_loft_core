@@ -7,6 +7,7 @@
  * @{
  */
 
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Template\Attribute;
 use Drupal\loft_core\StaticContentStreamWrapper;
 
@@ -567,3 +568,4 @@ function loft_core_menu_local_actions_alter(array &$local_actions) {
  */
 function loft_core_contextual_links_view_alter(array &$element, array $items) {
 }
+
