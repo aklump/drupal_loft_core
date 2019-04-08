@@ -1,6 +1,19 @@
 
 <p>This module contains features that I wish were in core, and which I often use for all my projects.  Documentation can be found at <em>docs/index.html</em> or by using the Advanced Help module.</p>
 
+<h2>Installation</h2>
+
+<p>Add the following to <em>composer.json</em> above web root.  Making sure you have done <code>composer require wikimedia/composer-merge-plugin</code></p>
+
+<pre><code>    "merge-plugin": {
+        "require": [
+            "web/modules/custom/loft_core/composer.json"
+        ]
+    },
+</code></pre>
+
+<p>Then do <code>composer update --lock</code>.</p>
+
 <h2>Contact</h2>
 
 <ul>

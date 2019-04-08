@@ -10,6 +10,9 @@ use Drupal\field\Entity\FieldStorageConfig;
 /**
  * A trait for obtaining entity data using convenient/safe methods.
  *
+ * When using this trait your class MUST:
+ * - implement \Drupal\loft_core\Entity\HasEntityInterface.
+ *
  * All methods that return a string, get a magic safe method.  Here's how it
  * works:
  *
@@ -23,8 +26,6 @@ use Drupal\field\Entity\FieldStorageConfig;
  * @package Drupal\loft_core\Entity
  */
 trait EntityDataAccessorTrait {
-
-  use HasEntityTrait;
 
   /**
    * Holds the fallback safe markup handler.

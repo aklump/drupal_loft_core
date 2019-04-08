@@ -4,6 +4,18 @@
    often use for all my projects. Documentation can be found at
    docs/index.html or by using the Advanced Help module.
 
+Installation
+
+   Add the following to composer.json above web root. Making sure you have
+   done composer require wikimedia/composer-merge-plugin
+    "merge-plugin": {
+        "require": [
+            "web/modules/custom/loft_core/composer.json"
+        ]
+    },
+
+   Then do composer update --lock.
+
 Contact
 
      * In the Loft Studios

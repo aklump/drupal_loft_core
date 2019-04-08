@@ -6,7 +6,7 @@
  */
 
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\loft_core\Attribute;
+use Drupal\Core\Template\Attribute;
 use Drupal\loft_core\Redirect;
 
 /**
@@ -76,8 +76,7 @@ function _loft_core_node_form_submit_redirect_handler(array $form, FormStateInte
  *   What is the array key to add to? Defaults to #attributes.
  */
 function loft_core_form_tabindex(array &$element, &$index, $key = '#attributes') {
-  $g = data_api();
-  $g->ensure($element, $key, array());
+  $element[$key] = $element[$key] ?? [];
   if ($element[$key] instanceof Attribute) {
     $element[$key]->setAttribute('tabindex', $index++);
   }

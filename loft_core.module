@@ -7,7 +7,6 @@
  * @{
  */
 
-use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Template\Attribute;
 use Drupal\loft_core\StaticContentStreamWrapper;
 
@@ -64,13 +63,17 @@ function is_live($feature) {
  */
 function loft_core_test_class(string $class): string {
   static $testing;
-  if ($testing || (defined('DRUPAL_ENV_ROLE') && strpos(DRUPAL_ENV_ROLE,
-        'prod') !== 0) || (!empty($_COOKIE['loft_core_testing']) && $_COOKIE['loft_core_testing'] === \Drupal::request()
-        ->getClientIp())) {
+  if ($testing
+    || (defined('DRUPAL_ENV_ROLE') && strpos(DRUPAL_ENV_ROLE, 'prod') !== 0)
+    || (!empty($_COOKIE['loft_core_testing'])
+      && $_COOKIE['loft_core_testing'] === \Drupal::request()->getClientIp())
+  ) {
     $testing = TRUE;
 
     return 't-' . $class;
   }
+
+  return '';
 }
 
 /**

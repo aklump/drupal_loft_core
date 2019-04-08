@@ -19,6 +19,11 @@
                 "src/",
                 "tests/src/"
             ]
-        }
+        },
+        "files": [
+            "tests/src/Unit/bootstrap.php",
+            "loft_core.module",
+            "modules/loft_core_users/loft_core_users.module"
+        ]
     }
 }
