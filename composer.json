@@ -22,6 +22,9 @@
     "autoload-dev": {
         "psr-4": {
             "Drupal\\loft_core\\": "tests/src/Drupal/loft_core"
-        }
+        },
+        "files": [
+            "loft_core.module"
+        ]
     }
 }
