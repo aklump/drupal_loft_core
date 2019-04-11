@@ -5,8 +5,10 @@
  * Provides extra form functionality.
  */
 
+use AKlump\LoftLib\Code\Arrays;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Template\Attribute;
+use Drupal\Core\Url;
 use Drupal\loft_core\Redirect;
 
 /**
@@ -184,21 +186,33 @@ function loft_core_get_form_during_ajaxing($form_id) {
  * for when a user is cancelled.
  *
  * @see loft_core_mail_alter
+ *
+ * @d8
  */
 function loft_core_form_user_admin_settings_alter(&$form, &$form_state, $form_id) {
-  // @FIXME
-  // Could not extract the default value because it is either indeterminate, or
-  // not scalar. You'll need to provide a default value in
-  // config/install/loft_core.settings.yml and config/schema/loft_core.schema.yml.
-  $form['registration_cancellation']['loft_core_mail_registration_from'] = array(
-    '#weight' => -1,
-    '#type' => \Drupal::moduleHandler()
-      ->moduleExists('emailfield') ? 'emailfield' : 'textfield',
-    '#title' => t('Send registration emails from'),
-    '#description' => t('This value will override the site\'s <a href="!url">default <em>From</em> address</a> for registration emails only.', array(
-      '!url' => \Drupal\Core\Url::fromRoute('system.site_information_settings'),
-    )),
-    '#default_value' => \Drupal::config('loft_core.settings')
-      ->get('loft_core_mail_registration_from'),
-  );
+  Arrays::insertAfterKey($form, 'mail_notification_address', [
+    'loft_core_mail_registration_from' => [
+      '#title' => t('Registration email address'),
+      '#type' => 'email',
+      '#description' => t('If supplied, this email will be used as the from address for registration emails only, instead of the default.', array(
+        ':url' => Url::fromRoute('system.site_information_settings')
+          ->toString(),
+      )),
+      '#default_value' => \Drupal::config('loft_core.settings')
+        ->get('mail_registration_from'),
+    ],
+  ]);
+
+  $form['#submit'][] = 'loft_core_form_user_admin_settings_submit';
+}
+
+/**
+ * Form submission handler for user_admin_settings().
+ *
+ * @see loft_core_form_user_admin_settings_alter()
+ */
+function loft_core_form_user_admin_settings_submit($form, FormStateInterface $form_state) {
+  \Drupal::configFactory()->getEditable('loft_core.settings')
+    ->set('mail_registration_from', $form_state->getValue('loft_core_mail_registration_from'))
+    ->save();
 }

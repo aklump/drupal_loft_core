@@ -440,7 +440,7 @@ function loft_core_exit() {
  */
 function loft_core_mail_alter(&$message) {
   if (($from = \Drupal::config('loft_core.settings')
-    ->get('loft_core_mail_registration_from'))) {
+    ->get('send_registration_mail_from'))) {
     switch ($message['key']) {
       case 'register_admin_created':
       case 'register_no_approval_required':
