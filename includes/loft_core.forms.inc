@@ -210,6 +210,8 @@ function loft_core_form_user_admin_settings_alter(&$form, &$form_state, $form_id
  * Form submission handler for user_admin_settings().
  *
  * @see loft_core_form_user_admin_settings_alter()
+ *
+ * @d8
  */
 function loft_core_form_user_admin_settings_submit($form, FormStateInterface $form_state) {
   \Drupal::configFactory()->getEditable('loft_core.settings')
