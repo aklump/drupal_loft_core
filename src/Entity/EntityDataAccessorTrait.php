@@ -4,14 +4,16 @@ namespace Drupal\loft_core\Entity;
 
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\datetime\Plugin\Field\FieldType\DateTimeItem;
-use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
 
 /**
  * A trait for obtaining entity data using convenient/safe methods.
  *
  * When using this trait your class MUST:
+ * - use \Drupal\loft_core\Entity\HasEntityTrait.
  * - implement \Drupal\loft_core\Entity\HasEntityInterface.
+ * - set $this->entityTypeManager.
+ * - set $this->entityFieldManager.
  *
  * All methods that return a string, get a magic safe method.  Here's how it
  * works:
@@ -33,6 +35,16 @@ trait EntityDataAccessorTrait {
    * @var string|callable
    */
   protected $safeMarkupHandler = NULL;
+
+  /**
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
+
+  /**
+   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
+   */
+  protected $entityFieldManager;
 
   /**
    * {@inheritdoc}
@@ -64,55 +76,79 @@ trait EntityDataAccessorTrait {
   }
 
   /**
-   * Return a DrupalDateTime in the current users's timezone.
+   * Get a date object from a field in a given timezone.
    *
-   * @param string $field_name
-   *   The field name of a date field or a field whose value can be understood
-   *   by date_create().
+   * This has been tested with the following field types:
+   * - Date
+   * - DateTime
+   * - Timestamp.
+   *
    * @param string $default
-   *   The default value to pass to date_create(), when no value can be
-   *   determined by field.
+   *   Fallback used when $field_name is empty.  If this is non-empty, it will
+   *   be passed to the DrupalDateTime constructor, otherwise it will be
+   *   returned directly.  For example you could pass: NULL or 'now'.
+   * @param string $field_name
+   *   The field name to look for a value to pass to DrupalDateTime
+   *   constructor.
+   * @param string $set_timezone_to
+   *   Set the timezone on the object to this timezone name.  Defaults to
+   *   'UTC'.
    *
-   * @return \Drupal\Core\Datetime\DrupalDateTime
-   *   A datetime object IN THE TIMEZONE OF THE CURRENT USER per Drupal
-   *   settings, represented by $field_name. On this return value use
-   *   ->getPhpDateTime to get a standard PHP \DateTime object.
+   * @return \Drupal\Core\Datetime\DrupalDateTime|mixed
+   *   An instance in the timezone indicated by $set_timezone_to, or if no
+   *   value and $default is empty, $default is returned.
    *
    * @d8
    */
-  public function date(string $field_name, $default = 'now'): DrupalDateTime {
-    $field_item = $this->getEntity()->get($field_name)->get(0);
-    if ($field_item instanceof DateTimeItem) {
-      $date = new DrupalDateTime($field_item->value, 'UTC');
+  public function date($default, string $field_name, string $set_timezone_to = 'UTC') {
+    $date = $this->f($default, $field_name, 'value');
+    if (empty($date)) {
+      return $default;
     }
-    elseif (($value = $this->f(NULL, $field_name))
-      && (date_create($value))) {
-      $date = new DrupalDateTime($value);
-    }
-    else {
-      $date = new DrupalDateTime($default);
+    // The stored field values use this timezone.
+    $current_timezone = DateTimeItemInterface::STORAGE_TIMEZONE;
+
+    // Convert timestamp values to dates.
+    if (is_scalar($date) && preg_match('/^\d+$/', $date)) {
+      // Timezones are always stored UTC.
+      $current_timezone = 'UTC';
+      $date = "@$date";
     }
 
-    return $date->setTimezone(new \DateTimeZone(drupal_get_user_timezone()));
+    $obj = new DrupalDateTime($date, $current_timezone, [
+      'langcode' => 'en',
+    ]);
+
+    return $obj->setTimezone(new \DateTimeZone($set_timezone_to));
   }
 
   /**
-   * Return the path to the entity.
+   * Return the unaliased path to the entity.
+   *
+   * For the aliased path use: $this->getEntity()->toUrl()->toString()
    *
    * @return string
-   *   The local path to the entity.
+   *   The local path to the entity, e.g. /node/3
    */
-  public function uri(): string {
-    try {
-      return $this->getEntity()->toUrl()->toString();
-    }
-    catch (\Exception $exception) {
-      return '';
-    }
+  public function path(): string {
+    return $this->getEntity()
+      ->toUrl('canonical', ['path_processing' => FALSE])
+      ->toString();
   }
 
   /**
    * Return data from an entity field in the entity's language.
+   *
+   * The column can be omitted from the arguments, only when the expected
+   * column is value.  If value does not exist as a column, then an exception
+   * will be thrown; the default will not be returned.  However, if you pass
+   * any column name, including 'value' and that column does not exist, the
+   * $default will be returned.
+   *
+   * You can omit 'value', when you want 'value' so long as the field has a
+   * 'value' column.  If you try to omit 'value' and the field doesn't contain
+   * a 'value' field, you will receive an exception to protect yourself from
+   * bad code.
    *
    * Examples of how to use:
    *
@@ -131,11 +167,14 @@ trait EntityDataAccessorTrait {
    *   $extract->f('lorem', 'field_pull_quote', 0, 'value');
    *   $extract->f('lorem', 'field_pull_quote', 1, 'value');
    *   $extract->f('lorem', 'field_pull_quote', 'value', 1);
-   *   $extract->f('lorem', 'field_pull_quote', 'target_id');
-   *   $extract->f('lorem', 'field_pull_quote', 'target_id', 0);
-   *   $extract->f('lorem', 'field_pull_quote', 0, 'target_id');
-   *   $extract->f('lorem', 'field_pull_quote', 'target_id', 1);
-   *   $extract->f('lorem', 'field_pull_quote', 1, 'target_id');
+   *
+   *   // As mentioned above, you cannot omit 'target_id' because an exception
+   *   will be thrown, since field_related does not have a 'value' column.
+   *   $extract->f('lorem', 'field_related', 'target_id');
+   *   $extract->f('lorem', 'field_related', 'target_id', 0);
+   *   $extract->f('lorem', 'field_related', 0, 'target_id');
+   *   $extract->f('lorem', 'field_related', 'target_id', 1);
+   *   $extract->f('lorem', 'field_related', 1, 'target_id');
    * @endcode
    *
    * @param mixed $default
@@ -146,33 +185,46 @@ trait EntityDataAccessorTrait {
    * @return mixed
    *   The value of the field as described by the request.
    *
-   * @throws \InvalidArgumentException
-   *   When $key is not a valid column for $field_name.
+   * @throws \Drupal\loft_core\Entity\MissingRequiredEntityException
    */
   public function f($default, $field_name) {
-    try {
-      list(, $entity) = $this->ensureEntityIsLoaded();
-      $args = func_get_args();
-      $default = array_shift($args);
-      list($is_field, $field_name, $delta, $column) = $this->getFieldArgs($args, __METHOD__);
+    $this->requireEntity();
+    list(, $entity) = $this->ensureEntityIsLoaded();
+    $args = func_get_args();
+    $default = array_shift($args);
 
-      if (!$is_field) {
-        return isset($entity->{$field_name}) ? $entity->{$field_name} : $default;
-      }
-      $items = $this->items($field_name);
+    list($is_field, $field_name, $delta, $column) = $this->getFieldArgs($args, __METHOD__);
 
-      if (!isset($items[$delta])) {
-        return $default;
-      }
-      elseif (is_null($column)) {
-        return $items[$delta];
+    $column_is_assumed = !in_array($column, $args);
+
+    if (!$is_field) {
+      if (isset($entity->{$field_name})) {
+        if (count($args) > 1) {
+          throw new \BadMethodCallException("You may not pass delta or column values for non-field entity value, e.g. \"\$$field_name\".");
+        }
+
+        return $entity->{$field_name};
       }
 
-      return $items[$delta][$column] ?? $default;
-    }
-    catch (\Exception $exception) {
       return $default;
     }
+    $items = $this->items($field_name);
+
+    if (isset($items[$delta])) {
+      if (is_null($column)) {
+        return $items[$delta];
+      }
+      elseif (isset($items[$delta][$column])) {
+        return $items[$delta][$column];
+      }
+    }
+
+    if (isset($items[$delta]) && $column_is_assumed) {
+      throw new \OutOfBoundsException('Missing column argument and column "value" does not exist; a column key assumption will not be made.');
+
+    }
+
+    return $default;
   }
 
   /**
@@ -214,10 +266,11 @@ trait EntityDataAccessorTrait {
    *   not.
    */
   public function items(string $field_name, array $default = []) {
-    $entity = $this->getEntity();
+    list(, $entity) = $this->requireEntity();
     $items = $default;
     $exists = FALSE;
     try {
+      // TODO Can we refactor with entity->getValue?
       foreach ($entity->get($field_name) as $item) {
         if ($exists === FALSE) {
           $items = [];
@@ -260,21 +313,17 @@ trait EntityDataAccessorTrait {
    *   An array of entities instances.  Keys are entity ids.
    */
   public function entities(string $field_name): array {
+    list($entity_type_id, , $bundle) = $this->requireEntity();
     $entities = [];
     try {
-      list($entity_type_id, , $bundle) = $this->validateEntity();
       foreach ($this->getEntity()->get($field_name) as $item) {
         $entities[] = $item->getValue();
       }
       if (!empty($entities)) {
-        $fields = \Drupal::service('entity_field.manager')
-          ->getFieldDefinitions($entity_type_id, $bundle);
-        if (!array_key_exists($field_name, $fields)) {
-          return $entities;
-        }
+        $fields = $this->entityFieldManager->getFieldDefinitions($entity_type_id, $bundle);
         $field_definition = $fields[$field_name]->getItemDefinition();
         $target_type = $field_definition->getSetting('target_type');
-        $storage = \Drupal::entityTypeManager()->getStorage($target_type);
+        $storage = $this->entityTypeManager->getStorage($target_type);
         $entities = $storage->loadMultiple(array_map(function ($item) {
           return $item['target_id'];
         }, $entities));
@@ -357,8 +406,10 @@ trait EntityDataAccessorTrait {
    * @see loft_core_shadow_entity_load()
    */
   protected function ensureEntityIsLoaded(): array {
-    list($entity_type, $entity, $bundle, $entity_id) = $this->validateEntity();
+    list($entity_type, $entity, $bundle, $entity_id) = $this->requireEntity();
     if ($entity_id && property_exists($entity, 'loft_core_shadow') && $entity->loft_core_shadow === FALSE) {
+
+      // TODO replace with $this->entityTypeManager->getStorage
       $entities = $this->d7->entity_load($entity_type, [$entity_id]);
       $this->setEntity($entity_type, $entities[$entity_id]);
     }
@@ -369,7 +420,7 @@ trait EntityDataAccessorTrait {
   /**
    * Return information about a field.
    *
-   * @param $args
+   * @param array $args
    * @param string $method
    *   The method name of the caller. This is only used for error reporting.
    *
@@ -379,48 +430,40 @@ trait EntityDataAccessorTrait {
    *  - 2 int The item delta.
    *  - 3 string The name of the value column.
    */
-  private function getFieldArgs($args, $method) {
-    // Completed: 1000000 runs in 154 seconds with static cache
-    // Completed: 1000000 runs in 161 seconds without static cache
-    static $runs = [];
-    $cid = json_encode(func_get_args());
-    if (!isset($runs[$cid])) {
-      $num_args = count($args);
-      if ($num_args > 3) {
-        throw new \InvalidArgumentException("Expecting max four arguments in $method.");
+  private function getFieldArgs(array $args, $method) {
+    list(, $entity) = $this->requireEntity();
+    $num_args = count($args);
+    if ($num_args > 3) {
+      throw new \BadMethodCallException("Expecting max four arguments in $method.");
+    }
+    $field_name = array_shift($args);
+    $delta = $column = NULL;
+    try {
+      $is_field = (bool) $entity->hasField($field_name);
+    }
+    catch (\Exception $exception) {
+      $is_field = FALSE;
+    }
+    if ($is_field) {
+      if ($num_args === 1) {
+        $column = 'value';
+        $delta = 0;
       }
-      $field_name = array_shift($args);
-      $delta = $column = NULL;
-      try {
-        $is_field = (bool) FieldStorageConfig::loadByName($this->getEntityTypeId(), $field_name);
-      }
-      catch (\Exception $exception) {
-        $is_field = FALSE;
-      }
-      if (!$is_field && $num_args > 1) {
-        throw new \InvalidArgumentException("Non-field with field name = \"$field_name\" does not have \$delta or \$column values.");
-      }
-      if ($is_field) {
-        if ($num_args === 1) {
-          $column = 'value';
-          $delta = 0;
+      while (count($args)) {
+        $arg = array_shift($args);
+        if (is_numeric($arg)) {
+          $delta = $arg;
         }
-        while (count($args)) {
-          $arg = array_shift($args);
-          if (is_numeric($arg)) {
-            $delta = $arg;
-          }
-          if (is_string($arg)) {
-            $column = $arg;
-            $delta = $delta ? $delta : 0;
-          }
+        if (is_string($arg)) {
+          $column = $arg;
+          $delta = $delta ? $delta : 0;
         }
       }
-
-      $runs[$cid] = [$is_field, $field_name, $delta, $column];
     }
 
-    return $runs[$cid];
+    $info = [$is_field, $field_name, $delta, $column];
+
+    return $info;
   }
 
 }
