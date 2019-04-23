@@ -188,8 +188,7 @@ trait EntityDataAccessorTrait {
    * @throws \Drupal\loft_core\Entity\MissingRequiredEntityException
    */
   public function f($default, $field_name) {
-    $this->requireEntity();
-    list(, $entity) = $this->ensureEntityIsLoaded();
+    list(, $entity) = $this->requireEntity();
     $args = func_get_args();
     $default = array_shift($args);
 
@@ -389,32 +388,6 @@ trait EntityDataAccessorTrait {
     }
 
     return $this->d7->check_markup($output, $handler);
-  }
-
-  /**
-   * Ensure the entity is not a not a Loft Shadow Entity.
-   *
-   * @return array
-   *   - entity_type
-   *   - entity
-   *   - bundle_type
-   *   - entity_id
-   *
-   * @throws \RuntimeException
-   *   If the entity cannot validate.
-   *
-   * @see loft_core_shadow_entity_load()
-   */
-  protected function ensureEntityIsLoaded(): array {
-    list($entity_type, $entity, $bundle, $entity_id) = $this->requireEntity();
-    if ($entity_id && property_exists($entity, 'loft_core_shadow') && $entity->loft_core_shadow === FALSE) {
-
-      // TODO replace with $this->entityTypeManager->getStorage
-      $entities = $this->d7->entity_load($entity_type, [$entity_id]);
-      $this->setEntity($entity_type, $entities[$entity_id]);
-    }
-
-    return [$entity_type, $entity, $bundle, $entity_id];
   }
 
   /**
