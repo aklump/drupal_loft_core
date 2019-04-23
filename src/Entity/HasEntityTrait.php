@@ -166,10 +166,8 @@ trait HasEntityTrait {
    * @endcode
    *
    * @param string $entity_type_id
-   *   The required entity_type_id.  Unlike other methods, this one requires
-   *   that you provide the entity_type_id, as this reads better in your code.
-   *   If you must, you can do $this->requireEntity(self::ENTITY_TYPE_ID) to
-   *   have a dynamic signature, but it's discouraged.
+   *   The required entity_type_id.  Pass an empty value to use
+   *   static::ENTITY_TYPE_ID.
    * @param array $required_bundles
    *   To allow all bundles leave these an empty array.  To require one or more
    *   bundles, send those bundle ids as an indexed array.
@@ -183,10 +181,8 @@ trait HasEntityTrait {
    * @throws \InvalidArgumentException
    *   If $entity_type_id is empty.
    */
-  protected function requireEntity(string $entity_type_id, array $required_bundles = []) {
-    if (empty($entity_type_id)) {
-      throw new \InvalidArgumentException("\$entity_type_id must be provided.  The default fallback cannot be used for this method.");
-    }
+  protected function requireEntity(string $entity_type_id = '', array $required_bundles = []) {
+    $this->ensureEntityTypeId($entity_type_id);
     if (!$this->hasEntity($entity_type_id)
       || !($entity = $this->_entities[$entity_type_id])
       || (count($required_bundles) && !in_array($entity->bundle(), $required_bundles))
@@ -211,12 +207,12 @@ trait HasEntityTrait {
    */
   private function ensureEntityTypeId(string &$provided): void {
     if (!$provided) {
-      $constant_name = self::class . '::ENTITY_TYPE_ID';
+      $constant_name = static::class . '::ENTITY_TYPE_ID';
       if (!defined($constant_name)) {
         throw new IncompleteImplementationException("Missing class constant ENTITY_TYPE_ID in " . get_class($this));
       }
 
-      $provided = self::ENTITY_TYPE_ID;
+      $provided = static::ENTITY_TYPE_ID;
     }
   }
 

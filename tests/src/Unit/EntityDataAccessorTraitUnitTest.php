@@ -18,7 +18,7 @@ use Drupal\loft_core\Entity\HasEntityTrait;
 use Drupal\node\NodeInterface;
 
 /**
- * @group LoftCore
+ * @group loft_core
  */
 class EntityDataAccessorTraitUnitTest extends UnitTestCase {
 

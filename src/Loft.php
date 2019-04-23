@@ -38,11 +38,14 @@ class Loft {
         return;
       }
     }
-    if (is_array($element)) {
-      foreach ($element as $key => &$value) {
-        if ($key === '#required') {
-          $value = FALSE;
-        }
+    if (!is_array($element) || empty($element)) {
+      return;
+    }
+    foreach ($element as $key => &$value) {
+      if ($key === '#required') {
+        $value = FALSE;
+      }
+      if (is_array($value)) {
         self::overrideValuesByKey($value, $key, $override_value, ++$level);
       }
     }

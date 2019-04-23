@@ -2,7 +2,7 @@
 
 namespace Drupal\Tests\loft_core\Unit;
 
-use AKlump\DrupalTest\UnitTestBase;
+use AKlump\DrupalTest\Drupal8\UnitTestCase;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\loft_core\Entity\HasEntityInterface;
 use Drupal\loft_core\Entity\HasEntityTrait;
@@ -17,10 +17,11 @@ use Drupal\user\UserInterface;
  * Tests basic Loft Core functionality at the Unit level.
  *
  * @group loft_core
+ *
  * @SuppressWarnings(PHPMD.StaticAccess)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class LoftCoreUnitTest extends UnitTestBase {
+class HasTraitsUnitTest extends UnitTestCase {
 
   public function testOnSetSwapsNewEntity() {
     global $new_entity_to_swap;
@@ -56,7 +57,7 @@ class LoftCoreUnitTest extends UnitTestBase {
   }
 
   /**
-   * @expectedException \InvalidArgumentException
+   * @expectedException \Drupal\loft_core\Entity\MissingRequiredEntityException
    */
   public function testRequireEntityWithEmptyStringThrows() {
     $obj = new HasDefaultEntityType();
