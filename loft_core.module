@@ -567,9 +567,10 @@ function loft_core_contextual_links_view_alter(array &$element, array $items) {
 
 /**
  * Implements HOOK_preprocess_status_messages().
+ *
+ * Remove any messages suppressed by loft_core_suppress_messages.
  */
 function loft_core_preprocess_status_messages(&$vars) {
-  // Remove suppressed messages.
   if ($vars['message_list'] && ($masks = \Drupal::moduleHandler()
       ->invokeAll('loft_core_suppress_messages'))) {
     foreach (array_keys($masks) as $type) {
