@@ -15,6 +15,19 @@ use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
  * - set $this->entityTypeManager.
  * - set $this->entityFieldManager.
  *
+ * @code
+ *
+ * arguments: ["@entity_type.manager", "@entity_field.manager"]
+ *
+ * public function __construct(
+ *   EntityTypeManagerInterface $entity_type_manager,
+ *   EntityFieldManagerInterface $entity_field_manager
+ * ) {
+ *   $this->entityTypeManager = $entity_type_manager;
+ *   $this->entityFieldManager = $entity_field_manager;
+ * }
+ * @endcode
+ *
  * All methods that return a string, get a magic safe method.  Here's how it
  * works:
  *
@@ -37,11 +50,15 @@ trait EntityDataAccessorTrait {
   protected $safeMarkupHandler = NULL;
 
   /**
+   * An entity type manager instance.
+   *
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
+   * An entity field manager instance.
+   *
    * @var \Drupal\Core\Entity\EntityFieldManagerInterface
    */
   protected $entityFieldManager;
