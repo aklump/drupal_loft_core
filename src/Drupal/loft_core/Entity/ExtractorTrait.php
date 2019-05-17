@@ -179,6 +179,24 @@ trait ExtractorTrait {
   }
 
   /**
+   * Return an array of items cast to safe value strings for a given field.
+   *
+   * @param string $field_name
+   *   The entity field name.
+   * @param array $default
+   *   The default value if the field is missing or empty.
+   *
+   * @return array
+   *   An array of field items in the entity language, cast to their safe value
+   *   strings.
+   */
+  public function itemsSafe($field_name, array $default = []) {
+    return array_map(function ($item) {
+      return $this->getFieldItemSafeValue($item);
+    }, $this->items($field_name, $default));
+  }
+
+  /**
    * Return the first loaded entity.
    *
    * @param string $field_name
@@ -320,13 +338,13 @@ trait ExtractorTrait {
   /**
    * Ensure that $this->entity is not a shadow entity.
    *
-   * @see loft_core_shadow_entity_load()
-   *
    * @return array
    *   - entity_type
    *   - entity
    *   - bundle_type
    *   - entity_id
+   * @see loft_core_shadow_entity_load()
+   *
    */
   protected function ensureEntityIsLoaded() {
     list($entity_type, $entity, $bundle, $entity_id) = $this->validateEntity();
