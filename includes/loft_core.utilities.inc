@@ -53,8 +53,6 @@ function loft_core_twiglike_token_scan(string $text): array {
  *
  * This is not for use with the token module.
  *
- * @see loft_core_twiglike_token_replace for Token module usage.
- *
  * @param string $text
  *   Should contain something like {{ sender.name }}
  * @param array $data Should be like ['sender'=>['name'=>'Paul']]
@@ -62,6 +60,8 @@ function loft_core_twiglike_token_scan(string $text): array {
  * @return string
  *
  * @fixme Must port to d8, not working.
+ * @see loft_core_twiglike_token_replace for Token module usage.
+ *
  */
 function loft_core_twiglike_replace($text, array $data = []) {
   $g = data_api();
@@ -349,7 +349,7 @@ function null_filter($array) {
 /**
  * Make a css safe class or id
  *
- * @param      string or array $input
+ * @param string or array $input
  *                    The string will be made css safe; array values will be
  *                    made css safe
  * @param bool $flatten
@@ -400,7 +400,9 @@ function loft_core_css_safe($input, $flatten = FALSE) {
 function loft_core_max_weight(array $render_array): int {
   $max = 0;
   array_walk($render_array, function ($value) use (&$max) {
-    $max = max($max, $value['#weight'] ?? 0);
+    if (is_array($value)) {
+      $max = max($max, $value['#weight'] ?? 0);
+    }
   });
 
   return $max;
@@ -417,7 +419,9 @@ function loft_core_max_weight(array $render_array): int {
 function loft_core_min_weight($render_array) {
   $min = 0;
   array_walk($render_array, function ($value) use (&$min) {
-    $min = min($min, $value['#weight'] ?? 0);
+    if (is_array($value)) {
+      $min = min($min, $value['#weight'] ?? 0);
+    }
   });
 
   return $min;
