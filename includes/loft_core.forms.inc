@@ -140,7 +140,7 @@ function loft_core_form_disable_elements(array &$form, array $paths, $module_nam
  * @param array $form
  *   The FAPI form definition.
  * @param array $paths
- *   An array of paths for data_api pointing to the form elment to hide.
+ *   An array of paths for data_api pointing to the form element to hide.
  */
 function loft_core_form_hide_elements(array &$form, array $paths) {
   $g = data_api();
@@ -154,6 +154,64 @@ function loft_core_form_hide_elements(array &$form, array $paths) {
       $g->set($form,
         "$path.#access",
         FALSE);
+    }
+  }
+}
+
+/**
+ * Require form elements by adding #required = true.
+ *
+ * @param array $form
+ *   The FAPI form definition.
+ * @param array $paths
+ *   An array of paths for data_api pointing to the form element to require.
+ */
+function loft_core_form_require_elements(array &$form, array $paths) {
+  $g = data_api();
+  foreach ($paths as $path) {
+    if ($g->get($form, $path)) {
+      $g->set($form, "$path.#required", TRUE);
+    }
+  }
+}
+
+/**
+ * Do not require form elements by adding #required = false.
+ *
+ * @param array $form
+ *   The FAPI form definition.
+ * @param array $paths
+ *   An array of paths for data_api pointing to the form element to make
+ *   optional.
+ */
+function loft_core_form_optional_elements(array &$form, array $paths) {
+  $g = data_api();
+  foreach ($paths as $path) {
+    if ($g->get($form, $path)) {
+      $g->set($form, "$path.#required", FALSE);
+    }
+  }
+}
+
+/**
+ * Set the form states on elements for a given condition
+ *
+ * @param array $form
+ *   The FAPI form definition.
+ * @param array $paths
+ *   An array of paths for data_api pointing to the form element to make
+ *   optional.
+ */
+function loft_core_form_add_state_conditions(array &$form, array $paths, string $state, array $condition) {
+  $g = data_api();
+  foreach ($paths as $path) {
+    $path = is_string($path) ? explode('.', $path) : $path;
+    if ($g->get($form, $path)) {
+      $path[] = '#states';
+      $path[] = $state;
+      $existing_conditions = $g->get($form, $path, []);
+      $existing_conditions[][] = $condition;
+      $g->set($form, $path, $existing_conditions);
     }
   }
 }
