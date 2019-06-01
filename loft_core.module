@@ -104,7 +104,7 @@ function loft_core_test_class(string $class): string {
  *   will be added as a child of this path.  The test class is the substring up
  *   to and not including the first '.' in the path; in the example just given,
  *   the test class will be built on 'field_account_name'. In cases where you
- *   want to specifiy the test class, you can use ' as [test class]', e.g.
+ *   want to specify the test class, you can use ' as [test class]', e.g.
  *   'field_account_name.widget.0.value as account_name' for the array item
  *   value.
  */
@@ -113,14 +113,17 @@ function loft_core_element_add_test_classes(array &$element, array $paths): void
   foreach ($paths as $path) {
     list($path, $test_class) = explode(' as ', $path . ' as ' . $path);
     list($test_class) = explode('.', $test_class);
-    $g->onlyIfHas($element, $path)
-      ->call(function () use (&$element, $path, $test_class) {
-        $s = data_api();
-        $path .= '.#attributes.class';
-        $classes = $s->get($element, $path, []);
-        $classes[] = loft_core_test_class($test_class);
-        $s->set($element, $path, $classes);
-      });
+    $exists = FALSE;
+    $g->onlyIfHas($element, $path)->call(function () use (&$exists) {
+      $exists = TRUE;
+    });
+    if ($exists) {
+      $s = data_api();
+      $path .= '.#attributes.class';
+      $classes = $s->get($element, $path, []);
+      $classes[] = loft_core_test_class($test_class);
+      $s->set($element, $path, $classes);
+    }
   }
 }
 
