@@ -9,8 +9,8 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
  *
  * In your custom module you need to:
  *
- * - Extend this class, e.g. UserCrudService
- * - Add it as a module service
+ * - Extend this class, e.g. UserCrudService extends EntityCrudService
+ * - Add it as service in your modules services.yml.
  * - Wrap a service call in the Drupal hooks, see code below.
  * - Implement a method like save or save__BUNDLE.
  *

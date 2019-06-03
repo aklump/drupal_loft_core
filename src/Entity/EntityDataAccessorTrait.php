@@ -3,20 +3,19 @@
 namespace Drupal\loft_core\Entity;
 
 use Drupal\Core\Datetime\DrupalDateTime;
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
 
 /**
  * A trait for obtaining entity data using convenient/safe methods.
  *
  * When using this trait your class MUST:
+ * - use \Drupal\loft_core\Entity\EntityDataAccessorTrait.
  * - use \Drupal\loft_core\Entity\HasEntityTrait.
  * - implement \Drupal\loft_core\Entity\HasEntityInterface.
  * - set $this->entityTypeManager.
  * - set $this->entityFieldManager.
  *
  * @code
- *
  * arguments: ["@entity_type.manager", "@entity_field.manager"]
  *
  * public function __construct(
@@ -106,10 +105,38 @@ trait EntityDataAccessorTrait {
    *   returned directly.  For example you could pass: NULL or 'now'.
    * @param string $field_name
    *   The field name to look for a value to pass to DrupalDateTime
-   *   constructor.
-   * @param string $set_timezone_to
-   *   Set the timezone on the object to this timezone name.  Defaults to
-   *   'UTC'.
+   *   constructor.  To use a date other than the first item, pass another
+   *   argument to this method, a third argument which is a numeric index of
+   *   which date to use.  This is most common in a date range where you want
+   *   to know the to date, which is index 1.
+   * @param ... Optional, any of the following, in any order:
+   *   - The item value key, e.g. 'value', 'end_value', default to 'value'.
+   *   - The item index for fields with multiple dates, defaults to 0.
+   *   - A valid string timezone name passed to timezone_open().  Defaults to
+   *   UTC.
+   *
+   * @code
+   *    // Create date object from field_date or return NULL.
+   *    $obj->date(NULL, 'field_date');
+   *
+   *    // Create date object from field_date or from current moment.
+   *    $obj->date('now', 'field_date');
+   *
+   *    // Create date object from field_date's end_date or from current
+   *   moment.
+   *    $obj->date('now', 'field_date', 'end_date');
+   *
+   *    // Create date object from field_date second date value.
+   *    $obj->date(NULL, 'field_date', 1);
+   *
+   *    // Create date object from field_date or return NULL.  Set timezone to
+   *   LA.
+   *    $obj->date(NULL, 'field_date', 'Los_Angeles/America');
+   *
+   *    // Create date object from field_date using second date value or return
+   *   NULL.  Set timezone to LA.
+   *    $obj->date('now', 'field_date', 1, 'Los_Angeles/America');
+   * @endcode
    *
    * @return \Drupal\Core\Datetime\DrupalDateTime|mixed
    *   An instance in the timezone indicated by $set_timezone_to, or if no
@@ -117,8 +144,28 @@ trait EntityDataAccessorTrait {
    *
    * @d8
    */
-  public function date($default, string $field_name, string $set_timezone_to = 'UTC') {
-    $date = $this->f($default, $field_name, 'value');
+  public function date($default, string $field_name) {
+    // Detect the arguments from those passed.
+    $args = func_get_args();
+    $default = array_shift($args);
+    $field_name = array_shift($args);
+    $delta = 0;
+    $column = 'value';
+    $set_timezone_to = 'UTC';
+    while ($final_arg = array_pop($args)) {
+      if (@timezone_open($final_arg)) {
+        $set_timezone_to = $final_arg;
+      }
+      elseif (is_numeric($final_arg)) {
+        $delta = $final_arg;
+      }
+      elseif ($final_arg) {
+        $column = $final_arg;
+      }
+    }
+    // End detection.
+
+    $date = $this->f($default, $field_name, $delta, $column);
     if (empty($date)) {
       return $default;
     }
@@ -308,15 +355,16 @@ trait EntityDataAccessorTrait {
    * @param string $field_name
    *   This should field that references entities.
    *
-   * @return \Drupal\Core\Entity\EntityInterface
-   *   The first loaded entity referenced by $field_name.
+   * @return \Drupal\Core\Entity\EntityInterface|null
+   *   The first loaded entity referenced by $field_name or NULL.
    *
    * @see ::entities()
    */
-  public function entity(string $field_name): EntityInterface {
+  public function entity(string $field_name) {
     $entities = $this->entities($field_name);
+    $entity = reset($entities);
 
-    return reset($entities);
+    return $entity ? $entity : NULL;
   }
 
   /**

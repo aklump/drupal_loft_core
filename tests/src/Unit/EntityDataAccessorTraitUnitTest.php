@@ -45,6 +45,57 @@ class EntityDataAccessorTraitUnitTest extends UnitTestCase {
     ];
   }
 
+  /**
+   * @dataProvider dataForTestDateReturnsDrupalDateTimeFromVariousValuesProvider
+   */
+  public function testDateReturnsDrupalDateTimeFromVariousValuesWhenUsingEndValueArgument($control_utc, $control_local, $field_value) {
+    $this->populateEntity('node', 'story');
+    $this->populateEntityFieldValues('field_date', [$field_value], 'end_value');
+
+    $date = $this->obj->setEntity($this->entity)->date('', 'field_date', 'end_value');
+    $this->assertInstanceOf(DrupalDateTime::class, $date);
+    $this->assertSame($control_utc, $date->format('r'));
+
+    $date = $this->obj->setEntity($this->entity)
+      ->date('', 'field_date', 'end_value', 'America/Los_Angeles');
+    $this->assertInstanceOf(DrupalDateTime::class, $date);
+    $this->assertSame($control_local, $date->format('r'));
+  }
+
+  /**
+   * @dataProvider dataForTestDateReturnsDrupalDateTimeFromVariousValuesProvider
+   */
+  public function testDateReturnsDrupalDateTimeFromVariousValuesWhenUsingItemIndexArgument($control_utc, $control_local, $field_value) {
+    $this->populateEntity('node', 'story');
+    $this->populateEntityFieldValues('field_date', [NULL, $field_value]);
+
+    $date = $this->obj->setEntity($this->entity)->date('', 'field_date', 1);
+    $this->assertInstanceOf(DrupalDateTime::class, $date);
+    $this->assertSame($control_utc, $date->format('r'));
+
+    $date = $this->obj->setEntity($this->entity)
+      ->date('', 'field_date', 1, 'America/Los_Angeles');
+    $this->assertInstanceOf(DrupalDateTime::class, $date);
+    $this->assertSame($control_local, $date->format('r'));
+  }
+
+  /**
+   * @dataProvider dataForTestDateReturnsDrupalDateTimeFromVariousValuesProvider
+   */
+  public function testDateReturnsDrupalDateTimeFromVariousValues($control_utc, $control_local, $field_value) {
+    $this->populateEntity('node', 'story');
+    $this->populateEntityFieldValues('field_date', [$field_value]);
+
+    $date = $this->obj->setEntity($this->entity)->date('', 'field_date');
+    $this->assertInstanceOf(DrupalDateTime::class, $date);
+    $this->assertSame($control_utc, $date->format('r'));
+
+    $date = $this->obj->setEntity($this->entity)
+      ->date('', 'field_date', 'America/Los_Angeles');
+    $this->assertInstanceOf(DrupalDateTime::class, $date);
+    $this->assertSame($control_local, $date->format('r'));
+  }
+
   public function testAnEmptyArrayIsReturnedWhenFieldDoesNotExist() {
     $this->populateEntity('node', 'person');
     $this->obj->setEntity($this->entity);
@@ -147,23 +198,6 @@ class EntityDataAccessorTraitUnitTest extends UnitTestCase {
     );
 
     return $tests;
-  }
-
-  /**
-   * @dataProvider dataForTestDateReturnsDrupalDateTimeFromVariousValuesProvider
-   */
-  public function testDateReturnsDrupalDateTimeFromVariousValues($control_utc, $control_local, $field_value) {
-    $this->populateEntity('node', 'story');
-    $this->populateEntityFieldValues('field_date', [$field_value]);
-
-    $date = $this->obj->setEntity($this->entity)->date('', 'field_date');
-    $this->assertInstanceOf(DrupalDateTime::class, $date);
-    $this->assertSame($control_utc, $date->format('r'));
-
-    $date = $this->obj->setEntity($this->entity)
-      ->date('', 'field_date', 'America/Los_Angeles');
-    $this->assertInstanceOf(DrupalDateTime::class, $date);
-    $this->assertSame($control_local, $date->format('r'));
   }
 
   public function testDefaultReturnsWhenFieldIsEmpty() {

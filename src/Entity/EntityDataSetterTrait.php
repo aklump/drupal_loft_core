@@ -42,7 +42,12 @@ trait EntityDataSetterTrait {
     list(, $entity) = $this->requireEntity();
     $index = 'value';
     if (!is_object($date_value)) {
-      $date_value = date_create($date_value);
+      if ($value = date_create($date_value)) {
+        $date_value = $value;
+      }
+      else {
+        throw new \InvalidArgumentException("Cannot understand string date value of \"$date_value\".");
+      }
     }
     if (!method_exists($date_value, 'format')) {
       throw new \InvalidArgumentException("\$date_value must be an object having the method \"format\".");
