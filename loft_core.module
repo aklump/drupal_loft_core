@@ -201,11 +201,11 @@ function loft_core_static_content_stream($target) {
 function loft_core_test_mode($state) {
   if ($state) {
     $min = 15;
-    setrawcookie('loft_core_testing', ip_address(), REQUEST_TIME + $min * 60, '/');
+    variable_set('loft_core_test_mode_expiry', REQUEST_TIME + $min * 60);
     $message = 'Test mode enabled for @minutes.';
   }
   else {
-    setrawcookie('loft_core_testing', '', REQUEST_TIME - 3600, '/');
+    variable_del('loft_core_test_mode_expiry');
     $message = 'Test mode disabled.';
   }
   drupal_set_message(t($message, array(
@@ -544,12 +544,20 @@ function is_live($feature) {
  */
 function loft_core_test_class($class) {
   static $testing;
-  if ($testing || (defined('DRUPAL_ENV_ROLE') && strpos(DRUPAL_ENV_ROLE,
-        'prod') !== 0) || (!empty($_COOKIE['loft_core_testing']) && $_COOKIE['loft_core_testing'] === ip_address())) {
+  if ($testing
+    || (defined('DRUPAL_ENV_ROLE') && strpos(DRUPAL_ENV_ROLE, 'prod') !== 0)
+    || ($expiry = variable_get('loft_core_test_mode_expiry'))) {
+
+    // First time on page load that we get here, we may delete the expiry.
+    if (!$testing && $expiry && $expiry < time()) {
+      variable_del('loft_core_test_mode_expiry');
+    }
     $testing = TRUE;
 
     return 't-' . $class;
   }
+
+  return '';
 }
 
 /**
@@ -564,10 +572,10 @@ function loft_core_test_class($class) {
  *
  * @return array
  *
- * @see  Drupal.ajax.prototype.commands.loftCoreTrackJsConsole().
+ * @throws InvalidArgumentException if $severity is not valid.
  * @link http://docs.trackjs.com/tracker/top-level-api#trackjsconsole
  *
- * @throws InvalidArgumentException if $severity is not valid.
+ * @see  Drupal.ajax.prototype.commands.loftCoreTrackJsConsole().
  */
 function loft_core_ajax_command_trackjs_console($severity,
                                                 $message
@@ -1000,7 +1008,7 @@ function null_filter($array) {
 /**
  * Make a css safe class or id
  *
- * @param      string or array $input
+ * @param string or array $input
  *                    The string will be made css safe; array values will be
  *                    made css safe
  * @param bool $flatten
@@ -1082,12 +1090,12 @@ function loft_core_twiglike_token_scan($text) {
  *
  * This is not for use with the token module.
  *
- * @see loft_core_twiglike_token_replace for Token module usage.
- *
  * @param string $text Should contain something like {{ sender.name }}
  * @param array $data Should be like ['sender'=>['name'=>'Paul']]
  *
  * @return string
+ * @see loft_core_twiglike_token_replace for Token module usage.
+ *
  */
 function loft_core_twiglike_replace($text, array $data = array()) {
   $g = data_api();
