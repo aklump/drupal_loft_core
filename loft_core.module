@@ -549,7 +549,7 @@ function loft_core_test_class($class) {
     || ($expiry = variable_get('loft_core_test_mode_expiry'))) {
 
     // First time on page load that we get here, we may delete the expiry.
-    if (!$testing && $expiry && $expiry < time()) {
+    if (!$testing && !empty($expiry) && $expiry < time()) {
       variable_del('loft_core_test_mode_expiry');
     }
     $testing = TRUE;
