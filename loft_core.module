@@ -65,9 +65,12 @@ function loft_core_test_class(string $class): string {
   static $testing;
   if ($testing
     || (defined('DRUPAL_ENV_ROLE') && strpos(DRUPAL_ENV_ROLE, 'prod') !== 0)
-    || (!empty($_COOKIE['loft_core_testing'])
-      && $_COOKIE['loft_core_testing'] === \Drupal::request()->getClientIp())
-  ) {
+    || ($expiry = \Drupal::state()->get('loft_core_test_mode_expiry'))) {
+
+    // First time on page load that we get here, we may delete the expiry.
+    if (!$testing && $expiry && $expiry < time()) {
+      \Drupal::state()->delete('loft_core_test_mode_expiry');
+    }
     $testing = TRUE;
 
     return 't-' . $class;

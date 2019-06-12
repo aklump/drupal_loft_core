@@ -38,11 +38,11 @@ class TestModeController {
    */
   public function setTestMode(bool $state, int $duration_minutes): void {
     if ($state) {
-      setrawcookie('loft_core_testing', \Drupal::request()
-        ->getClientIp(), REQUEST_TIME + $duration_minutes * 60, '/');
+      \Drupal::state()->set('loft_core_test_mode_expiry', \Drupal::time()
+          ->getRequestTime() + $duration_minutes * 60);
     }
     else {
-      setrawcookie('loft_core_testing', '', REQUEST_TIME - 3600, '/');
+      \Drupal::state()->delete('loft_core_test_mode_expiry');
     }
   }
 
