@@ -11,7 +11,7 @@
     ],
     "require": {
         "sunra/php-simple-html-dom-parser": "^1.5",
-        "aklump/loft-lib": "~1.0.18"
+        "aklump/loft-lib": "^1.0"
     },
     "autoload-dev": {
         "psr-4": {
