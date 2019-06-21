@@ -15,3 +15,33 @@ When you visit the url endpoint, include the testing key like so:
     /loft-core/testing/enable/{test_mode_url_token}
     
 This will enable the test mode for a short duration and cause test classes to appear on production, for your IP only.  The response is JSON and contains the expiry timestamp.
+
+## Anomolies with Adding Test Classes
+
+### Paragraphs Add Widget
+
+![Paragraphs Add Widget](images/paragraphs-widget.jpg)
+
+The buttons on a paragraph element widget are really tricky, use `loft_core_paragraphs_element_add_test_classes` to simplify test classes.
+
+In a form alter hook do something like:
+
+    loft_core_paragraphs_element_add_test_classes($form, [
+      'field_components',
+    ]);
+
+To target the dropbutton toggle:
+
+    .t-field_components_add .dropbutton-toggle
+    
+To target any of the add paragraph buttons:
+    
+    .t-field_components_add__members_list
+    .t-field_components_add__members_photos
+    .t-field_components_add__...
+
+To target any paragraph that has been added:
+
+    .t-field_components__item0
+    .t-field_components__item1
+    .t-field_components__item...

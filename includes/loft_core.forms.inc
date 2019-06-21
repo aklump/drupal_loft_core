@@ -7,6 +7,7 @@
 
 use AKlump\LoftLib\Code\Arrays;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Element;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Url;
 use Drupal\loft_core\Redirect;
@@ -275,4 +276,57 @@ function loft_core_form_user_admin_settings_submit($form, FormStateInterface $fo
   \Drupal::configFactory()->getEditable('loft_core.settings')
     ->set('mail_registration_from', $form_state->getValue('loft_core_mail_registration_from'))
     ->save();
+}
+
+/**
+ * Add test classes to a paragraphs element.
+ *
+ * @code
+ *   // Where field_components is a paragraph reference field pointing to
+ *   multiple paragraph types.
+ *   loft_core_paragraphs_element_add_test_classes($form, [
+ *     'field_components',
+ *   ]);
+ *   loft_core_element_add_test_classes($form, [
+ *     'actions.submit as create_board',
+ *   ]);
+ * @endcode
+ *
+ * @param array $form
+ * @param array $paths
+ */
+function loft_core_paragraphs_element_add_test_classes(array &$form, array $paths): void {
+  $final_paths = [];
+  foreach ($paths as $field_name) {
+    if (!is_string($field_name)) {
+      throw new \InvalidArgumentException("Each element of $field_name must be a string, which is a fieldname");
+    }
+    if (empty($form[$field_name]['widget']['add_more'])) {
+      throw new \InvalidArgumentException("The $field_name element does not have an \"add_more\" widget");
+    }
+    $final_paths[] = "$field_name.widget.add_more as {$field_name}_add";
+    foreach (Element::children($form[$field_name]['widget']['add_more']['operations']['#links']) as $option) {
+      $alias = str_replace('add_more_button_', $field_name . '_add__', $option);
+      $final_paths[] = implode('.',
+          [
+            $field_name,
+            'widget.add_more.operations.#links',
+            $option,
+            'title',
+          ]) . ' as ' . $alias;
+    }
+    foreach (Element::children($form[$field_name]['widget']) as $item) {
+      if ($item === 'add_more') {
+        continue;
+      }
+      $alias = $field_name . "__item$item";
+      $final_paths[] = implode('.',
+          [
+            $field_name,
+            'widget',
+            $item,
+          ]) . ' as ' . $alias;
+    }
+    loft_core_element_add_test_classes($form, $final_paths);
+  }
 }
