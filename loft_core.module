@@ -60,6 +60,8 @@ function is_live($feature) {
  * @param string $class
  *
  * @return string
+ *
+ * @deprecated Use TestingMarkup::class instead.
  */
 function loft_core_test_class(string $class): string {
   static $testing;

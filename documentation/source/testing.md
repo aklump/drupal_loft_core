@@ -42,6 +42,6 @@ To target any of the add paragraph buttons:
 
 To target any paragraph that has been added:
 
-    .t-field_components__item0
+    .t-field_components__item
     .t-field_components__item1
     .t-field_components__item...

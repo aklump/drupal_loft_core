@@ -1,0 +1,38 @@
+<?php
+
+/**
+ * @file
+ * The main module file for loft_core_testing
+ */
+
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\loft_core_testing\Component\Utility\TestingMarkup;
+
+/**
+ * Implements hook_form_alter().
+ *
+ * @param array $form
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
+ * @param string $form_id
+ */
+function loft_core_testing_form_alter(array &$form, FormStateInterface $form_state, $form_id) {
+  TestingMarkup::isTesting() && TestingMarkup::formAddClasses($form);
+}
+
+/**
+ * Implements hook_preprocess_menu_local_task().
+ */
+function loft_core_testing_preprocess_menu_local_task(&$vars) {
+  if (isset($vars['link']) && ($id = $vars['link']['#url']->getRouteName())) {
+    $vars['link']['#attributes']['class'][] = TestingMarkup::id('local_task--' . loft_core_css_safe($id));
+  }
+}
+
+/**
+ * Implements hook_preprocess_menu_local_task().
+ */
+function loft_core_testing_preprocess_menu_local_action(&$vars) {
+  if (isset($vars['link']) && ($id = $vars['link']['#url']->getRouteName())) {
+    $vars['link']['#options']['attributes']['class'][] = TestingMarkup::id('local_action--' . loft_core_css_safe($id));
+  }
+}
