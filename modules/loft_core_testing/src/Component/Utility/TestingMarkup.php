@@ -80,7 +80,7 @@ class TestingMarkup {
       $element['#after_build'] = $element['#after_build'] ?? [];
       switch ($element['#type']) {
         case 'form':
-          $context['form_name'] = $element['#id'];
+          list($context['form_name']) = explode('--', $element['#id'] . '--');
           $context['form_name'] = preg_replace('/[-_]+form$/', '', $context['form_name']);
           $context['form_name'] = preg_replace('/^node[-_]+/', '', $context['form_name']);
           $class[] = $context['form_name'];
@@ -108,25 +108,43 @@ class TestingMarkup {
           }
           break;
 
+        case 'address':
+          $element['#after_build'][] = [self::class, 'addressAfterBuild'];
+          $context['class_base'] = self::defaultClassGenerator($context);
+          $element['#loft_core_testing']['context'] = $context;
+          break;
+
         case 'managed_file':
           $element['#after_build'][] = [self::class, 'fileAfterBuild'];
           $context['class_base'] = self::defaultClassGenerator($context);
           $element['#loft_core_testing']['context'] = $context;
           break;
 
-        case 'datetime':
-          $element['#after_build'][] = [self::class, 'datetimeAfterBuild'];
+        case 'details':
+          $element['#after_build'][] = [self::class, 'stripTestClassesAfterBuild'];
           $class = self::defaultClassGenerator($context);
           break;
 
+        case 'datetime':
+          $element['#after_build'][] = [self::class, 'stripTestClassesAfterBuild'];
+          $class = self::defaultClassGenerator($context);
+          break;
+
+        case 'details':
         case 'container':
           if (!empty($context['parent']['#paragraphs_widget']) && isset($element['#delta'])) {
             $class[] = $context['field_name'];
             $class[] = $element['#delta'] ? 'item' . $element['#delta'] : 'item';
           }
+          else {
+            $c = $context;
+            array_unshift($c['path'], 'wrap');
+            $class = self::defaultClassGenerator($c);
+          }
           break;
 
         case 'checkbox':
+        case 'checkboxes':
         case 'email':
         case 'entity_autocomplete':
         case 'file':
@@ -167,7 +185,6 @@ class TestingMarkup {
 
         case 'item':
         case 'actions':
-        case 'details':
         case 'hidden':
         case 'vertical_tabs':
         case 'weight':
@@ -292,7 +309,15 @@ class TestingMarkup {
    * @return array
    *   The altered element.
    */
-  public static function datetimeAfterBuild(array $element) {
+  public static function stripTestClassesAfterBuild(array $element) {
+    $element['#attributes']['class'] = array_filter($element['#attributes']['class'], function ($item) {
+      return strpos($item, 't-') !== 0;
+    });
+
+    return $element;
+  }
+
+  public static function detailsAfterBuild(array $element) {
     $element['#attributes']['class'] = array_filter($element['#attributes']['class'], function ($item) {
       return strpos($item, 't-') !== 0;
     });
@@ -332,6 +357,21 @@ class TestingMarkup {
     foreach (Element::children($element) as $child) {
       $context['parent'] = $element;
       $context['parent_key'] = $child;
+      self::formAddClasses($element[$child], $context);
+    }
+
+    return $element;
+  }
+
+  public static function addressAfterBuild(array $element, FormStateInterface $form_state) {
+    $context = $element['#loft_core_testing']['context'];
+    $path = $context['path'];
+    array_pop($path);
+    foreach (Element::children($element) as $child) {
+      $context['parent'] = $element;
+      $context['parent_key'] = $child;
+      $context['path'] = $path;
+      $context['path'][] = $child;
       self::formAddClasses($element[$child], $context);
     }
 
