@@ -5,5 +5,5 @@
  * This file must be autoloaded before running tests.
  */
 
-define('DRUPAL_ENV', 'dev');
-define('DRUPAL_ENV_ROLE', 'dev');
+($value = getenv('DRUPAL_ENV')) && define('DRUPAL_ENV', $value);
+($value = getenv('DRUPAL_ENV_ROLE')) && define('DRUPAL_ENV_ROLE', $value);
