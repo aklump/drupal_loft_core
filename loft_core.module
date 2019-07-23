@@ -10,25 +10,6 @@
 use Drupal\Core\Template\Attribute;
 use Drupal\loft_core\StaticContentStreamWrapper;
 
-// By default we will assume production environment.  To control or override this behavior see the documentation regarding these constants, e.g. settings.env.php, etc.
-if (!defined('DRUPAL_ENV')) {
-  define('DRUPAL_ENV', 'prod');
-}
-if (!defined('DRUPAL_ENV_ROLE')) {
-  define('DRUPAL_ENV_ROLE', 'prod');
-}
-
-// These should already be defined in settings as of 7.x-0.3-rc26, but in case they're not.
-if (!defined('DRUPAL_ENV_PROD')) {
-  define('DRUPAL_ENV_PROD', 'prod');
-}
-if (!defined('DRUPAL_ENV_STAGING')) {
-  define('DRUPAL_ENV_STAGING', 'staging');
-}
-if (!defined('DRUPAL_ENV_DEV')) {
-  define('DRUPAL_ENV_DEV', 'dev');
-}
-
 require_once dirname(__FILE__) . '/includes/loft_core.forms.inc';
 require_once dirname(__FILE__) . '/includes/loft_core.ajax.inc';
 require_once dirname(__FILE__) . '/includes/loft_core.utilities.inc';
