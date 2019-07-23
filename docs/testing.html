@@ -42,6 +42,40 @@
 </code></pre>
 
 <p>This will enable the test mode for a short duration and cause test classes to appear on production, for your IP only.  The response is JSON and contains the expiry timestamp.</p>
+
+<h2>Anomolies with Adding Test Classes</h2>
+
+<h3>Paragraphs Add Widget</h3>
+
+<p><img src="images/paragraphs-widget.jpg" alt="Paragraphs Add Widget" /></p>
+
+<p>The buttons on a paragraph element widget are really tricky, use <code>loft_core_paragraphs_element_add_test_classes</code> to simplify test classes.</p>
+
+<p>In a form alter hook do something like:</p>
+
+<pre><code>loft_core_paragraphs_element_add_test_classes($form, [
+  'field_components',
+]);
+</code></pre>
+
+<p>To target the dropbutton toggle:</p>
+
+<pre><code>.t-field_components_add .dropbutton-toggle
+</code></pre>
+
+<p>To target any of the add paragraph buttons:</p>
+
+<pre><code>.t-field_components_add__members_list
+.t-field_components_add__members_photos
+.t-field_components_add__...
+</code></pre>
+
+<p>To target any paragraph that has been added:</p>
+
+<pre><code>.t-field_components__item
+.t-field_components__item1
+.t-field_components__item...
+</code></pre>
 </section>
 
 <div class="search__results">
@@ -51,7 +85,7 @@
 <footer>
   <div class="pager"><a href="static_content.html" class="prev static_content">&laquo;Stream wrapper &quot;static-content://&quot;</a><a href="index.html" class="index pager__book-title">Loft Drupal Core</a><a href="entities.html" class="next entities">Working With Entities Cheat Sheet&raquo;</a></div>  
   <div id="footer-legaleeze">
-    <p class="legaleeze center">Version: 1.0 &bull; Last Updated: Tue, 11 Jun 2019 18:19:25 -0700</p>
+    <p class="legaleeze center">Version: 1.0 &bull; Last Updated: Tue, 23 Jul 2019 13:00:38 -0700</p>
   </div>
 </footer>
 
