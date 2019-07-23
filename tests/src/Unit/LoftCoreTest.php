@@ -1,8 +1,9 @@
 <?php
 
 use Drupal\loft_core\Attribute;
+use PHPUnit\Framework\TestCase;
 
-class LoftCoreTest extends PHPUnit_Framework_TestCase {
+class LoftCoreTest extends TestCase {
 
   /**
    * Provides data for test_loft_core_users_get_email_domain.
