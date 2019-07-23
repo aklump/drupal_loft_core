@@ -7,6 +7,7 @@
  * @{
  */
 
+use Dotenv\Exception\ValidationException;
 use Drupal\Core\Template\Attribute;
 use Drupal\loft_core\StaticContentStreamWrapper;
 
@@ -575,4 +576,30 @@ function loft_core_preprocess_status_messages(&$vars) {
       $vars['message_list'] = array_filter($vars['message_list']);
     };
   }
+}
+
+/**
+ * Return environment var or default.
+ *
+ * @param string $varname
+ *   Name of the environment variable.
+ * @param mixed $default
+ *   The default value if not set.  If this is not passed then the $varname
+ *   must be set or an exception is thrown.
+ *
+ * @return array|false|string|null
+ *   The value or default value.
+ *
+ * @throws \Dotenv\Exception\ValidationException
+ *   If the environment variable is not defined and $default is not provided.
+ */
+function loft_core_env($varname, $default = NULL) {
+  if (($value = getenv($varname)) !== FALSE) {
+    return $value;
+  }
+  if (func_num_args() === 1) {
+    throw new ValidationException("One or more environment variables failed assertions: $varname is missing.");
+  }
+
+  return $default;
 }
