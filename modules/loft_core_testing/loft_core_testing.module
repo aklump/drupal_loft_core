@@ -7,6 +7,7 @@
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\loft_core_testing\Component\Utility\TestingMarkup;
+use Drupal\Component\Utility\Html;
 
 /**
  * Implements hook_form_alter().
@@ -34,5 +35,18 @@ function loft_core_testing_preprocess_menu_local_task(&$vars) {
 function loft_core_testing_preprocess_menu_local_action(&$vars) {
   if (isset($vars['link']) && ($id = $vars['link']['#url']->getRouteName())) {
     $vars['link']['#options']['attributes']['class'][] = TestingMarkup::id('local_action--' . loft_core_css_safe($id));
+  }
+}
+
+/**
+ * Implements hook_preprocess_views_view_list().
+ */
+function loft_core_testing_preprocess_views_view_list(&$vars) {
+  if (TestingMarkup::isTesting()) {
+    $view_id = $vars['view']->id();
+    foreach ($vars['rows'] as &$row) {
+      $row['attributes']
+        ->addClass(TestingMarkup::id(Html::getUniqueId($view_id . '--item')));
+    }
   }
 }
