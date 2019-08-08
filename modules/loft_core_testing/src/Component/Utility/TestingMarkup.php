@@ -121,13 +121,21 @@ class TestingMarkup {
           break;
 
         case 'details':
-          $element['#after_build'][] = [self::class, 'stripTestClassesAfterBuild'];
+          $element['#after_build'][] = [
+            self::class,
+            'stripTestClassesAfterBuild',
+          ];
           $class = self::defaultClassGenerator($context);
           break;
 
         case 'datetime':
-          $element['#after_build'][] = [self::class, 'stripTestClassesAfterBuild'];
+          $element['#after_build'][] = [
+            self::class,
+            'stripTestClassesAfterBuild',
+          ];
+          $element['#after_build'][] = [self::class, 'datetimeAfterBuild'];
           $class = self::defaultClassGenerator($context);
+          $element['#loft_core_testing']['context'] = $context;
           break;
 
         case 'details':
@@ -311,15 +319,25 @@ class TestingMarkup {
    */
   public static function stripTestClassesAfterBuild(array $element) {
     $element['#attributes']['class'] = array_filter($element['#attributes']['class'], function ($item) {
-      return strpos($item, 't-') !== 0;
+      return strpos($item, self::CSS_PREFIX) !== 0;
     });
+
+    return $element;
+  }
+
+  public static function datetimeAfterBuild(array $element) {
+    if (isset($element['time'])) {
+      $element['time']['#attributes']['class'] = array_map(function ($item) {
+        return strpos($item, self::CSS_PREFIX) === 0 ? $item . '__time' : $item;
+      }, $element['time']['#attributes']['class']);
+    }
 
     return $element;
   }
 
   public static function detailsAfterBuild(array $element) {
     $element['#attributes']['class'] = array_filter($element['#attributes']['class'], function ($item) {
-      return strpos($item, 't-') !== 0;
+      return strpos($item, self::CSS_PREFIX) !== 0;
     });
 
     return $element;
