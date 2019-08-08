@@ -14,16 +14,19 @@ use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
  * - implement \Drupal\loft_core\Entity\HasEntityInterface.
  * - set $this->entityTypeManager.
  * - set $this->entityFieldManager.
+ * - set $this->renderer.
  *
  * @code
- * arguments: ["@entity_type.manager", "@entity_field.manager"]
+ * arguments: ["@entity_type.manager", "@entity_field.manager" "@renderer"]
  *
  * public function __construct(
  *   EntityTypeManagerInterface $entity_type_manager,
- *   EntityFieldManagerInterface $entity_field_manager
+ *   EntityFieldManagerInterface $entity_field_manager,
+ *   RendererInterface $renderer
  * ) {
  *   $this->entityTypeManager = $entity_type_manager;
  *   $this->entityFieldManager = $entity_field_manager;
+ *   $this->renderer = $renderer;
  * }
  * @endcode
  *
@@ -63,6 +66,20 @@ trait EntityDataAccessorTrait {
   protected $entityFieldManager;
 
   /**
+   * @var \Drupal\Core\Render\RendererInterface
+   */
+  protected $renderer;
+
+  /**
+   * Retains information about formatting about used in chaining.
+   *
+   * @var string
+   *
+   * @see ::date.
+   */
+  private $_format;
+
+  /**
    * {@inheritdoc}
    */
   public function __call($name, $arguments) {
@@ -92,7 +109,7 @@ trait EntityDataAccessorTrait {
   }
 
   /**
-   * Get a date object from a field in a given timezone.
+   * Get a date object from a field in a given timezone, or from a string.
    *
    * This has been tested with the following field types:
    * - Date
@@ -108,16 +125,25 @@ trait EntityDataAccessorTrait {
    *   constructor.  To use a date other than the first item, pass another
    *   argument to this method, a third argument which is a numeric index of
    *   which date to use.  This is most common in a date range where you want
-   *   to know the to date, which is index 1.
-   * @param ... Optional, any of the following, in any order:
-   *   - The item value key, e.g. 'value', 'end_value', default to 'value'.
-   *   - The item index for fields with multiple dates, defaults to 0.
-   *   - A valid string timezone name passed to timezone_open().  Defaults to
-   *   UTC.
+   *   to know the to date, which is index 1.  If you omit this, the $default
+   *   will be used.  You might do such a thing if you're passing 'now' as
+   *   $default, because you want a current date object.
+   *
+   * @return \Drupal\Core\Datetime\DrupalDateTime|mixed
+   *   An instance in the timezone indicated by $set_timezone_to, or if no
+   *   value and $default is empty, $default is returned.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   * @throws \OutOfBoundsException
+   *   If the provided date format is invalid.
    *
    * @code
    *    // Create date object from field_date or return NULL.
    *    $obj->date(NULL, 'field_date');
+   *
+   *    // Create date object for the  current moment.
+   *    $obj->date('now');
    *
    *    // Create date object from field_date or from current moment.
    *    $obj->date('now', 'field_date');
@@ -133,18 +159,25 @@ trait EntityDataAccessorTrait {
    *   LA.
    *    $obj->date(NULL, 'field_date', 'Los_Angeles/America');
    *
-   *    // Create date object from field_date using second date value or return
+   *   // Create date object from field_date using second date value or return
    *   NULL.  Set timezone to LA.
-   *    $obj->date('now', 'field_date', 1, 'Los_Angeles/America');
-   * @endcode
+   *   $obj->date('now', 'field_date', 1, 'Los_Angeles/America');
    *
-   * @return \Drupal\Core\Datetime\DrupalDateTime|mixed
-   *   An instance in the timezone indicated by $set_timezone_to, or if no
-   *   value and $default is empty, $default is returned.
+   *   // Create a date object for the current moment
+   *   $obj->date('now').
+   *
+   *   // Get a date object formatted by drupal date format short.  The
+   *   advantage of this is that you will not get an error trying to chain
+   *   `format` after the `date` method in the case that the date is null.
+   *   $obj->format('short')->date(NULL, 'field_dates');
+   *
+   *   // Get a date object formatted using a string.
+   *   $obj->format('m/Y')->date(NULL, 'field_dates');
+   * @endcode
    *
    * @d8
    */
-  public function date($default, string $field_name) {
+  public function date($default, string $field_name = '') {
     // Detect the arguments from those passed.
     $args = func_get_args();
     $default = array_shift($args);
@@ -165,7 +198,12 @@ trait EntityDataAccessorTrait {
     }
     // End detection.
 
-    $date = $this->f($default, $field_name, $delta, $column);
+    if ($field_name) {
+      $date = $this->f($default, $field_name, $delta, $column);
+    }
+    else {
+      $date = $default;
+    }
     if (empty($date)) {
       return $default;
     }
@@ -183,7 +221,40 @@ trait EntityDataAccessorTrait {
       'langcode' => 'en',
     ]);
 
-    return $obj->setTimezone(new \DateTimeZone($set_timezone_to));
+    $return = $obj->setTimezone(new \DateTimeZone($set_timezone_to));
+
+    // Format this date if the ::format() method was called.
+    if ($this->_format) {
+      $format = reset($this->_format);
+      $this->_format = NULL;
+
+      // The format is either going to be a drupal date format string, or an
+      // argument meant for date_format().  First check with Drupal...
+      $pattern = $this->entityTypeManager
+        ->getStorage('date_format')
+        ->load($format);
+      if ($pattern) {
+        $return = $return->format($pattern->getPattern());
+      }
+      else {
+        $return = $return->format($format);
+      }
+    }
+
+    return $return;
+  }
+
+  /**
+   * A helper function to provide formatting data to a future, chained method.
+   *
+   * @return $this
+   *
+   * @see this::date()
+   */
+  public function format() {
+    $this->_format = func_get_args();
+
+    return $this;
   }
 
   /**
@@ -381,7 +452,7 @@ trait EntityDataAccessorTrait {
     $entities = [];
     try {
       foreach ($this->getEntity()->get($field_name) as $item) {
-        $entities[] = $item->getValue();
+        ($value = $item->getValue()) && $entities[] = $value;
       }
       if (!empty($entities)) {
         $fields = $this->entityFieldManager->getFieldDefinitions($entity_type_id, $bundle);
@@ -439,20 +510,52 @@ trait EntityDataAccessorTrait {
   protected function makeOutputSafe($output) {
     if (!is_scalar($output)) {
       throw new \RuntimeException("Non-scalar cannot be made safe.");
-
-      // TODO Should we throw or not?
-      return $output;
     }
 
-    $handler = isset($this->safeMarkupHandler) ? $this->safeMarkupHandler : $this->core->getSafeMarkupHandler();
+    $handler = $this->safeMarkupHandler ?? '\Drupal\Component\Utility\Xss::filterAdmin';
     if (function_exists($handler) || is_callable($handler)) {
       return $handler($output);
     }
-    if (function_exists('filter_formats') && !array_key_exists($handler, filter_formats())) {
-      throw new \RuntimeException("Cannot understand safe markup handler \"$handler\"");
+
+    if (empty($this->renderer)) {
+      throw new \RuntimeException(sprintf("Missing required class property \"renderer\", safe markup handling is not available.  Did you inject the \"@renderer\" service into %s?", __CLASS__));
     }
 
-    return $this->d7->check_markup($output, $handler);
+    if (!$this->isFilterFormatIdValid($handler)) {
+      throw new \RuntimeException("Cannot make output safe; missing or invalid filter format: \"$handler\".");
+    }
+
+    $build = [
+      '#type' => 'processed_text',
+      '#text' => $output,
+      '#format' => $handler,
+    ];
+
+    return $this->renderer->renderPlain($build);
+  }
+
+  /**
+   * Checks to see if a filter format machine name is valid.
+   *
+   * @param string $id
+   *   The filter format machine name/id.
+   *
+   * @return bool
+   *   True if valid.
+   */
+  private function isFilterFormatIdValid($id): bool {
+    if (is_null($this->_validFilterFormats)) {
+      try {
+        $this->_validFilterFormats = $this->entityTypeManager
+          ->getStorage('filter_format')
+          ->loadByProperties(['status' => TRUE]);
+      }
+      catch (\Exception $exception) {
+        $this->_validFilterFormats = [];
+      }
+    }
+
+    return isset($this->_validFilterFormats[$id]);
   }
 
   /**
