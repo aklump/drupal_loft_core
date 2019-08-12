@@ -160,6 +160,51 @@ function loft_core_form_hide_elements(array &$form, array $paths) {
 }
 
 /**
+ * Show form elements by adding #access = true.
+ *
+ * @param array $form
+ *   The FAPI form definition.
+ * @param array $paths
+ *   An array of paths for data_api pointing to the form element to show.
+ */
+function loft_core_form_show_elements(array &$form, array $paths) {
+  $g = data_api();
+  foreach ($paths as $path) {
+    if ($g->get($form,
+      $path)
+    ) {
+      $g->onlyIfHas($form, "$path.#required")->call(function () {
+        return FALSE;
+      })->set($form);
+      $g->set($form,
+        "$path.#access",
+        TRUE);
+    }
+  }
+}
+
+/**
+ * Hide form groups.
+ *
+ * This must be called in hook_field_group_form_process_build_alter.
+ *
+ * @param array $form
+ * @param array $group_paths
+ */
+function loft_core_form_hide_groups(array &$form, array $group_paths) {
+  $hidden_elements = [];
+  foreach ($group_paths as $hidden_group) {
+    if (isset($form['#fieldgroups'][$hidden_group])) {
+      $hidden_elements = array_merge($form['#fieldgroups'][$hidden_group]->children, $hidden_elements);
+      $form['#fieldgroups'][$hidden_group]->children = [];
+      $hidden_elements[] = $hidden_group;
+    }
+  }
+
+  loft_core_form_hide_elements($form, $hidden_elements, 'se_core');
+}
+
+/**
  * Require form elements by adding #required = true.
  *
  * @param array $form
