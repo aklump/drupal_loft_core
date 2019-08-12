@@ -5,9 +5,11 @@
  * The main module file for loft_core_testing
  */
 
-use Drupal\Core\Form\FormStateInterface;
-use Drupal\loft_core_testing\Component\Utility\TestingMarkup;
 use Drupal\Component\Utility\Html;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Markup;
+use Drupal\loft_core_testing\Component\Utility\TestingMarkup;
+use Drupal\Core\Url;
 
 /**
  * Implements hook_form_alter().
@@ -18,6 +20,16 @@ use Drupal\Component\Utility\Html;
  */
 function loft_core_testing_form_alter(array &$form, FormStateInterface $form_state, $form_id) {
   TestingMarkup::isTesting() && TestingMarkup::formAddClasses($form);
+}
+
+function loft_core_testing_preprocess_status_messages(&$vars) {
+  if (TestingMarkup::isTesting()) {
+    foreach ($vars['message_list'] as $type => $items) {
+      foreach ($vars['message_list'][$type] as $delta => $item) {
+        $vars['message_list'][$type][$delta] = Markup::create('<span class="' . TestingMarkup::id("status-message--{$type}__{$delta}") . '">' . $item . '</span>');
+      }
+    }
+  }
 }
 
 /**
@@ -36,6 +48,32 @@ function loft_core_testing_preprocess_menu_local_action(&$vars) {
   if (isset($vars['link']) && ($id = $vars['link']['#url']->getRouteName())) {
     $vars['link']['#options']['attributes']['class'][] = TestingMarkup::id('local_action--' . loft_core_css_safe($id));
   }
+}
+
+/**
+ * Implements hook_preprocess_menu_link().
+ */
+function loft_core_testing_preprocess_menu(&$vars) {
+  $vars['items'] = array_map(function ($item) use ($vars) {
+    $id = loft_core_css_safe('menu--' . $vars['menu_name'] . '--' . _loft_core_testing_get_link_id($item['url']));
+    $class = TestingMarkup::id($id);
+    $item['attributes']->addClass($class);
+
+    return $item;
+  }, $vars['items']);
+}
+
+/**
+ * Generate the link id to use for testing classes.
+ *
+ * You should preceed by menu name or other contextual info.
+ *
+ * @param \Url $url
+ *
+ * @return string
+ */
+function _loft_core_testing_get_link_id(Url $url) {
+  return md5($url->toString());
 }
 
 /**

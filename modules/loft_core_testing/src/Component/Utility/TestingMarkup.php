@@ -103,7 +103,13 @@ class TestingMarkup {
             $class[] = preg_replace('/[-_]+button$/', '', $context['parent_key']);
           }
           elseif (empty($class)) {
-            $class[] = $context['form_name'] ?? '';
+
+            // Mutate some form names.
+            $form_name = $context['form_name'] ?? '';
+            if ($form_name) {
+              $form_name = preg_replace('/\-form\-commerce\-product\-\d+/', '', $form_name);
+              $class[] = $form_name;
+            }
             $class[] = $context['parent_key'] ?? '';
           }
           break;
@@ -117,6 +123,14 @@ class TestingMarkup {
         case 'managed_file':
           $element['#after_build'][] = [self::class, 'fileAfterBuild'];
           $context['class_base'] = self::defaultClassGenerator($context);
+          $element['#loft_core_testing']['context'] = $context;
+          break;
+
+        case 'commerce_price':
+          $element['#after_build'][] = [
+            self::class,
+            'commercePriceAfterBuild',
+          ];
           $element['#loft_core_testing']['context'] = $context;
           break;
 
@@ -335,6 +349,14 @@ class TestingMarkup {
     return $element;
   }
 
+  public static function commercePriceAfterBuild(array $element) {
+    $context = $element['#loft_core_testing']['context'];
+    $class = self::defaultClassGenerator($context);
+    $element['number']['#attributes']['class'][] = self::id(implode('__', $class));
+
+    return $element;
+  }
+
   public static function detailsAfterBuild(array $element) {
     $element['#attributes']['class'] = array_filter($element['#attributes']['class'], function ($item) {
       return strpos($item, self::CSS_PREFIX) !== 0;
@@ -390,6 +412,10 @@ class TestingMarkup {
       $context['parent_key'] = $child;
       $context['path'] = $path;
       $context['path'][] = $child;
+
+      // Remove the redundant "address".
+      $last = array_pop($context['path']);
+      $context['path'][] = preg_replace('/^address_/', '', $last);
       self::formAddClasses($element[$child], $context);
     }
 
