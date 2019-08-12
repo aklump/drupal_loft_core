@@ -51,4 +51,27 @@ class Loft {
     }
   }
 
+  /**
+   * Build a menu render array by name.
+   *
+   * @param string $menu_name
+   *   The menu name.
+   *
+   * @return array
+   *   The menu render array.
+   */
+  public static function buildMenu($menu_name): array {
+    $menu_tree = \Drupal::MenuTree();
+    $parameters = $menu_tree->getCurrentRouteMenuTreeParameters($menu_name);
+    $tree = $menu_tree->load($menu_name, $parameters);
+    $manipulators = [
+      ['callable' => 'menu.default_tree_manipulators:checkNodeAccess'],
+      ['callable' => 'menu.default_tree_manipulators:checkAccess'],
+      ['callable' => 'menu.default_tree_manipulators:generateIndexAndSort'],
+    ];
+    $tree = $menu_tree->transform($tree, $manipulators);
+
+    return $menu_tree->build($tree);
+  }
+
 }
