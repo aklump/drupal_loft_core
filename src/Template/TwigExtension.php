@@ -24,6 +24,7 @@ class TwigExtension extends \Twig_Extension {
         'splitBy',
       ]),
       new \Twig_SimpleFunction('loft_core_test_class', 'loft_core_test_class'),
+      new \Twig_SimpleFunction('testing_id', 'loft_core_test_class'),
     ];
   }
 
