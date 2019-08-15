@@ -84,7 +84,7 @@ function loft_core_testing_preprocess_views_view_list(&$vars) {
     $view_id = $vars['view']->id();
     foreach ($vars['rows'] as &$row) {
       $row['attributes']
-        ->addClass(TestingMarkup::id(Html::getUniqueId($view_id . '--item')));
+        ->addClass(TestingMarkup::uniqueId($view_id . '--item'));
     }
   }
 }

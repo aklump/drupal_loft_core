@@ -5,6 +5,7 @@ namespace Drupal\loft_core_testing\Component\Utility;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Template\Attribute;
+use Drupal\Component\Utility\Html;
 
 /**
  * Utility class to provide testing markup, classes and functions.
@@ -59,6 +60,17 @@ class TestingMarkup {
    */
   public static function id($css_class_base) {
     return self::isTesting() ? self::CSS_PREFIX . strtolower($css_class_base) : '';
+  }
+
+  /**
+   * Use this to generate unique ids like when looping rows or something.
+   *
+   * @param $css_class_base
+   *
+   * @return string
+   */
+  public static function uniqueId($css_class_base) {
+    return static::id(Html::getUniqueId($css_class_base));
   }
 
   private static function getModifiedFormId(string $form_id) {
