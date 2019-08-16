@@ -5,7 +5,6 @@ namespace Drupal\loft_core_testing\Component\Utility;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Template\Attribute;
-use Drupal\Component\Utility\Html;
 
 /**
  * Utility class to provide testing markup, classes and functions.
@@ -18,6 +17,8 @@ class TestingMarkup {
    * @var string
    */
   const CSS_PREFIX = 't-';
+
+  protected static $seenUniqueIds = [];
 
   /**
    * Holds the value of the environment test to determine if we're in test mode.
@@ -70,7 +71,14 @@ class TestingMarkup {
    * @return string
    */
   public static function uniqueId($css_class_base) {
-    return static::id(Html::getUniqueId($css_class_base));
+    if (empty(static::$seenUniqueIds[$css_class_base])) {
+      static::$seenUniqueIds[$css_class_base] = 1;
+    }
+    else {
+      $css_class_base .= '--' . ++static::$seenUniqueIds[$css_class_base];
+    }
+
+    return static::id($css_class_base);
   }
 
   private static function getModifiedFormId(string $form_id) {
