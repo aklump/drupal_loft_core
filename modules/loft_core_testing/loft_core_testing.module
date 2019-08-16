@@ -5,11 +5,10 @@
  * The main module file for loft_core_testing
  */
 
-use Drupal\Component\Utility\Html;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Markup;
-use Drupal\loft_core_testing\Component\Utility\TestingMarkup;
 use Drupal\Core\Url;
+use Drupal\loft_core_testing\Component\Utility\TestingMarkup;
 
 /**
  * Implements hook_form_alter().
@@ -85,6 +84,19 @@ function loft_core_testing_preprocess_views_view_list(&$vars) {
     foreach ($vars['rows'] as &$row) {
       $row['attributes']
         ->addClass(TestingMarkup::uniqueId($view_id . '--item'));
+    }
+  }
+}
+
+function loft_core_testing_preprocess_views_view_table(array &$vars) {
+  $id = $vars['view']->id();
+  foreach ($vars['rows'] as $row) {
+    $row['attributes']->addClass(TestingMarkup::uniqueId($id . '__row'));
+    foreach ($row['columns'] as $column) {
+      $column['attributes']->addClass(TestingMarkup::uniqueId($id . '__cell'));
+      if(isset($column['fields'][0])) {
+        $column['attributes']->addClass(TestingMarkup::uniqueId($id . '__column--' . $column['fields'][0]));
+      }
     }
   }
 }
