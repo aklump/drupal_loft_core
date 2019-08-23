@@ -12,3 +12,8 @@ services:
     arguments: ["@rabbit_hole.behavior_invoker", "@plugin.manager.rabbit_hole_behavior_plugin"]
     tags:
       - { name: event_subscriber }
+  loft_core.images:
+    class: Drupal\loft_core\Service\ImageService
+  loft_core.vimeo_based_entity:
+    class: Drupal\loft_core\Service\VimeoBasedEntityService
+    arguments: ["@loft_core.images", "@entity_field.manager", "@file_system"]
