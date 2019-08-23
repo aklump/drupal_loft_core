@@ -2,6 +2,7 @@
 
 namespace Drupal\loft_core\Entity;
 
+use Drupal\Core\Routing\Access\AccessResultInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
@@ -49,10 +50,16 @@ abstract class EntityCrudService implements HasEntityInterface {
     $args = func_get_args();
     $hook = array_shift($args);
     $methods = [$hook, $hook . "__" . $bundle];
+    if ($hook === 'access') {
+      $operation = array_shift($args);
+      $methods[] = $operation . '_' . $hook;
+      $methods[] = $operation . '_' . $hook . "__" . $bundle;
+    }
     if (in_array($hook, ['insert', 'update'])) {
       $methods[] = 'save';
       $methods[] = 'save__' . $bundle;
     }
+
     foreach ($methods as $method) {
       if (method_exists($this, $method)) {
         $return[$method] = call_user_func_array([
