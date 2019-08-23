@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\loft_core;
+namespace Drupal\loft_core\Utility;
 
 use Drupal\Core\Breadcrumb\Breadcrumb;
 use Drupal\Core\Link;
