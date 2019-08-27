@@ -157,7 +157,6 @@ class EntityProtectionService {
    * @throws \Drupal\Core\TempStore\TempStoreException
    */
   public function handleForm(array &$form, FormStateInterface $form_state, $form_id) {
-    $base_form_id = $form_state->getBuildInfo()['base_form_id'] ?? $form_id;
     $form_object = $form_state->getFormObject();
     $entity = NULL;
     $entity_type = NULL;
@@ -173,6 +172,7 @@ class EntityProtectionService {
     }
 
     switch ($form_id) {
+      // TODO Is there and entity_delete_multiple_confirm_form?
       case 'node_delete_multiple_confirm_form':
         $storage_key = $this->currentUser->id() . ':node';
         $filtered_items = array_filter($this->tempStore->get($storage_key), function ($nid) {

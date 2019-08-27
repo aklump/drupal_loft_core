@@ -9,12 +9,15 @@ use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
  * A trait for obtaining entity data using convenient/safe methods.
  *
  * When using this trait your class MUST:
+ * - mark your service as non-shared (see link below).
  * - use \Drupal\loft_core\Entity\EntityDataAccessorTrait.
  * - use \Drupal\loft_core\Entity\HasEntityTrait.
  * - implement \Drupal\loft_core\Entity\HasEntityInterface.
  * - set $this->entityTypeManager.
  * - set $this->entityFieldManager.
  * - set $this->renderer.
+ *
+ * @link https://symfony.com/doc/current/service_container/shared.html
  *
  * @code
  * arguments: ["@entity_type.manager", "@entity_field.manager" "@renderer"]

@@ -10,9 +10,12 @@ use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
  * A trait for simplification of setting data on entities.
  *
  * When using this trait your class MUST:
+ * - mark your service as non-shared.
  * - use \Drupal\loft_core\Entity\EntityDataSetterTrait.
  * - use \Drupal\loft_core\Entity\HasEntityTrait.
  * - implement \Drupal\loft_core\Entity\HasEntityInterface.
+ *
+ * @link https://symfony.com/doc/current/service_container/shared.html
  *
  * @package Drupal\loft_core\Entity
  */
