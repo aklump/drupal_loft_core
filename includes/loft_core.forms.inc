@@ -120,6 +120,8 @@ function loft_core_form_disable_elements(array &$form, array $paths, $module_nam
       $type = $g->get($form, "$path.#type");
       $g->set($form, "$path.#required", FALSE);
       $g->set($form, "$path.#disabled", TRUE);
+      // Address fields seem to require this as well.
+      $g->set($form, "$path.#attributes.disabled", 'disabled');
 
       switch ($type) {
         case 'container':
