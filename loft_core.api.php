@@ -6,6 +6,7 @@
  */
 
 use Drupal\Core\Url;
+use Drupal\loft_core\Block\BlockRebuilder;
 
 /**
  * Implements HOOK_loft_core_redirect_node_BUNDLE_TYPE()_view.
@@ -174,5 +175,25 @@ function HOOK_loft_core_suppress_messages() {
  * @param string $form_id
  */
 function HOOK_loft_core_BUNDLE_node_form_alter(array &$form, \Drupal\Core\Form\FormStateInterface $form_state, string $form_id) {
+
+}
+
+/**
+ * Renders a block as learn_more_card.
+ */
+class LearnMoreCardBlock extends BlockRebuilder {
+
+  /**
+   * {@inheritdoc}
+   */
+  public function rebuild($label, $content) {
+    return [
+      '#theme' => 'learn_more_card',
+      '#attributes' => $this->getAttributes(),
+      '#title' => $label,
+      '#body' => $content['body'],
+      '#target_href' => $this->element['#target_href'],
+    ];
+  }
 
 }

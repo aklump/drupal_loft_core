@@ -5,6 +5,7 @@
  * The main module file for loft_core_testing
  */
 
+use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Url;
@@ -94,9 +95,24 @@ function loft_core_testing_preprocess_views_view_table(array &$vars) {
     $row['attributes']->addClass(TestingMarkup::uniqueId($id . '__row'));
     foreach ($row['columns'] as $column) {
       $column['attributes']->addClass(TestingMarkup::uniqueId($id . '__cell'));
-      if(isset($column['fields'][0])) {
+      if (isset($column['fields'][0])) {
         $column['attributes']->addClass(TestingMarkup::uniqueId($id . '__column--' . $column['fields'][0]));
       }
     }
+  }
+}
+
+/**
+ * Implements hook_block_view_alter().
+ *
+ * Add testing classes to all blocks.
+ *
+ * @param array $build
+ * @param \Drupal\Core\Block\BlockPluginInterface $block
+ */
+function loft_core_testing_block_view_alter(array &$build, BlockPluginInterface $block) {
+  $build['#attributes']['class'][] = TestingMarkup::id($build['#base_plugin_id']);
+  if ($build['#derivative_plugin_id']) {
+    $build['#attributes']['class'][] = TestingMarkup::id($build['#base_plugin_id'] . '--' . $build['#derivative_plugin_id']);
   }
 }
