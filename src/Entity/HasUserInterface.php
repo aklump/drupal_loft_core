@@ -2,6 +2,7 @@
 
 namespace Drupal\loft_core\Entity;
 
+use Drupal\Core\Session\AccountInterface;
 use Drupal\user\UserInterface;
 
 /**
@@ -32,12 +33,12 @@ interface HasUserInterface extends HasEntityInterface {
   /**
    * Set the user object.
    *
-   * @param \Drupal\user\UserInterface $user
+   * @param \Drupal\Core\Session\AccountInterface $user
    *   The user instance.
    *
    * @return \Drupal\loft_core\Entity\HasUserTrait
    *   Self for chaining.
    */
-  public function setUser(UserInterface $user);
+  public function setUser(AccountInterface $user);
 
 }

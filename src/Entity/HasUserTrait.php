@@ -2,7 +2,9 @@
 
 namespace Drupal\loft_core\Entity;
 
+use Drupal\Core\Session\AccountInterface;
 use Drupal\user\UserInterface;
+use Drupal\user\Entity\User;
 
 /**
  * Adds functionality if an object needs to work with an account entity.
@@ -20,7 +22,11 @@ trait HasUserTrait {
   /**
    * {@inheritdoc}
    */
-  public function setUser(UserInterface $user): self {
+  public function setUser(AccountInterface $user): self {
+    if (!$user instanceof User) {
+      $user = User::load($user->id());
+    }
+
     return $this->setEntity($user);
   }
 
