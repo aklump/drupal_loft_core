@@ -28,6 +28,34 @@ class TestingMarkup {
   private static $isTestingFlag;
 
   /**
+   * Add a prefixed data attribute only for testing.
+   *
+   * For example if you want to embed an entity id on a form you should use
+   * this.
+   *
+   * @param array $element
+   *   The render element; attributes will be set on $element['#attributes'].
+   *   It may be an array or an Attribute object.
+   * @param $key
+   *   The key, 'data-t-' will be prefixed.
+   * @param $value
+   *   The value to set, if an array it will be jsoned.
+   */
+  public static function addDataAttribute(array &$element, $key, $value) {
+    if (self::isTesting()) {
+      $key = strtolower('data-' . self::CSS_PREFIX . $key);
+      $value = is_scalar($value) ? $value : json_encode($value);
+      $element['#attributes'] = $element['#attributes'] ?? [];
+      if (is_array($element['#attributes'])) {
+        $element['#attributes'][$key] = $value;
+      }
+      else {
+        $element['#attributes']->setAttribute($key, $value);
+      }
+    }
+  }
+
+  /**
    * Determining if test mode is enabled.
    *
    * @return bool
