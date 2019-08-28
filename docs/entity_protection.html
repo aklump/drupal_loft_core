@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>Protecting Critical Entities</title>
+  <link href="search/tipuesearch.css" rel="stylesheet">
+  <link href="style.css" rel="stylesheet">
+</head>
+
+<body class="page--entity_protection">
+<header>
+  <div class="pager"><a href="html_parsing.html" class="prev html_parsing">&laquo;Parsing HTML/DOM in PHP</a><a href="index.html" class="index pager__book-title">Loft Drupal Core</a><a href="remember_users.html" class="next remember_users">Remember Usernames in Login Form&raquo;</a></div></header>
+<section class="sub-header">
+  <div class="breadcrumbs"><a href="index.html">Index</a>
+         &raquo
+      </div>      <div class="search__wrapper">
+  <form action="search--results.html">
+    <input type="text" class="search-input" name="q" id="tipue_search_input" autocomplete="off" required>
+  </form>
+</div>
+  </section>
+
+
+<h1>Protecting Critical Entities</h1>
+
+<section>
+
+<p>With Loft Core, it's easy to protect critical entities that should not be deleted through the admin UI.  Learn more by looking at the docblocks in <code>\Drupal\loft_core\Service\EntityProtectionService</code>.</p>
+
+<ol>
+<li><p>Add this to <em>settings.php</em>, where <code>SE_CORE_</code> is the uppercase name of your custom module or other identifying prefix you wish to use for your PHP constants.</p>
+
+<pre><code>$config['loft_core.entity_protection']['prefix'] = 'SE_CORE_';
+</code></pre></li>
+<li><p>Define some constants like so, in your core module file.</p>
+
+<pre><code>&lt;?php
+
+/**
+ * @file
+ * Module entry file for se_core.
+ */
+
+define('SE_CORE_NID_ABOUT', 531);
+define('SE_CORE_COMMERCE_STORE_ID_SEAO', 1);
+
+...
+</code></pre></li>
+<li><p>Add this to <em>hook_form_alter</em> implementation:</p>
+
+<pre><code>/**
+ * Implements hook_form_alter().
+ */
+function se_core_form_alter(array &amp;$form, FormStateInterface $form_state, $form_id) {
+  \Drupal::service('loft_core.entity_protection')
+    -&gt;handleForm($form, $form_state, $form_id);
+  ...  
+</code></pre></li>
+<li><p>Add this to <em>hook_entity_predelete</em> implementation:</p>
+
+<pre><code>/**
+ * Implements hook_entity_predelete().
+ */
+function se_core_entity_predelete(EntityInterface $entity) {
+  \Drupal::service('loft_core.entity_protection')
+    -&gt;handlePreDelete($entity);
+}
+</code></pre></li>
+<li><p>The delete UI for these entities will be removed from Drupal.</p></li>
+</ol>
+</section>
+
+<div class="search__results">
+  <div id="tipue_search_content"></div>
+</div>
+
+<footer>
+  <div class="pager"><a href="html_parsing.html" class="prev html_parsing">&laquo;Parsing HTML/DOM in PHP</a><a href="index.html" class="index pager__book-title">Loft Drupal Core</a><a href="remember_users.html" class="next remember_users">Remember Usernames in Login Form&raquo;</a></div>  
+  <div id="footer-legaleeze">
+    <p class="legaleeze center">Version: 1.0 &bull; Last Updated: Wed, 28 Aug 2019 14:30:04 -0700</p>
+  </div>
+</footer>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script src="search/tipuesearch_content.js"></script>
+  <script src="search/tipuesearch_set.js"></script>
+  <script src="search/tipuesearch.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      $('#tipue_search_input').tipuesearch()
+    })
+  </script>
+<script src="js/core.js"></script>
+</body>
+</html>
+
