@@ -111,8 +111,19 @@ function loft_core_testing_preprocess_views_view_table(array &$vars) {
  * @param \Drupal\Core\Block\BlockPluginInterface $block
  */
 function loft_core_testing_block_view_alter(array &$build, BlockPluginInterface $block) {
-  $build['#attributes']['class'][] = TestingMarkup::id($build['#base_plugin_id']);
+  $build['#pre_render'][] = '_loft_core_testing_block_view_alter';
+  $build['#loft_core_testing'][] = TestingMarkup::id($build['#base_plugin_id']);
   if ($build['#derivative_plugin_id']) {
-    $build['#attributes']['class'][] = TestingMarkup::id($build['#base_plugin_id'] . '--' . $build['#derivative_plugin_id']);
+    $build['#loft_core_testing'][] = TestingMarkup::id($build['#base_plugin_id'] . '--' . $build['#derivative_plugin_id']);
   }
+}
+
+function _loft_core_testing_block_view_alter($element) {
+  if (isset($element['#loft_core_testing'])) {
+    foreach ($element['#loft_core_testing'] as $class) {
+      $element['#attributes']['class'][] = $class;
+    }
+  }
+
+  return $element;
 }
