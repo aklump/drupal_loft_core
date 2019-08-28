@@ -130,7 +130,7 @@ class EntityProtectionService {
   public function isEntityProtectedById($entity_type, $entity_id) {
     $entities = $this->getProtectedEntities();
 
-    return isset($entities[$entity->getEntityTypeId()][$entity_id]);
+    return isset($entities[$entity_type][$entity_id]);
   }
 
   /**
@@ -158,6 +158,7 @@ class EntityProtectionService {
    */
   public function handleForm(array &$form, FormStateInterface $form_state, $form_id) {
     $form_object = $form_state->getFormObject();
+    $base_form_id = $form_state->getBuildInfo()['base_form_id'] ?? $form_id;
     $entity = NULL;
     $entity_type = NULL;
 
@@ -171,19 +172,19 @@ class EntityProtectionService {
       };
     }
 
-    switch ($form_id) {
-      // TODO Is there and entity_delete_multiple_confirm_form?
-      case 'node_delete_multiple_confirm_form':
-        $storage_key = $this->currentUser->id() . ':node';
-        $filtered_items = array_filter($this->tempStore->get($storage_key), function ($nid) {
-          return !$this->isNodeProtectedById($nid);
+    switch ($base_form_id) {
+      case 'entity_delete_multiple_confirm_form':
+        $entity_type = $form_state->getBuildInfo()['args'][0];
+        $storage_key = $this->currentUser->id() . ':' . $entity_type;
+        $filtered_items = array_filter($this->tempStore->get($storage_key), function ($id) use ($entity_type) {
+          return !$this->isEntityProtectedById($entity_type, $id);
         }, ARRAY_FILTER_USE_KEY);
         $this->tempStore->set($storage_key, $filtered_items);
         $original = count($form['entities']['#items']);
-        $form['entities']['#items'] = array_filter($form['entities']['#items'], function ($key) {
-          list($nid) = explode(':', $key);
+        $form['entities']['#items'] = array_filter($form['entities']['#items'], function ($key) use ($entity_type) {
+          list($id) = explode(':', $key);
 
-          return !$this->isNodeProtectedById($nid);
+          return !$this->isEntityProtectedById($entity_type, $id);
         }, ARRAY_FILTER_USE_KEY);
         if (($new_count = count($form['entities']['#items'])) !== $original) {
           \Drupal::messenger()
@@ -194,7 +195,9 @@ class EntityProtectionService {
           $form['description']['#access'] = FALSE;
         }
         break;
+    }
 
+    switch ($form_id) {
       case '{entity_type}_{bundle}_edit_form':
         if (isset($form['actions']['delete']) && $is_protected()) {
           $form['actions']['delete']['#access'] = FALSE;
