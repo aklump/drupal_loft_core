@@ -7,6 +7,8 @@
  * @{
  */
 
+use Drupal\loft_core_users\Utility\LoftCoreUsers;
+
 /**
  * Default setting for storing authenticated user IPs.
  *
@@ -126,15 +128,13 @@ function loft_core_users_module_implements_alter(&$implementations, $hook) {
  * @param string $email
  *
  * @return string
+ *
+ * @deprecated Use \Drupal\loft_core_users\Utility\Core instead.
  */
 function _loft_core_users_get_email_domain($email) {
-  if (!trim($email)) {
-    return '';
-  }
-  $domain = preg_replace('/^.+@/', '', $email);
-  $domain = explode('.', $domain);
+  $core = new LoftCoreUsers();
 
-  return trim(implode('.', array_slice($domain, -2)));
+  return $core->getEmailDomain($email);
 }
 
 /**
@@ -149,11 +149,11 @@ function _loft_core_users_get_email_domain($email) {
  *   One of 1, 2, 3, 34, 4
  * @param int $uid
  *
- * @see LOFT_CORE_USERS_STATUS_*
- *
+ * @throws \InvalidArgumentException If the status is not a valid status.
  * @see loft_core_users_mark_user_spammy()
  *
- * @throws \InvalidArgumentException If the status is not a valid status.
+ * @see LOFT_CORE_USERS_STATUS_*
+ *
  */
 function loft_core_users_set_user_status($status, $uid) {
   $valid = [

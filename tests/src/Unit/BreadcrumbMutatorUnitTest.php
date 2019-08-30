@@ -160,7 +160,7 @@ class BreadcrumbMutatorUnitTest extends TestCase {
 
   protected function getSchema() {
     return [
-      'classToBeTested' => '\Drupal\loft_core\BreadcrumbMutator',
+      'classToBeTested' => '\Drupal\loft_core\Utility\BreadcrumbMutator',
       'classArgumentsMap' => [
         'breadcrumb' => function () {
           $links = [];

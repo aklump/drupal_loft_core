@@ -1,7 +1,10 @@
 <?php
 
 use Drupal\loft_core\Attribute;
+use Drupal\loft_core_users\Utility\LoftCoreUsers;
 use PHPUnit\Framework\TestCase;
+use Drupal\loft_core_users\Utility\Core;
+use Drupal\loft_core_testing\Component\Utility\TestingMarkup;
 
 class LoftCoreTest extends TestCase {
 
@@ -26,11 +29,12 @@ class LoftCoreTest extends TestCase {
    * @dataProvider DataForTest_loft_core_users_get_email_domainProvider
    */
   public function test_loft_core_users_get_email_domain($control, $mail) {
-    $this->assertSame($control, _loft_core_users_get_email_domain($mail));
+    $core = new LoftCoreUsers();
+    $this->assertSame($control, $core->getEmailDomain($mail));
   }
 
   public function testLoftCoreTestClass() {
-    $this->assertSame('t-golden', loft_core_test_class('golden'));
+    $this->assertSame('t-golden', TestingMarkup::id('golden'));
   }
 
   /**

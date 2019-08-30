@@ -4,6 +4,7 @@ namespace Drupal\Tests\loft_core\Unit;
 
 use AKlump\DrupalTest\Drupal8\UnitTestCase;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\loft_core\Entity\HasEntityInterface;
 use Drupal\loft_core\Entity\HasEntityTrait;
 use Drupal\loft_core\Entity\HasNodeInterface;
@@ -93,7 +94,8 @@ class HasTraitsUnitTest extends UnitTestCase {
   }
 
   public function testHasUserWorks() {
-    $node = \Mockery::mock(UserInterface::class);
+    $node = \Mockery::mock(AccountInterface::class);
+    $node->allows('id')->andReturn(123);
     $node->allows('getEntityTypeId')->andReturn('user');
 
     $obj = new EntityManipulator();

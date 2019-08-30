@@ -19,6 +19,12 @@
             "Drupal\\loft_core\\": [
                 "src/",
                 "tests/src/"
+            ],
+            "Drupal\\loft_core_testing\\": [
+                "modules/loft_core_testing/src/"
+            ],
+            "Drupal\\loft_core_users\\": [
+                "modules/loft_core_users/src/"
             ]
         }
     }
