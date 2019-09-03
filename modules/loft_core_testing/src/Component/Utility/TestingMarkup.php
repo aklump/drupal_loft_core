@@ -33,24 +33,23 @@ class TestingMarkup {
    * For example if you want to embed an entity id on a form you should use
    * this.
    *
-   * @param array $element
-   *   The render element; attributes will be set on $element['#attributes'].
-   *   It may be an array or an Attribute object.
+   * @param array $attributes
+   *   The render element attributes array or Attribute object, e.g.,
+   *   $attributes['#attributes'] or $vars['attributes'].
    * @param $key
    *   The key, 'data-t-' will be prefixed.
    * @param $value
    *   The value to set, if an array it will be jsoned.
    */
-  public static function addDataAttribute(array &$element, $key, $value) {
+  public static function addDataAttribute(array &$attributes, $key, $value) {
     if (self::isTesting()) {
       $key = strtolower('data-' . self::CSS_PREFIX . $key);
       $value = is_scalar($value) ? $value : json_encode($value);
-      $element['#attributes'] = $element['#attributes'] ?? [];
-      if (is_array($element['#attributes'])) {
-        $element['#attributes'][$key] = $value;
+      if (is_array($attributes)) {
+        $attributes[$key] = $value;
       }
       else {
-        $element['#attributes']->setAttribute($key, $value);
+        $attributes->setAttribute($key, $value);
       }
     }
   }
@@ -135,6 +134,7 @@ class TestingMarkup {
           $class[] = 'form';
           break;
 
+        case 'link':
         case 'submit':
           $class = $context['class_base'] ?? [];
           switch ($context['parent']['#type'] ?? '') {
@@ -254,7 +254,6 @@ class TestingMarkup {
           break;
 
         case 'item':
-        case 'actions':
         case 'hidden':
         case 'vertical_tabs':
         case 'weight':
