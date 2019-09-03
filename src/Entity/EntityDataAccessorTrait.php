@@ -220,11 +220,15 @@ trait EntityDataAccessorTrait {
       $date = "@$date";
     }
 
-    $obj = new DrupalDateTime($date, $current_timezone, [
+    if (!$date instanceof DrupalDateTime && is_object($date)) {
+      $current_timezone = $date->getTimezone();
+      $date = $date->format(DATE_ISO8601);
+    }
+
+    $date = new DrupalDateTime($date, $current_timezone, [
       'langcode' => 'en',
     ]);
-
-    $return = $obj->setTimezone(new \DateTimeZone($set_timezone_to));
+    $return = $date->setTimezone(new \DateTimeZone($set_timezone_to));
 
     // Format this date if the ::format() method was called.
     if ($this->_format) {
