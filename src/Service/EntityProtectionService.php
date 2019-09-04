@@ -6,6 +6,7 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Logger\LoggerChannelTrait;
+use Drupal\Core\Render\Element;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\TempStore\PrivateTempStoreFactory;
@@ -167,12 +168,40 @@ class EntityProtectionService {
       $entity_type = $entity->getEntityTypeId();
       $bundle = $entity->bundle();
       $form_id = preg_replace("/^{$entity_type}_{$bundle}/", "{entity_type}_{bundle}", $form_id);
+      $form_id = preg_replace("/^{$entity_type}/", "{entity_type}", $form_id);
       $is_protected = function () use ($entity) {
         return $this->isEntityProtected($entity);
       };
     }
 
     switch ($base_form_id) {
+      case 'user_multiple_cancel_confirm':
+        $entity_type = 'user';
+        $filtered_items = Element::children($form['accounts']);
+        $original_count = count($filtered_items);
+        $filtered_items = array_filter($filtered_items, function ($id) use ($entity_type) {
+          return !$this->isEntityProtectedById($entity_type, $id);
+        });
+        $form['accounts'] = array_filter($form['accounts'], function ($uid) use ($filtered_items) {
+          return !is_numeric($uid) || in_array($uid, $filtered_items);
+        }, ARRAY_FILTER_USE_KEY);
+        $form['account']['names']['#items'] = array_filter($form['account']['names']['#items'], function ($uid) use ($filtered_items) {
+          return in_array($uid, $filtered_items);
+        }, ARRAY_FILTER_USE_KEY);
+
+        if (($new_count = count($filtered_items)) !== $original_count) {
+          \Drupal::messenger()
+            ->addWarning("One or more protected entities have been removed from your selection.  They may not be deleted.");
+        }
+        if ($new_count === 0) {
+          $form['actions']['submit']['#access'] = FALSE;
+          $form['description']['#access'] = FALSE;
+          $form['user_cancel_confirm']['#access'] = FALSE;
+          $form['user_cancel_method']['#access'] = FALSE;
+          $form['user_cancel_notify']['#access'] = FALSE;
+        }
+        break;
+
       case 'entity_delete_multiple_confirm_form':
         $entity_type = $form_state->getBuildInfo()['args'][0];
         $storage_key = $this->currentUser->id() . ':' . $entity_type;
@@ -180,13 +209,13 @@ class EntityProtectionService {
           return !$this->isEntityProtectedById($entity_type, $id);
         }, ARRAY_FILTER_USE_KEY);
         $this->tempStore->set($storage_key, $filtered_items);
-        $original = count($form['entities']['#items']);
+        $original_count = count($form['entities']['#items']);
         $form['entities']['#items'] = array_filter($form['entities']['#items'], function ($key) use ($entity_type) {
           list($id) = explode(':', $key);
 
           return !$this->isEntityProtectedById($entity_type, $id);
         }, ARRAY_FILTER_USE_KEY);
-        if (($new_count = count($form['entities']['#items'])) !== $original) {
+        if (($new_count = count($form['entities']['#items'])) !== $original_count) {
           \Drupal::messenger()
             ->addWarning("One or more protected entities have been removed from your selection.  They may not be deleted.");
         }
@@ -198,12 +227,14 @@ class EntityProtectionService {
     }
 
     switch ($form_id) {
+      case '{entity_type}_form':
       case '{entity_type}_{bundle}_edit_form':
         if (isset($form['actions']['delete']) && $is_protected()) {
           $form['actions']['delete']['#access'] = FALSE;
         }
         break;
 
+      case '{entity_type}_cancel_form':
       case '{entity_type}_{bundle}_delete_form':
         if ($is_protected()) {
           \Drupal::messenger()
