@@ -165,6 +165,15 @@ class TestingMarkup {
         case 'address':
           $element['#after_build'][] = [self::class, 'addressAfterBuild'];
           $context['class_base'] = self::defaultClassGenerator($context);
+          // Commerce is not consistent across it's payment methods, so we are
+          // going to try and make it so here.
+          if (isset($context['form_name']) && strpos($context['form_name'], 'commerce-checkout-flow') === 0) {
+            $first = array_shift($context['path']);
+            while (reset($context['path']) !== 'billing_information') {
+              array_shift($context['path']);
+            }
+            array_unshift($context['path'], $first);
+          }
           $element['#loft_core_testing']['context'] = $context;
           break;
 
