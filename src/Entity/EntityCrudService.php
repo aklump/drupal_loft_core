@@ -50,6 +50,9 @@ abstract class EntityCrudService implements HasEntityInterface {
     $args = func_get_args();
     $hook = array_shift($args);
     $methods = [$hook, $hook . "__" . $bundle];
+    array_walk($methods, function (&$item) {
+      $item = str_replace('-', '_', $item);
+    });
     if ($hook === 'access') {
       $operation = array_shift($args);
       $methods[] = $operation . '_' . $hook;
