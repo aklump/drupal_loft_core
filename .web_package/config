@@ -6,5 +6,5 @@ create_tags = patch
 push_tags = auto
 push_master = auto
 push_develop = no
-patch_prefix = -rc
+patch_prefix = .
 info_file = loft_core.info.yml
