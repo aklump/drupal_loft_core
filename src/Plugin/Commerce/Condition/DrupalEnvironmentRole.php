@@ -7,17 +7,17 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Provides a condition to enable payment gateways by environment role.
+ * Provides a condition to enable payment gateways by environment.
  *
  * @CommerceCondition(
- *   id = "loft_core_drupal_env_role",
+ *   id = "loft_core_drupal_env",
  *   label = @Translation("Environments"),
  *   entity_type = "commerce_order",
  * )
  *
  * @link https://docs.drupalcommerce.org/commerce2/developer-guide/core/conditions
  */
-class DrupalEnvironmentRole extends ConditionBase {
+class DrupalEnvironment extends ConditionBase {
 
   /**
    * {@inheritdoc}
@@ -38,7 +38,7 @@ class DrupalEnvironmentRole extends ConditionBase {
    *   TRUE if the condition has been met, FALSE otherwise.
    */
   public function evaluate(EntityInterface $entity) {
-    return in_array(DRUPAL_ENV_ROLE, $this->configuration['environments']);
+    return in_array(DRUPAL_ENV, $this->configuration['environments']);
   }
 
   /**

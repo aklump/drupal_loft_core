@@ -9,6 +9,7 @@
 
 use Drupal\Core\Template\Attribute;
 use Drupal\loft_core\StaticContentStreamWrapper;
+use Drupal\loft_core_testing\Component\Utility\TestingMarkup;
 
 require_once dirname(__FILE__) . '/includes/loft_core.forms.inc';
 require_once dirname(__FILE__) . '/includes/loft_core.ajax.inc';
@@ -46,9 +47,7 @@ function is_live($feature) {
  */
 function loft_core_test_class(string $class): string {
   static $testing;
-  if ($testing
-    || (defined('DRUPAL_ENV_ROLE') && strpos(DRUPAL_ENV_ROLE, 'prod') !== 0)
-    || ($expiry = \Drupal::state()->get('loft_core_test_mode_expiry'))) {
+  if (TestingMarkup::isTesting()) {
 
     // First time on page load that we get here, we may delete the expiry.
     if (!$testing && !empty($expiry) && $expiry < time()) {
@@ -119,7 +118,6 @@ function loft_core_element_add_test_classes(array &$element, array $paths): void
 function loft_core_js_settings_build(array &$settings, \Drupal\Core\Asset\AttachedAssetsInterface $assets) {
   $settings['env'] = [
     'env' => DRUPAL_ENV,
-    'role' => DRUPAL_ENV_ROLE,
     'prod' => DRUPAL_ENV_PROD,
     'staging' => DRUPAL_ENV_STAGING,
     'dev' => DRUPAL_ENV_DEV,
@@ -143,7 +141,7 @@ function loft_core_js_settings_build(array &$settings, \Drupal\Core\Asset\Attach
 function loft_core_preprocess_html(&$vars) {
   $user = \Drupal::currentUser();
   $vars['loft_core_tracking'] = '';
-  if (DRUPAL_ENV_ROLE === 'prod' && ($token = \Drupal::config('loft_core.settings')
+  if (DRUPAL_ENV === 'prod' && ($token = \Drupal::config('loft_core.settings')
       ->get('loft_core_trackjs_token'))) {
 
     // @link http://docs.trackjs.com/tracker/configuration
@@ -495,7 +493,7 @@ function loft_core_preprocess_status_report(&$vars) {
         'severity' => REQUIREMENT_ERROR,
       ];
     }
-    elseif (DRUPAL_ENV_ROLE === 'prod' && $item['value'] === t('Enabled')) {
+    elseif (DRUPAL_ENV === DRUPAL_ENV_PROD && $item['value'] === t('Enabled')) {
       $item['severity'] = REQUIREMENT_WARNING;
       $item['description'] = t('Update module should not be enabled on production as updates are handled by ITLS.');
     }

@@ -62,7 +62,7 @@ class TestingMarkup {
    */
   public static function isTesting() {
     if (is_null(self::$isTestingFlag)) {
-      self::$isTestingFlag = (defined('DRUPAL_ENV_ROLE') && strpos(DRUPAL_ENV_ROLE, 'prod') !== 0)
+      self::$isTestingFlag = DRUPAL_ENV !== DRUPAL_ENV_PROD
         || ($expiry = \Drupal::state()->get('loft_core_test_mode_expiry'));
 
       // First time on page load that we get here, we may delete the expiry.

@@ -10,7 +10,7 @@
         <?= $loft_core_tracking ?>
         <?= $scripts; ?>
 
-4. This will only be present when `DRUPAL_ENV_ROLE` is `prod`.
+4. This will only be present when `DRUPAL_ENV` is `prod`.
 
 ## Config and Metadata
 

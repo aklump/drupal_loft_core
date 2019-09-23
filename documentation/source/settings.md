@@ -8,6 +8,8 @@
     settings.local.php
     
 ## Changes to `settings.php`
+
+If using environment variables then the following does not apply.
     
 1. Add the following lines to `settings.php` at the very end:
     
@@ -31,27 +33,15 @@
          */
         define('DRUPAL_ENV', DRUPAL_ENV_DEV);
         
-        
 1. Create `settings.dev.php` and `settings.prod.php` and put in the environment settings specific to environment, e.g. cache settings.
-1. Move the database declaration into `settings.local.php`.  Also include the following lines:
+1. Move the database declaration into `settings.local.php`.
+1. If you're using loft_deploy module you must add a `$conf` var right below the `DRUPAL_ENV` definition. 
 
-        //
-        //
-        // Define the server environment's role, one of: DRUPAL_ENV_PROD, DRUPAL_ENV_STAGING, DRUPAL_ENV_DEV
-        //
-        // The role may be different than the environment, for example a staging server should have a production environment, but it is serving a staging role.  Production would have the same DRUPAL_ENV_PROD for both DRUPAL_ENV_ROLE and DRUPAL_ENV.
-        //
-        define('DRUPAL_ENV_ROLE', DRUPAL_ENV_DEV);
-
-1. If you're using loft_deploy module you must add a `$conf` var right below the `DRUPAL_ENV_ROLE` definition. 
-
-        define('DRUPAL_ENV_ROLE', DRUPAL_ENV_DEV);
-        $conf['loft_deploy_site_role'] = DRUPAL_ENV_ROLE;
+        $conf['loft_deploy_site_role'] = DRUPAL_ENV;
 
 ## Available in PHP as
 
     DRUPAL_ENV
-    DRUPAL_ENV_ROLE
     
     DRUPAL_ENV_PROD
     DRUPAL_ENV_STAGING
@@ -62,7 +52,6 @@
 There must be at least on library using the dependeny of _core/drupalSettings_ for these to appear on the page.
     
     drupalSettings.env.env
-    drupalSettings.env.role
 
     drupalSettings.env.prod
     drupalSettings.env.staging
