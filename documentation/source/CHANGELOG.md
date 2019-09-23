@@ -1,3 +1,12 @@
+## [Unreleased]
+- lorem
+
+## [8.x-1.1.15] - 2019-09-23
+
+### Removed
+- DRUPAL_ENV_ROLE and drupalSettings.env.env
+- You must replace all usages of DRUPAL_ENV_ROLE with DRUPAL_ENV; having two concepts was too darn confusing.
+ 
 ## 8.x-1.0-rc1
 
 - The API for the redirect hooks have changed.  You must update the following implementations per _loft_core.api.php_.
