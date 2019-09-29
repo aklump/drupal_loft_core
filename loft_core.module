@@ -43,7 +43,7 @@ function is_live($feature) {
  *
  * @return string
  *
- * @deprecated Use TestingMarkup::class instead.
+ * @deprecated Use TestingMarkup::id instead.
  */
 function loft_core_test_class(string $class): string {
   static $testing;
@@ -574,3 +574,4 @@ function loft_core_preprocess_status_messages(&$vars) {
     };
   }
 }
+
