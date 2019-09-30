@@ -51,6 +51,26 @@ class ImageService {
     return Markup::create($svg);
   }
 
+  public function getBase64DataSrc($uri): string {
+    if (empty(trim($uri))) {
+      return '';
+    }
+    $extension = pathinfo($uri, PATHINFO_EXTENSION);
+    switch ($extension) {
+      case 'png':
+        $mime = 'image/png';
+        break;
+
+      default:
+        throw new \RuntimeException("URI is not yet supported.");
+    }
+    if (!file_exists($uri)) {
+      throw new \InvalidArgumentException(sprintf('Provided URI: %s does not exist.', $uri));
+    }
+
+    return sprintf('data:%s;base64,%s', $mime, base64_encode(file_get_contents($uri)));
+  }
+
   /**
    * Filters SVG markup removing unsafe tags.
    *
