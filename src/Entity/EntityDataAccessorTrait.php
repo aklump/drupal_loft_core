@@ -551,7 +551,7 @@ trait EntityDataAccessorTrait {
    *   True if valid.
    */
   private function isFilterFormatIdValid($id): bool {
-    if (is_null($this->_validFilterFormats)) {
+    if (!isset($this->_validFilterFormats)) {
       try {
         $this->_validFilterFormats = $this->entityTypeManager
           ->getStorage('filter_format')
