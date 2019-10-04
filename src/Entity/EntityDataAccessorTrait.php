@@ -369,6 +369,50 @@ trait EntityDataAccessorTrait {
   }
 
   /**
+   * Return the first field value from a stack of fields on an entity.
+   *
+   * The fields do not need to be present on the entity.  Use this say, to get
+   * the "summary" for any node type where the summay might be one of any
+   * number of fields.
+   *
+   * @param mixed $default
+   *   The default value to return if no field property value is worthy.
+   * @param array $stack
+   *   An array of field names, the first field's property value to cause
+   *   $match() to return true will be used and the search will stop.  If you
+   *   need to indicate a property other than `value`, use an array instead of
+   *   a string for an single $stack element, with [field_name, property].
+   * @param callable $match
+   *   This should return true if the value is acceptable.  It will receive the
+   *   following arguments: ($property_value, $field_name, $entity). Defaults
+   *   to testing if the value is !empty.
+   *
+   * @return mixed
+   *   A property value or $default.
+   */
+  public function getFirstFromFieldnameStack($default, array $stack, callable $match = NULL) {
+    list(, $entity) = $this->requireEntity();
+    foreach ($stack as $field_name) {
+      $key = 'value';
+      if (is_array($field_name)) {
+        list($field_name, $key) = $field_name;
+      }
+      if ($entity->hasField($field_name)
+        && ($field_item_list = $entity->get($field_name))) {
+        foreach ($field_item_list as $item) {
+          $value = $item->{$key};
+          if ((!is_callable($match) && !empty($value))
+            || $match($value, $field_name, $entity)) {
+            return $value;
+          }
+        }
+      }
+    }
+
+    return $default;
+  }
+
+  /**
    * Return safe-for-output translated data from an entity field.
    *
    * This is more lightweight than field_view_field() and doesn't take into
