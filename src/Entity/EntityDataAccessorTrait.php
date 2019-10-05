@@ -390,7 +390,7 @@ trait EntityDataAccessorTrait {
    * @return mixed
    *   A property value or $default.
    */
-  public function getFirstFromFieldnameStack($default, array $stack, callable $match = NULL) {
+  public function getFirstFromFieldStack($default, array $stack, callable $match = NULL) {
     list(, $entity) = $this->requireEntity();
     foreach ($stack as $field_name) {
       $key = 'value';
