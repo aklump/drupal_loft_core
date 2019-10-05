@@ -19,7 +19,7 @@ use Drupal\Core\Template\Attribute;
  *
  * @return array
  *
- * @see  Drupal.ajax.prototype.commands.loftCoreTrackJsConsole().
+ * @see  Drupal.AjaxCommands.prototype.loftCoreTrackJsConsole().
  * @link http://docs.trackjs.com/tracker/top-level-api#trackjsconsole
  *
  * @throws InvalidArgumentException if $severity is not valid.

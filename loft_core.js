@@ -22,7 +22,7 @@ var trackJS = trackJS || null;
      * @see loft_core_ajax_command_trackjs_console().
      * @link http://docs.trackjs.com/tracker/top-level-api#trackjsconsole
      */
-    Drupal.ajax.prototype.commands.loftCoreTrackJsConsole = function(
+    Drupal.AjaxCommands.prototype.loftCoreTrackJsConsole = function(
       ajax,
       response,
       status
@@ -37,7 +37,7 @@ var trackJS = trackJS || null;
      *   - hash string
      * @param status
      */
-    Drupal.ajax.prototype.commands.loftCoreAjaxBbqPushState = function(
+    Drupal.AjaxCommands.prototype.loftCoreAjaxBbqPushState = function(
       ajax,
       response,
       status
@@ -53,7 +53,7 @@ var trackJS = trackJS || null;
      *   - selector
      *   - value
      */
-    Drupal.ajax.prototype.commands.update_data_refresh = function(
+    Drupal.AjaxCommands.prototype.update_data_refresh = function(
       ajax,
       response
     ) {
@@ -71,7 +71,7 @@ var trackJS = trackJS || null;
      *   - delay int How long before fade out.
      * @param status
      */
-    Drupal.ajax.prototype.commands.loftCoreAjaxHtmlAndFade = function(
+    Drupal.AjaxCommands.prototype.loftCoreAjaxHtmlAndFade = function(
       ajax,
       response,
       status
