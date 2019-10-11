@@ -1,12 +1,12 @@
 {
-  "name": "loft_core",
-  "version": "1.0.0",
-  "main": "index.js",
-  "repository": "git@github.com:aklump/drupal_loft_core.git",
-  "author": "Aaron Klump <sourcecode@intheloftstudios.com>",
-  "license": "MIT",
-  "private": true,
-  "devDependencies": {
-    "prettier": "1.16.4"
-  }
+    "license": "GPL-2.0-or-later",
+    "name": "loft_core",
+    "version": "1.0.0",
+    "main": "index.js",
+    "repository": "git@github.com:aklump/drupal_loft_core.git",
+    "author": "Aaron Klump <sourcecode@intheloftstudios.com>",
+    "private": true,
+    "devDependencies": {
+        "prettier": "1.16.4"
+    }
 }
