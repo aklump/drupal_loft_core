@@ -134,3 +134,9 @@ function _loft_core_testing_block_view_alter($element) {
 function loft_core_testing_preprocess_node(&$variables) {
   TestingMarkup::addDataAttribute($variables['attributes'], 'nid', $variables['node']->id());
 }
+/**
+ * Implements hook_preprocess_HOOK().
+ */
+function loft_core_testing_preprocess_group(&$variables) {
+  TestingMarkup::addDataAttribute($variables['attributes'], 'group_id', $variables['group']->id());
+}
