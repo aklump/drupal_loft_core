@@ -1,3 +1,4 @@
+
 # Protecting Critical Entities
 
 With Loft Core, it's easy to protect critical entities that should not be deleted through the admin UI.  Learn more by looking at the docblocks in `\Drupal\loft_core\Service\EntityProtectionService`.
@@ -16,6 +17,7 @@ With Loft Core, it's easy to protect critical entities that should not be delete
          */
         
         define('SE_CORE_NID_ABOUT', 531);
+        define('SE_CORE_USER_ID_API', 123);
         define('SE_CORE_COMMERCE_STORE_ID_SEAO', 1);
         
         ...
