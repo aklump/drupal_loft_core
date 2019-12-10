@@ -36,7 +36,7 @@ abstract class EntityCrudService implements HasEntityInterface {
    * - save__BUNDLE.
    *
    * @param string $hook
-   *   The hook to be fired.
+   *   The hook to be fired, e.g. 'save', 'presave', etc.
    *
    * @return array
    *   The hook method return value.
