@@ -81,10 +81,9 @@ class EntityProtectionService {
    *   value is an array of protected ids of that entity type.
    */
   protected function getProtectedEntities() {
-    if (empty(self::$entities)) {
+    if (($prefix = $this->config->get('prefix')) && empty(self::$entities)) {
       self::$entities = [];
       foreach (get_defined_constants() as $name => $value) {
-        $prefix = $this->config->get('prefix');
         if (strpos($name, $prefix) !== 0) {
           continue;
         }
