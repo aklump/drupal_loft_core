@@ -55,10 +55,16 @@ class ImageService {
     if (empty(trim($uri))) {
       return '';
     }
-    $extension = pathinfo($uri, PATHINFO_EXTENSION);
+    $path = parse_url($uri, PHP_URL_PATH);
+    $extension = pathinfo($path, PATHINFO_EXTENSION);
     switch ($extension) {
       case 'png':
         $mime = 'image/png';
+        break;
+
+      case 'jpg':
+      case 'jpeg':
+        $mime = 'image/jpeg';
         break;
 
       default:
