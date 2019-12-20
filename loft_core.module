@@ -9,6 +9,7 @@
 
 use Drupal\Core\Template\Attribute;
 use Drupal\loft_core\StaticContentStreamWrapper;
+use Drupal\loft_core\Utility\RenderInPageBottom;
 use Drupal\loft_core_testing\Component\Utility\TestingMarkup;
 
 require_once dirname(__FILE__) . '/includes/loft_core.forms.inc';
@@ -575,3 +576,13 @@ function loft_core_preprocess_status_messages(&$vars) {
   }
 }
 
+/**
+ * Implements hook_page_bottom().
+ */
+function loft_core_page_bottom(&$page_bottom) {
+  $page_bottom[] = [
+    '#post_render' => [
+      [RenderInPageBottom::class, 'render'],
+    ],
+  ];
+}
