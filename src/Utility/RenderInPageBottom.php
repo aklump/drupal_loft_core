@@ -57,13 +57,13 @@ class RenderInPageBottom {
   /**
    * Get the final rendering.
    *
-   * @return \Drupal\Component\Render\MarkupInterface
+   * @return \Drupal\Component\Render\MarkupInterface|string
    *   The final rendered markup of all renderables that were added in ::add;
    *   to be appended to the $page_bottom variable.
    *
    * @see loft_core_page_bottom().
    */
-  public static function render(): MarkupInterface {
+  public static function render() {
     return \Drupal::service('renderer')->render(static::$build);
   }
 
