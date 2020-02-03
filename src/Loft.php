@@ -56,7 +56,10 @@ class Loft {
    * Build a menu render array by name.
    *
    * @param string $menu_name
-   *   The menu name.
+   *   The menu name.  To find the menu name through th UI, edit a menu and
+   *   pull the last element from the URL, e.g., 'desktop-header-dropdown'.  To
+   *   see all menu names using SQL try: SELECT DISTINCT(menu_name) FROM
+   *   menu_tree;.
    *
    * @return array
    *   The menu render array.

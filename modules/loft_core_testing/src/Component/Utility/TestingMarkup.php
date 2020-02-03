@@ -388,6 +388,7 @@ class TestingMarkup {
    *   The altered element.
    */
   public static function stripTestClassesAfterBuild(array $element) {
+    $element['#attributes']['class'] = $element['#attributes']['class'] ?? [];
     $element['#attributes']['class'] = array_filter($element['#attributes']['class'], function ($item) {
       return strpos($item, self::CSS_PREFIX) !== 0;
     });
