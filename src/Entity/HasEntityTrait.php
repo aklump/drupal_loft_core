@@ -25,7 +25,7 @@ use Drupal\Core\Entity\EntityInterface;
  * from being set, you should throw an exception.
  *
  * @code
- * private function onSetEntity($entity) {
+ * protected function onSetEntity($entity) {
  *   $final = $entity;
  *   if ($story = $this->entity('field_cover_story')) {
  *
