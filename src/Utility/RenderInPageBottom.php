@@ -32,6 +32,25 @@ class RenderInPageBottom {
   protected static $build = [];
 
   /**
+   * Flag to know if delayed rendered is disabled.
+   *
+   * @var bool
+   */
+  protected static $disabled = FALSE;
+
+  /**
+   * Disable the rendering of content in the page bottom.
+   *
+   * In the case of AJAX callbacks you may need to render your data
+   * immediately, and not push it to the page bottom.  Call this method to
+   * disable the migration of content rendering to the page bottom.  This has
+   * the affect of not using this class at all.
+   */
+  public static function disable() {
+    static::$disabled = TRUE;
+  }
+
+  /**
    * Add to the page_bottom renderable.
    *
    * This should be registered as the last post_render hook on a renderable
@@ -43,6 +62,9 @@ class RenderInPageBottom {
    *   The render array.
    */
   public static function add(MarkupInterface $output, array $element) {
+    if (static::$disabled) {
+      return $output;
+    }
     $output = is_array($output) ?: ['#markup' => $output];
 
     // If we have a uuid then only the last element to register  will be used.
