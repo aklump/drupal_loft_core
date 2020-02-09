@@ -23,10 +23,20 @@ function loft_core_testing_form_alter(array &$form, FormStateInterface $form_sta
 }
 
 function loft_core_testing_preprocess_status_messages(&$vars) {
-  if (TestingMarkup::isTesting()) {
+  if (TestingMarkup::isTesting() && !empty($vars['message_list'])) {
     foreach ($vars['message_list'] as $type => $items) {
-      foreach ($vars['message_list'][$type] as $delta => $item) {
-        $vars['message_list'][$type][$delta] = Markup::create('<span class="' . TestingMarkup::id("status-message--{$type}__{$delta}") . '">' . $item . '</span>');
+      foreach ($vars['message_list'][$type] as $delta => &$item) {
+        $prefix = sprintf('<span class="%s">', TestingMarkup::id("status-message--{$type}__{$delta}"));
+        $suffix = '</span>';
+        if (is_array($item)) {
+          $item = [
+              '#prefix' => $prefix,
+              '#suffix' => $suffix,
+            ] + [$item];
+        }
+        else {
+          $item = Markup::create($prefix . $item . $suffix);
+        }
       }
     }
   }
@@ -112,8 +122,10 @@ function loft_core_testing_preprocess_views_view_table(array &$vars) {
  */
 function loft_core_testing_block_view_alter(array &$build, BlockPluginInterface $block) {
   $build['#pre_render'][] = '_loft_core_testing_block_view_alter';
-  $build['#loft_core_testing'][] = TestingMarkup::id($build['#base_plugin_id']);
-  if ($build['#derivative_plugin_id']) {
+  if (!empty($build['#base_plugin_id'])) {
+    $build['#loft_core_testing'][] = TestingMarkup::id($build['#base_plugin_id']);
+  }
+  if (!empty($build['#derivative_plugin_id'])) {
     $build['#loft_core_testing'][] = TestingMarkup::id($build['#base_plugin_id'] . '--' . $build['#derivative_plugin_id']);
   }
 }
@@ -134,6 +146,7 @@ function _loft_core_testing_block_view_alter($element) {
 function loft_core_testing_preprocess_node(&$variables) {
   TestingMarkup::addDataAttribute($variables['attributes'], 'nid', $variables['node']->id());
 }
+
 /**
  * Implements hook_preprocess_HOOK().
  */
