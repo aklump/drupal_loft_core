@@ -43,16 +43,6 @@ function loft_core_ajax_command_trackjs_console($severity,
   ];
 }
 
-
-function loft_core_ajax_command_bbq_push_state($hash_string) {
-  return [
-    'command' => 'loftCoreAjaxBbqPushState',
-    'data' => [
-      'hash' => '#' . ltrim($hash_string, '#'),
-    ],
-  ];
-}
-
 /**
  * @param string $selector jQuery selector of the element to replace
  * @param string $content
