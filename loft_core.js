@@ -11,7 +11,14 @@ var trackJS = trackJS || null;
 
   Drupal.loft = {};
 
-  if (Drupal.ajax) {
+  // To use these commands you must require the library core.drupal.ajax and
+  // then these commands will be added.  For example you would do this:
+  // @code
+  //   $build['#attached']['library'][] = 'core/drupal.ajax';
+  //   $build['#attached']['library'][] = 'loft_core/core';
+  // @endcode.
+
+  if (Drupal.AjaxCommands) {
     /**
      * Receive an ajax command to fire off trackjs.console.
      *
