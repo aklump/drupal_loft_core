@@ -3,16 +3,13 @@
 namespace Drupal\loft_core;
 
 use AKlump\Data\DataInterface;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\data_api\DataTrait;
+use Drupal\block_content\Entity\BlockContent;
+use Drupal\Core\Template\Attribute;
 
 /**
  * Abstract class to use for a custom module's "Core" class.
  */
 abstract class CoreBase implements CoreInterface {
-
-  use StringTranslationTrait;
-  use DataTrait;
 
   /**
    * CoreBase constructor.
@@ -94,6 +91,21 @@ abstract class CoreBase implements CoreInterface {
       $bid,
       'title',
     ]);
+  }
+
+  /**
+   * Ensure $element[$key] is an instance of Attribute.
+   *
+   * @param array &$element
+   *   An array that will receive $key as an attribute instance.
+   * @param string $key
+   *   Defaults to '#attributes'.
+   */
+  public static function ensureAttribute(array &$element, $key = '#attributes') {
+    $element[$key] = $element[$key] ?? [];
+    if (is_array($element[$key])) {
+      $element[$key] = new Attribute($element[$key]);
+    }
   }
 
 }
