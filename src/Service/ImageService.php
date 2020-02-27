@@ -5,6 +5,7 @@ namespace Drupal\loft_core\Service;
 use Drupal\Component\Utility\Xss;
 use Drupal\Core\Render\Markup;
 use Drupal\file\Entity\File;
+use Drupal\image\Entity\ImageStyle;
 
 /**
  * Functions for working with images.
@@ -12,27 +13,53 @@ use Drupal\file\Entity\File;
 class ImageService {
 
   /**
-   * Return HTML markup for an image uri.
+   * Adds image_src as an web-accessible URL using image_uri/style_name.
    *
-   * In the case of SVG, this is the SVG code itself.
+   * @param array $vars
+   *   An array of preprocess variables.
+   *   - image_uri REQUIRED
+   *   - style_name OPTIONAL
+   *   - image_src FORBIDDEN.
+   */
+  public function preprocessImageVars(array &$vars) {
+    if (empty($vars['image_uri'])) {
+      throw new \InvalidArgumentException("Missing key image_uri");
+    }
+    if (!empty($vars['image_src'])) {
+      throw new \InvalidArgumentException("image_src is already set; it must be empty to use this method.");
+    }
+    if (!empty($vars['style_name'])) {
+      if (!($style = ImageStyle::load($vars['style_name']))) {
+        throw new \InvalidArgumentException(sprintf('Invalid image style: %s', $vars['style_name']));
+      }
+      $vars['image_src'] = $style->buildUrl($vars['image_uri']);
+    }
+    else {
+      $vars['image_src'] = file_create_url($vars['image_uri']);
+    }
+  }
+
+  /**
+   * Return HTML markup for an image uri or path.
    *
-   * @param string $uri
-   *   The URI of the image.
+   * In the case of SVG, this returns the SVG code itself, optimized.
+   *
+   * @param string $file_resource
+   *   The filepath to the file to use for extracting markup.  This can also be
+   *   a valid stream resource.
+   * @param callable|null $processor
+   *   A callback to mutate the markup before it gets created as a Markup
+   *   instance.  You can use this to replace the stroke color, as an example.
    *
    * @return string
    *   The markup representing the image.
-   *
-   * @throws \InvalidArgumentException
-   *   If the $uri is not understood.
    */
-  public function getMarkup($uri) {
-    if (empty(trim($uri))) {
-      return '';
-    }
-    $extension = pathinfo($uri, PATHINFO_EXTENSION);
+  public function getMarkup(string $file_resource, callable $processor = NULL) {
+    $this->validateResourceExists($file_resource);
+    $extension = pathinfo($file_resource, PATHINFO_EXTENSION);
     if ($extension === 'svg') {
       $dom = new \DOMDocument();
-      $dom->load($uri);
+      $dom->load($file_resource);
 
       // Strip XML header.
       $svg = '';
@@ -48,14 +75,16 @@ class ImageService {
       throw new \RuntimeException("Unsupported filetype: $extension");
     }
 
+    if (is_callable($processor)) {
+      $svg = $processor($svg);
+    }
+
     return Markup::create($svg);
   }
 
-  public function getBase64DataSrc($uri): string {
-    if (empty(trim($uri))) {
-      return '';
-    }
-    $path = parse_url($uri, PHP_URL_PATH);
+  public function getBase64DataSrc($file_resource): string {
+    $this->validateResourceExists($file_resource);
+    $path = parse_url($file_resource, PHP_URL_PATH);
     $extension = pathinfo($path, PATHINFO_EXTENSION);
     switch ($extension) {
       case 'png':
@@ -70,11 +99,11 @@ class ImageService {
       default:
         throw new \RuntimeException("URI is not yet supported.");
     }
-    if (!file_exists($uri)) {
-      throw new \InvalidArgumentException(sprintf('Provided URI: %s does not exist.', $uri));
+    if (!file_exists($file_resource)) {
+      throw new \InvalidArgumentException(sprintf('Provided URI: %s does not exist.', $file_resource));
     }
 
-    return sprintf('data:%s;base64,%s', $mime, base64_encode(file_get_contents($uri)));
+    return sprintf('data:%s;base64,%s', $mime, base64_encode(file_get_contents($file_resource)));
   }
 
   /**
@@ -183,7 +212,6 @@ class ImageService {
     ]);
   }
 
-
   /**
    * Copy a remote image to a local, temporary file.
    *
@@ -201,7 +229,6 @@ class ImageService {
    * @endcode
    */
   public function copyRemoteImageByUrl($remote_url) {
-    global $user;
     $extensions = 'jpg jpeg gif png';
 
     $info = explode('?', $remote_url);
@@ -220,6 +247,19 @@ class ImageService {
     $file['filesize'] = filesize($file['uri']);
 
     return File::create($file);
+  }
+
+  /**
+   * Shared helper.
+   *
+   * @param string $file_resource
+   *   Ensure that path exists or throw an exception.
+   */
+  private function validateResourceExists(string $file_resource) {
+    $file_resource = trim($file_resource);
+    if (!file_exists($file_resource)) {
+      throw new \InvalidArgumentException(sprintf('The file does not exists at: "%s"', $file_resource));
+    }
   }
 
 }
