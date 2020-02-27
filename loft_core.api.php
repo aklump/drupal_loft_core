@@ -175,7 +175,9 @@ function HOOK_loft_core_suppress_messages() {
  * @param string $form_id
  */
 function HOOK_loft_core_BUNDLE_node_form_alter(array &$form, \Drupal\Core\Form\FormStateInterface $form_state, string $form_id) {
+  $node = $form_state->getFormObject()->getEntity();
 
+  ...
 }
 
 /**
