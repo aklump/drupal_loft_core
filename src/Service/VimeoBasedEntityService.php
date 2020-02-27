@@ -25,6 +25,8 @@ final class VimeoBasedEntityService {
 
   private $fileSystem;
 
+  private $posterHandler;
+
   /**
    * VimeoBasedEntityService constructor.
    *
@@ -59,10 +61,11 @@ final class VimeoBasedEntityService {
    *
    * @param string $field_name
    *
-   * @return \Drupal\loft_core\Utility\VimeoBasedEntityService
+   * @return \Drupal\loft_core\Service\VimeoBasedEntityService
    */
-  public function setPosterField(string $field_name): VimeoBasedEntityService {
+  public function setPosterField(string $field_name, callable $handler = NULL): VimeoBasedEntityService {
     $this->fields['poster'] = $field_name;
+    $this->posterHandler = $handler;
 
     return $this;
   }
@@ -151,10 +154,22 @@ final class VimeoBasedEntityService {
     $temp_file = $this->imageService
       ->copyRemoteImageByUrl($remote_url);
     $video = $this->entityFieldManager
-      ->getFieldDefinitions('commerce_product', 'video');
+      ->getFieldDefinitions($entity->getEntityTypeId(), $entity->bundle());
     $directory = 'public://' . $video[$field_name]->getSettings()['file_directory'];
-    $this->fileSystem->prepareDirectory($directory, FileSystemInterface::MODIFY_PERMISSIONS);
+    $this->fileSystem->prepareDirectory($directory, FileSystemInterface::CREATE_DIRECTORY);
     $local_file = file_copy($temp_file, $directory . '/' . $temp_file->getFilename(), FileSystemInterface::EXISTS_REPLACE);
-    $entity->{$field_name} = $local_file;
+
+    // This is to allow fancy handling of the poster image setting, for example
+    // if you want to tag it or replace it based on tags, e.g. field_tag module
+    // kind of thing.
+    if ($this->posterHandler) {
+      ($this->posterHandler)($local_file);
+    }
+
+    // Otherwise the image will be replaced.
+    else {
+      $entity->set($field_name, $local_file);
+    }
   }
+
 }
