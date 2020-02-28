@@ -250,6 +250,30 @@ class ImageService {
   }
 
   /**
+   * Detect the final width of an image style.
+   *
+   * This is not perfect but should work in most cases.  It looks at all the
+   * image effects for a configured width value, and takes the final one found.
+   *
+   * @param \Drupal\image\Entity\ImageStyle $image_style
+   *   An image style to decipher.
+   *
+   * @return int
+   *   The configured width for the final effect having a width configuration
+   *   value.
+   */
+  public function getStyleWidth(ImageStyle $image_style): int {
+    $width = NULL;
+    foreach ($image_style->getEffects() as $effect) {
+      if (($w = ($effect->getConfiguration()['data']['width'] ?? NULL))) {
+        $width = $w;
+      }
+    }
+
+    return (int) $width;
+  }
+
+  /**
    * Shared helper.
    *
    * @param string $file_resource
