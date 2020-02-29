@@ -79,11 +79,15 @@ abstract class CoreBase implements CoreInterface {
    *   An array that will receive $key as an attribute instance.
    * @param string $key
    *   Defaults to '#attributes'.
+   * @param null $attribute_classname
+   *   You may pass an alternative classname to use, e.g.,
+   *   \Drupal\loft_core\Attribute.
    */
-  public static function ensureAttribute(array &$element, $key = '#attributes') {
+  public static function ensureAttribute(array &$element, $key = '#attributes', $attribute_classname = NULL) {
     $element[$key] = $element[$key] ?? [];
     if (is_array($element[$key])) {
-      $element[$key] = new Attribute($element[$key]);
+      $attribute_classname = $attribute_classname ?? Attribute::class;
+      $element[$key] = new $attribute_classname($element[$key]);
     }
   }
 
