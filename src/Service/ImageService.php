@@ -23,6 +23,9 @@ class ImageService {
    */
   public function preprocessImageVars(array &$vars) {
     if (empty($vars['image_uri'])) {
+      throw new \InvalidArgumentException("Empty value for image_uri");
+    }
+    if (!array_key_exists('image_uri', $vars)) {
       throw new \InvalidArgumentException("Missing key image_uri");
     }
     if (!empty($vars['image_src'])) {
