@@ -588,3 +588,14 @@ function loft_core_page_bottom(&$page_bottom) {
     ],
   ];
 }
+
+/**
+ * Implements hook_preprocess_links__dropbutton__operations__paragraphs().
+ *
+ * Put all paragraphs in alphabetical order.
+ */
+function loft_core_preprocess_links__dropbutton__operations__paragraphs(&$vars) {
+  uasort($vars['links'], function ($a, $b) {
+    return strcasecmp((string) $a['text']['#value'], (string) $b['text']['#value']);
+  });
+}
