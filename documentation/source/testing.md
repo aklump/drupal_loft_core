@@ -45,3 +45,10 @@ To target any paragraph that has been added:
     .t-field_components__item
     .t-field_components__item1
     .t-field_components__item...
+
+### Sometimes the auto classes creates duplicates.
+
+This has shown up for WYSIWYG text areas, to handle this use also the element for your selector like this:
+
+        - .t-field_description
+        + textarea.t-field_description

@@ -114,32 +114,6 @@ class TestingMarkup {
   }
 
   /**
-   * Strip duplicated test classes from rendered HTML.
-   *
-   * In some cases, not sure how it happens but a testclass will bubble up into
-   * wrapper markup, this creates a situation where that same test class is
-   * applied to two elements, when it should not.  This step seeks to handle
-   * that.
-   *
-   * @param \Drupal\Core\Render\Markup $markup
-   * @param $b
-   *
-   * @return \Drupal\Component\Render\MarkupInterface|\Drupal\Core\Render\Markup|string|string[]|null
-   */
-  public static function removeDuplicateClassesPostRender(Markup $markup, array $element) {
-    $class = array_first(self::defaultClassGenerator($element['#loft_core_testing']['context']));
-    $class = self::id($class);
-    if (($count = substr_count($markup, $class) > 1)) {
-      // Replace all but the last instance, which we ASSUME is going to be the
-      // innermost DOM element.
-      $markup = preg_replace('/' . preg_quote($class) . '\s*/', '', $markup, --$count);
-      $markup = Markup::create($markup);
-    }
-
-    return $markup;
-  }
-
-  /**
    * Recursively add test classes to a form.
    *
    * @param array $element
@@ -326,17 +300,7 @@ class TestingMarkup {
         $s->set($element, $path, $attributes);
       }
     }
-    elseif (isset($element['#theme'])) {
-      $element['#loft_core_testing']['context'] = $context;
-      switch ($element['#theme']) {
-        case 'field_multiple_value_form':
-          $element['#post_render'][] = [
-            self::class,
-            'removeDuplicateClassesPostRender',
-          ];
-          break;
-      }
-    }
+
     foreach (Element::children($element) as $key) {
       if (!is_array($element[$key])) {
         return;
