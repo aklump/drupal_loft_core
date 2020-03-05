@@ -47,7 +47,7 @@ function loft_core_testing_preprocess_status_messages(&$vars) {
  */
 function loft_core_testing_preprocess_menu_local_task(&$vars) {
   if (isset($vars['link']) && ($id = $vars['link']['#url']->getRouteName())) {
-    $vars['link']['#attributes']['class'][] = TestingMarkup::id('local_task--' . loft_core_css_safe($id));
+    $vars['link']['#options']['attributes']['class'][] = TestingMarkup::id('local_task--' . loft_core_css_safe($id));
   }
 }
 
