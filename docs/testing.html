@@ -58,9 +58,10 @@
 ]);
 </code></pre>
 
-<p>To target the dropbutton toggle:</p>
+<p>To target the dropbutton toggle you may need to pick one of these:</p>
 
-<pre><code>.t-field_components_add .dropbutton-toggle
+<pre><code>.t-field_components_add .dropbutton__toggle
+.t-field_components_add .dropbutton-toggle button
 </code></pre>
 
 <p>To target any of the add paragraph buttons:</p>
@@ -76,6 +77,21 @@
 .t-field_components__item1
 .t-field_components__item...
 </code></pre>
+
+<h3>Sometimes the auto classes creates duplicates.</h3>
+
+<p>This has shown up for WYSIWYG text areas, to handle this use also the element for your selector like this:</p>
+
+<pre><code>    - .t-field_description
+    + textarea.t-field_description
+</code></pre>
+
+<h3>Handling the Chosen Module</h3>
+
+<p>You may need to upgrade your selectors to use the <code>select</code> portion:</p>
+
+<pre><code>    select.t-field_newsletter
+</code></pre>
 </section>
 
 <div class="search__results">
@@ -85,7 +101,7 @@
 <footer>
   <div class="pager"><a href="static_content.html" class="prev static_content">&laquo;Stream wrapper &quot;static-content://&quot;</a><a href="index.html" class="index pager__book-title">Loft Drupal Core</a><a href="vimeo.html" class="next vimeo">Vimeo&raquo;</a></div>  
   <div id="footer-legaleeze">
-    <p class="legaleeze center">Version: 1.0 &bull; Last Updated: Fri, 28 Feb 2020 16:34:47 -0800</p>
+    <p class="legaleeze center">Version: 1.0 &bull; Last Updated: Thu, 05 Mar 2020 16:34:05 -0800</p>
   </div>
 </footer>
 
