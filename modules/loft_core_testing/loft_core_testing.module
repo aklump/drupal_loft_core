@@ -153,3 +153,21 @@ function loft_core_testing_preprocess_node(&$variables) {
 function loft_core_testing_preprocess_group(&$variables) {
   TestingMarkup::addDataAttribute($variables['attributes'], 'group_id', $variables['group']->id());
 }
+
+function loft_core_testing_form_commerce_checkout_flow_multistep_default_alter(array &$form, FormStateInterface $form_state) {
+  if (($class = TestingMarkup::id('commerce-order-id'))) {
+    $form['#attributes']['class'][] = $class;
+    $form['#attributes']['data-order-id'] = $form_state->getFormObject()
+      ->getOrder()
+      ->id();
+  }
+}
+
+function loft_core_testing_preprocess_commerce_cart_block(&$vars) {
+  if (($class = TestingMarkup::id('shopping-cart'))) {
+    $carts = \Drupal::service('commerce_cart.cart_provider')
+      ->getCartIds($vars['user']);
+    $vars['attributes']['class'][] = $class;
+    $vars['attributes']['data-order-id'] = array_first($carts);
+  }
+}

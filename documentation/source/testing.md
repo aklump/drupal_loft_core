@@ -30,10 +30,11 @@ In a form alter hook do something like:
       'field_components',
     ]);
 
-To target the dropbutton toggle:
+To target the dropbutton toggle you may need to pick one of these:
 
-    .t-field_components_add .dropbutton-toggle
-    
+    .t-field_components_add .dropbutton__toggle
+    .t-field_components_add .dropbutton-toggle button
+            
 To target any of the add paragraph buttons:
     
     .t-field_components_add__members_list
@@ -52,3 +53,9 @@ This has shown up for WYSIWYG text areas, to handle this use also the element fo
 
         - .t-field_description
         + textarea.t-field_description
+
+### Handling the Chosen Module
+
+You may need to upgrade your selectors to use the `select` portion:
+
+        select.t-field_newsletter
