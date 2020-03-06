@@ -32,9 +32,10 @@
 ]);
 </code></pre>
 
-<p>To target the dropbutton toggle:</p>
+<p>To target the dropbutton toggle you may need to pick one of these:</p>
 
-<pre><code>.t-field_components_add .dropbutton-toggle
+<pre><code>.t-field_components_add .dropbutton__toggle
+.t-field_components_add .dropbutton-toggle button
 </code></pre>
 
 <p>To target any of the add paragraph buttons:</p>
@@ -49,4 +50,19 @@
 <pre><code>.t-field_components__item
 .t-field_components__item1
 .t-field_components__item...
+</code></pre>
+
+<h3>Sometimes the auto classes creates duplicates.</h3>
+
+<p>This has shown up for WYSIWYG text areas, to handle this use also the element for your selector like this:</p>
+
+<pre><code>    - .t-field_description
+    + textarea.t-field_description
+</code></pre>
+
+<h3>Handling the Chosen Module</h3>
+
+<p>You may need to upgrade your selectors to use the <code>select</code> portion:</p>
+
+<pre><code>    select.t-field_newsletter
 </code></pre>
