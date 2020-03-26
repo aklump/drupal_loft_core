@@ -4,6 +4,7 @@ namespace Drupal\loft_core\Utility;
 
 use Drupal\Core\Breadcrumb\Breadcrumb;
 use Drupal\Core\Link;
+use Drupal\Core\Url;
 
 /**
  * Helper class for advanced modification of breadcrumb objects.
@@ -198,6 +199,36 @@ final class BreadcrumbMutator {
     $this->links[$position] = $link;
 
     return $this;
+  }
+
+  /**
+   * Get the position of the link pointing to $url if it exists.
+   *
+   * @code
+   *   // Add a link if it doesn't yet exist.
+   *   $mutator = new BreadcrumbMutator($breadcrumb);
+   *   $foo = \Drupal\Core\Url::fromRoute('foo.bar');
+   *   if (!$mutator->hasLink($foo)) {
+   *     $breadcrumb->addLink(new Link(t('Home' $foo->toUrl()));
+   *   }
+   * @endcode
+   *
+   * @param \Drupal\loft_core\Utility\Url $url
+   *   The URL that you want to look for.
+   *
+   * @return FALSE|int
+   *   False if the URL does not exist in the breadcrumb instance, otherwise
+   *   the index, which can be use for at(), etc.
+   */
+  public function hasLink(Url $url) {
+    $find = $url->toUriString();
+    foreach ($this->breadcrumb as $delta => $item) {
+      if ($item->getUrl()->toUriString() === $find) {
+        return (int) $delta;
+      }
+    }
+
+    return FALSE;
   }
 
   /**
