@@ -222,7 +222,7 @@ final class BreadcrumbMutator {
    */
   public function hasLink(Url $url) {
     $find = $url->toUriString();
-    foreach ($this->breadcrumb as $delta => $item) {
+    foreach ($this->breadcrumb->getLinks() as $delta => $item) {
       if ($item->getUrl()->toUriString() === $find) {
         return (int) $delta;
       }
