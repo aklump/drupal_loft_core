@@ -218,13 +218,13 @@ final class BreadcrumbMutator {
    *
    * @return FALSE|int
    *   False if the URL does not exist in the breadcrumb instance, otherwise
-   *   the index, which can be use for at(), etc.
+   *   the 1-base index, which can be used for at(), etc.
    */
   public function hasLink(Url $url) {
     $find = $url->toUriString();
     foreach ($this->breadcrumb->getLinks() as $delta => $item) {
       if ($item->getUrl()->toUriString() === $find) {
-        return (int) $delta;
+        return (int) $delta + 1;
       }
     }
 
