@@ -227,6 +227,7 @@ class EntityProtectionService {
 
     switch ($form_id) {
       case '{entity_type}_form':
+      case '{entity_type}_{bundle}_form':
       case '{entity_type}_{bundle}_edit_form':
         if (isset($form['actions']['delete']) && $is_protected()) {
           $form['actions']['delete']['#access'] = FALSE;
