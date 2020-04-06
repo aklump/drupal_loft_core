@@ -5,6 +5,7 @@ namespace Drupal\loft_core\Service;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\File\FileSystemInterface;
+use Drupal\Core\Logger\LoggerChannelTrait;
 use Vimeo\Vimeo;
 
 /**
@@ -27,6 +28,8 @@ final class VimeoBasedEntityService {
 
   private $posterHandler;
 
+  use LoggerChannelTrait;
+
   /**
    * VimeoBasedEntityService constructor.
    *
@@ -43,6 +46,7 @@ final class VimeoBasedEntityService {
     $this->imageService = $image_service;
     $this->entityFieldManager = $entity_field_manager;
     $this->fileSystem = $file_system;
+    $this->logger = $this->getLogger('vimeo');
   }
 
   /**
@@ -121,6 +125,11 @@ final class VimeoBasedEntityService {
     ], 'GET');
 
     $data = $response['body'];
+    if (isset($data['error'])) {
+      $this->logger->error(sprintf('Failed retrieving remote data from vimeo for "%s"; Vimeo says: %s', $entity->label(), $data['developer_message']));
+
+      return $this;
+    }
 
     if (isset($data['pictures']['sizes'])) {
       uasort($data['pictures']['sizes'], function ($a, $b) {
