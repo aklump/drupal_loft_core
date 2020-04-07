@@ -38,21 +38,6 @@ var trackJS = trackJS || null;
     };
 
     /**
-     * Ajax command for pushing a jquery bbq state.
-     * @param ajax
-     * @param response
-     *   - hash string
-     * @param status
-     */
-    Drupal.AjaxCommands.prototype.loftCoreAjaxBbqPushState = function(
-      ajax,
-      response,
-      status
-    ) {
-      $.bbq && $.bbq.pushState(response.data.hash);
-    };
-
-    /**
      * Update the data-data-time value for an element.
      *
      * @param ajax
