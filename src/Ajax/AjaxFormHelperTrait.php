@@ -4,6 +4,7 @@ namespace Drupal\loft_core\Ajax;
 
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Ajax\ReplaceCommand;
 
 /**
  * Provides a better helper for submitting an AJAX form.
