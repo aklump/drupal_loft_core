@@ -25,12 +25,20 @@
             if (!($vimeo_id = $provider->getIdFromInput($vimeo_url))) {
               return;
             }
-            
+            if (!($client_id = getenv('VIMEO_CLIENT_ID'))) {
+              throw new \RuntimeException("Missing VIMEO_CLIENT_ID");
+            }
+            if (!($secret = getenv('VIMEO_CLIENT_SECRET'))) {
+              throw new \RuntimeException("Missing VIMEO_CLIENT_SECRET");
+            }
+            if (!($token = getenv('VIMEO_ACCESS_TOKEN'))) {
+              throw new \RuntimeException("Missing VIMEO_ACCESS_TOKEN");
+            }
             try {
               $client = new Vimeo(
-                getenv('VIMEO_CLIENT_ID'),
-                getenv('VIMEO_CLIENT_SECRET'),
-                getenv('VIMEO_ACCESS_TOKEN')
+                $client_id,
+                $secret,
+                $token
               );
               \Drupal::service('loft_core.vimeo_based_entity')
                 ->setClient($client)
