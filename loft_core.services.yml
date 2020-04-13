@@ -7,11 +7,6 @@ services:
     class: Drupal\loft_core\Template\TwigExtension
     tags:
       - { name: twig.extension }
-  loft_core.rabbit_hole_subscriber:
-    class: Drupal\loft_core\EventSubscriber\RabbitHoleSubscriber
-    arguments: ["@rabbit_hole.behavior_invoker", "@plugin.manager.rabbit_hole_behavior_plugin"]
-    tags:
-      - { name: event_subscriber }
   loft_core.images:
     class: Drupal\loft_core\Service\ImageService
   loft_core.vimeo_based_entity:
