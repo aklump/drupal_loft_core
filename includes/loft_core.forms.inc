@@ -10,7 +10,6 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Url;
-use Drupal\loft_core\Redirect;
 
 /**
  * Implements hook_form_BASE_FORM_ID_alter().
@@ -27,36 +26,11 @@ use Drupal\loft_core\Redirect;
  * @d8
  */
 function loft_core_form_node_form_alter(array &$form, FormStateInterface $form_state, string $form_id) {
-  $node = $form_state->getFormObject()->getEntity();
-  if (Redirect::isNodeRedirected($node, 'view')) {
-    $form_state->set('loft_core.redirect_form', TRUE);
-    $form['actions']['submit']['#submit'][] = '_loft_core_node_form_submit_redirect_handler';
-  }
-
   // Call our special combined hook.
   $node = $form_state->getFormObject()->getEntity();
   $hooks = ['loft_core_' . $node->bundle() . '_node_form'];
   \Drupal::service('module_handler')
     ->alter($hooks, $form, $form_state, $form_id);
-}
-
-/**
- * Handle a form reload on save of redirected node.
- *
- * If a node is being edited and it's been redirected by our hooks, then we
- * want to reload the edit form on save.
- *
- * @param array $form
- *   The form definition.
- * @param Drupal\Core\Form\FormStateInterface $form_state
- *   The state of the form.
- *
- * @d8
- */
-function _loft_core_node_form_submit_redirect_handler(array $form, FormStateInterface $form_state) {
-  if ($form_state->get('loft_core.redirect_form')) {
-    $form_state->setRedirect('entity.node.edit_form', ['node' => $form_state->get('nid')]);
-  }
 }
 
 /**

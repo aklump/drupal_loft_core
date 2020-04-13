@@ -1,5 +1,10 @@
-## [Unreleased]
-- lorem
+## [8.x-1.2] - 2020-04-13
+
+### Removed
+1. HOOK_loft_core_redirect_node_BUNDLE_TYPE_view; use [Rabbit Hole Hooks](https://github.com/aklump/drupal_rh_hooks) instead.
+1. `HOOK_loft_core_redirect_node_BUNDLE_TYPE_edit`; no alternative given.
+1. `HOOK_loft_core_redirect_node_BUNDLE_TYPE_delete`; no alternative given.
+1. You should use 
 
 ## [8.x-1.1.15] - 2019-09-23
 
