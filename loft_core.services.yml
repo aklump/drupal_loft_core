@@ -10,6 +10,7 @@ services:
   loft_core.images:
     class: Drupal\loft_core\Service\ImageService
   loft_core.vimeo_based_entity:
+    shared: false
     class: Drupal\loft_core\Service\VimeoBasedEntityService
     arguments: ["@loft_core.images", "@entity_field.manager", "@file_system"]
   loft_core.entity_protection:
