@@ -166,7 +166,12 @@ final class VimeoBasedEntityService {
       ->getFieldDefinitions($entity->getEntityTypeId(), $entity->bundle());
     $directory = 'public://' . $video[$field_name]->getSettings()['file_directory'];
     $this->fileSystem->prepareDirectory($directory, FileSystemInterface::CREATE_DIRECTORY);
-    $local_file = file_copy($temp_file, $directory . '/' . $temp_file->getFilename(), FileSystemInterface::EXISTS_REPLACE);
+
+    // By renaming, we might create orphaned files, but it is better than
+    // replacing an image with the assumption that a matched name is actually
+    // intended to be the same file.  So we have to RENAME--don't change to
+    // REPLACE.
+    $local_file = file_copy($temp_file, $directory . '/' . $temp_file->getFilename(), FileSystemInterface::EXISTS_RENAME);
 
     // This is to allow fancy handling of the poster image setting, for example
     // if you want to tag it or replace it based on tags, e.g. field_tag module
