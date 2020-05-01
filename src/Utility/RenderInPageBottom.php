@@ -2,8 +2,6 @@
 
 namespace Drupal\loft_core\Utility;
 
-use Drupal\Component\Render\MarkupInterface;
-
 /**
  * A post_render utility to move markup to the bottom of the page.
  *
@@ -11,7 +9,7 @@ use Drupal\Component\Render\MarkupInterface;
  * this to it's render array:
  *
  * @code
- *   '#post_render' => [[RenderInPageBottom::class, 'add']],
+ *   '#pre_render' => [[RenderInPageBottom::class, 'add']],
  * @endcode
  *
  * To prevent duplicates you may use the key `#page_bottom_unique` and only the
@@ -19,7 +17,7 @@ use Drupal\Component\Render\MarkupInterface;
  *
  * @code
  *   '#page_bottom_unique' => 'login_modal',
- *   '#post_render' => [[RenderInPageBottom::class, 'add']],
+ *   '#pre_render' => [[RenderInPageBottom::class, 'add']],
  * @endcode
  */
 class RenderInPageBottom {
@@ -61,32 +59,50 @@ class RenderInPageBottom {
    * @param array $element
    *   The render array.
    */
-  public static function add(MarkupInterface $output, array $element) {
+  public static function add(array $element) {
+
     if (static::$disabled) {
-      return $output;
+      return $element;
     }
-    $output = is_array($output) ?: ['#markup' => $output];
+
+    // Remove the pre_render callback to this method so we don't have recursion.
+    if (isset($element['#pre_render'])) {
+      $element['#pre_render'] = array_filter($element['#pre_render'], function ($item) {
+        return $item[0] !== static::class && $item[1] !== __METHOD__;
+      });
+      if (empty($element['#pre_render'])) {
+        unset($element['#pre_render']);
+      }
+    }
 
     // If we have a uuid then only the last element to register  will be used.
     if (($uuid = $element['#page_bottom_unique'] ?? NULL)) {
-      static::$build[$uuid] = $output;
+      static::$build[$uuid] = $element;
+      unset($element['#page_bottom_unique']);
     }
     else {
-      static::$build[] = $output;
+      static::$build[] = $element;
     }
+
+    // We return an empty array because we've effectively "moved" the render
+    // array to be later retrieved by ::get() via loft_core_page_bottom().
+    return [];
   }
 
   /**
-   * Get the final rendering.
+   * Get the amalgam of render arrays to be rendered in the bottom.
    *
-   * @return \Drupal\Component\Render\MarkupInterface|string
-   *   The final rendered markup of all renderables that were added in ::add;
-   *   to be appended to the $page_bottom variable.
+   * All elements that have been sent to
+   * \Drupal\loft_core\Utility\RenderInPageBottom::add will be returned by this
+   * method.
    *
-   * @see loft_core_page_bottom().
+   * @return array
+   *   The final render array.
+   *
+   * @see loft_core_page_bottom()
    */
-  public static function render() {
-    return \Drupal::service('renderer')->render(static::$build);
+  public static function get() {
+    return static::$build;
   }
 
 }

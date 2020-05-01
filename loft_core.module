@@ -418,7 +418,7 @@ function loft_core_trackjs_echo_drupal_messages(array &$commands, array $severit
  *   user.
  * @param callable|NULL $callback
  */
-function loft_core_user_stash($temporary_user = NULL, Callable $callback = NULL) {
+function loft_core_user_stash($temporary_user = NULL, callable $callback = NULL) {
   $user = \Drupal::currentUser();
   static $stashed = NULL;
   $needs_unstash = is_null($temporary_user);
@@ -582,11 +582,7 @@ function loft_core_preprocess_status_messages(&$vars) {
  * Implements hook_page_bottom().
  */
 function loft_core_page_bottom(&$page_bottom) {
-  $page_bottom[] = [
-    '#post_render' => [
-      [RenderInPageBottom::class, 'render'],
-    ],
-  ];
+  $page_bottom[] = ['#pre_render' => [[RenderInPageBottom::class, 'get']]];
 }
 
 /**
