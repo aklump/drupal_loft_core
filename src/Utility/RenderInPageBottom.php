@@ -85,8 +85,13 @@ class RenderInPageBottom {
     }
 
     // We return an empty array because we've effectively "moved" the render
-    // array to be later retrieved by ::get() via loft_core_page_bottom().
-    return [];
+    // array to be later retrieved by ::get() via loft_core_page_bottom().  We
+    // HAVE TO SET THE CACHE CONTEXTS to `url` since this is a page bottom event
+    // and it has to bubble up later.  This is a very, very important step or we
+    // will loose data in production mode.
+    return [
+      '#cache' => ['contexts' => ['url']],
+    ];
   }
 
   /**
