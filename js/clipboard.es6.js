@@ -16,23 +16,21 @@ import copy from 'copy-to-clipboard';
           const $el = $(this);
           const permalink = $el.data('loft-core-clipboard');
           const confirm = $el.data('loft-core-clipboard-confirm') || null;
-          let options = {
+
+          let result = copy(permalink, {
             debug: true,
             message: 'Press #{key} to copy',
-          };
+          });
 
-          if (confirm) {
+          if (result && confirm) {
             const label = $el.html();
             const duration =
               $el.data('loft-core-clipboard-confirm-duration') || 3000;
-            options.onCopy = function() {
-              $el.html(confirm);
-              setTimeout(function() {
-                $el.html(label);
-              }, duration);
-            };
+            $el.html(confirm);
+            setTimeout(function() {
+              $el.html(label);
+            }, duration);
           }
-          copy(permalink, options);
 
           return e.preventDefault();
         });
