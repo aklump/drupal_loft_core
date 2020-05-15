@@ -6,3 +6,8 @@ core:
     - core/drupalSettings
     - core/jquery
     - core/drupal.ajax
+clipboard:
+  js:
+    js/clipboard.js: {}
+  dependencies:
+    - core/jquery
