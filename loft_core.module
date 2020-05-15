@@ -595,3 +595,19 @@ function loft_core_preprocess_links__dropbutton__operations__paragraphs(&$vars) 
     return strcasecmp((string) $a['text']['#value'], (string) $b['text']['#value']);
   });
 }
+
+/**
+ * Implements hook_preprocess_menu_local_task().
+ */
+function loft_core_preprocess_menu_local_task(&$vars) {
+  $route_name = $vars['link']['#url']->getRouteName();
+  if ($route_name === 'loft_core.node.permalink') {
+    $vars['#attached']['library'][] = 'loft_core/clipboard';
+    $vars['link']['#url']
+      ->setOption('path_processing', FALSE)
+      ->setOption('absolute', FALSE);
+    $vars['link']['#options']['attributes']['data-loft-core-clipboard'] = $vars['link']['#url']->toString();
+    $vars['link']['#options']['attributes']['data-loft-core-clipboard-reveal'] = $vars['link']['#url']->toString();
+    $vars['link']['#options']['attributes']['data-loft-core-clipboard-reveal-duration'] = 2000;
+  }
+}

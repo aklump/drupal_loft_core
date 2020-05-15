@@ -1,0 +1,5 @@
+loft_core.node.permalink:
+  route_name: loft_core.node.permalink
+  base_route: entity.node.canonical
+  title: Copy link
+  weight: -1
