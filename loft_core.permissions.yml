@@ -2,3 +2,6 @@
   'restrict access': true
   title: 'Access raw static content'
   description: 'Allow user to access static content files directly.'
+loft_core access permalink tab:
+  title: 'Access permalink tab'
+  description: 'Allow user to access the copy link tab for pages.'
