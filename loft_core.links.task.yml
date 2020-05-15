@@ -2,4 +2,6 @@ loft_core.node.permalink:
   route_name: loft_core.node.permalink
   base_route: entity.node.canonical
   title: Copy link
-  weight: -1
+  # Using a weight of  1 is based on the fact that view, edit are 0 as defined
+  # in node.links.task.yml.
+  weight: 1
