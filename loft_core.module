@@ -582,7 +582,9 @@ function loft_core_preprocess_status_messages(&$vars) {
  * Implements hook_page_bottom().
  */
 function loft_core_page_bottom(&$page_bottom) {
-  $page_bottom[] = ['#pre_render' => [[RenderInPageBottom::class, 'get']]];
+  $page_bottom['render_in_page_bottom'] = [
+    '#pre_render' => [[RenderInPageBottom::class, 'get']],
+  ];
 }
 
 /**

@@ -3,7 +3,7 @@
 namespace Drupal\loft_core\Utility;
 
 /**
- * A post_render utility to move markup to the bottom of the page.
+ * A utility to move markup to the bottom of the page and reduce duplication.
  *
  * To cause a renderable array to be rendered in the $page_bottom section add
  * this to it's render array:
@@ -13,7 +13,10 @@ namespace Drupal\loft_core\Utility;
  * @endcode
  *
  * To prevent duplicates you may use the key `#page_bottom_unique` and only the
- *   last element having that key will be rendered in the final output.
+ *   last element having that key will be rendered in the final output.  This
+ *   is helpful if you only want to render a single block of markup once, but
+ *   may build it multiple times, calling this class, e.g., a modal or tooltip
+ *   help window.
  *
  * @code
  *   '#page_bottom_unique' => 'login_modal',
@@ -51,7 +54,7 @@ class RenderInPageBottom {
   /**
    * Add to the page_bottom renderable.
    *
-   * This should be registered as the last post_render hook on a renderable
+   * This should be registered as the last pre_render hook on a renderable
    * element.  See class code docblock for usage.
    *
    * @param \Drupal\Component\Render\MarkupInterface $output
