@@ -5,7 +5,6 @@
  * Defines the API interfaces for loft_core module.
  */
 
-use Drupal\Core\Url;
 use Drupal\loft_core\Block\BlockRebuilder;
 
 /**
@@ -100,6 +99,19 @@ function HOOK_loft_core_BUNDLE_node_form_alter(array &$form, \Drupal\Core\Form\F
   $node = $form_state->getFormObject()->getEntity();
 
   ...
+}
+
+/**
+ * Change the default label for the permalink tab.
+ *
+ * @param $local_tasks
+ *
+ * @see $config['loft_core.settings']['permalink_type']
+ */
+function HOOK_local_tasks_alter(&$local_tasks) {
+  if (isset($local_tasks['loft_core.node.permalink'])) {
+    $local_tasks['loft_core.node.permalink']['title'] = t('Foo bar');
+  }
 }
 
 /**
