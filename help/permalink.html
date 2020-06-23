@@ -1,0 +1,13 @@
+
+<p>For users with the correct permissions a tab will be added to node pages, which when clicked copies a canonical link to the clipboard.</p>
+
+<h2>Absolute links</h2>
+
+<p>By default the copy link is relative. To make the copied value absolute add the following to <em>settings.php</em>.</p>
+
+<pre><code>$config['loft_core.settings']['permalink_type'] = 'absolute';
+</code></pre>
+
+<h2>Change tab label</h2>
+
+<p>To change the tab label implement <code>hook_local_task_alter</code>.  See <em>loft_core.api.php</em> for an example implementation.</p>
