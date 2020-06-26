@@ -25,7 +25,7 @@ trait AjaxFormHelperTrait {
    *
    * @return $this
    */
-  public function setPostValidationError(FormStateInterface $form_state, $message = ''): self {
+  public function setPostValidationError(FormStateInterface $form_state, $message = '') {
     $errors = $form_state->get('ajaxFormHelperTraitPostValidationErrors');
     $errors[] = $message;
     $form_state->set('ajaxFormHelperTraitPostValidationErrors', $errors);
