@@ -2,6 +2,8 @@
 
 namespace Drupal\loft_core\Utility;
 
+use Drupal\Core\Cache\Cache;
+
 /**
  * A utility to facility time-based cache tag expiration.
  *
@@ -37,6 +39,13 @@ namespace Drupal\loft_core\Utility;
 class ExpiringCacheTags {
 
   /**
+   * The Drupal configuration ID.
+   *
+   * @var string
+   */
+  private static $cid = 'loft_core.expiring_class_tags';
+
+  /**
    * Set up some cache tags to expire in the future.
    *
    * @param array $cache_tags
@@ -47,10 +56,11 @@ class ExpiringCacheTags {
    *   on your cron frequency--but only AFTER this time.
    */
   public static function add(array $cache_tags, int $max_age): void {
-    \Drupal::configFactory()
-      ->getEditable('loft_core.time_based_cache')
-      ->set(microtime(), [time() + $max_age, $cache_tags])
-      ->save();
+    $expiry = time() + $max_age;
+    $records = \Drupal::configFactory()
+      ->getEditable(self::$cid);
+    $cache_tags = Cache::mergeTags($records->get($expiry) ?? [], $cache_tags);
+    $records->set($expiry, $cache_tags)->save();
   }
 
   /**
@@ -61,14 +71,20 @@ class ExpiringCacheTags {
    */
   public static function expire(): void {
     $settings = \Drupal::configFactory()
-      ->getEditable('loft_core.time_based_cache');
-    $items = $settings->get()[0] ?? [];
-    foreach ($items as $cid => $item) {
-      list($expiry, $cache_tags) = $item;
+      ->getEditable(self::$cid);
+    if (!($items = $settings->get() ?? [])) {
+      return;
+    }
+    $needs_save = FALSE;
+    foreach ($items as $expiry => $cache_tags) {
       if (time() >= $expiry) {
         Cache::invalidateTags($cache_tags);
-        $settings->clear($cid);
+        $settings->clear($expiry);
+        $needs_save = TRUE;
       }
+    }
+    if ($needs_save) {
+      $settings->save();
     }
   }
 
@@ -80,23 +96,23 @@ class ExpiringCacheTags {
    */
   public static function removeAll() {
     \Drupal::configFactory()
-      ->getEditable('loft_core.time_based_cache')
+      ->getEditable(self::$cid)
       ->delete();
   }
 
   /**
    * Convert a future date into a max age value.
    *
-   * @param \DateTime|\Drupal\Core\Datetime\DrupalDateTime $future_datetime
+   * @param \DateTime|\Drupal\Core\Datetime\DrupalDateTime $date
    *   A datetime object presumably in the future.
    *
    * @return int
    *   The number of seconds between now and a future date, to be used as
-   *   max-age.  If this is a negative number it means that $future_datetime
+   *   max-age.  If this is a negative number it means that $date
    *   has already passed.
    */
-  public static function maxAgeByDate($future_datetime) {
-    return $future_datetime->format('U') - date_create('now', $future_datetime->getTimezone())->format('U');
+  public static function maxAgeByDate($date) {
+    return $date->format('U') - date_create('now', $date->getTimezone())->format('U');
   }
 
 }
