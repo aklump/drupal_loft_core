@@ -13,6 +13,9 @@ namespace Drupal\loft_core\Utility;
  *     return 'user-collections';
  *   }
  * @endcode
+ *
+ * @deprecated Use \Drupal\front_end_components\BemTrait instead and declare a
+ *   dependency on that module.
  */
 trait BemTrait {
 
