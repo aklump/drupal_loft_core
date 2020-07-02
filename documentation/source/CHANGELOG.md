@@ -1,4 +1,17 @@
-## [8.x-1.2] - 2020-04-13
+# Changelog
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+- lorem
+
+## [8.x-1.2] - 2020-07-01
+### Added
+- Added \Drupal\loft_core\Utility\ExpiringCacheTags
+
+## [8.x-1.16] - 2020-04-13
 
 ### Removed
 1. HOOK_loft_core_redirect_node_BUNDLE_TYPE_view; use [Rabbit Hole Hooks](https://github.com/aklump/drupal_rh_hooks) instead.
