@@ -43,7 +43,7 @@ class ExpiringCacheTags {
    *
    * @var string
    */
-  private static $cid = 'loft_core.expiring_class_tags';
+  private static $cid = 'loft_core.expiring_cache_tags';
 
   /**
    * Set up some cache tags to expire in the future.
@@ -57,10 +57,9 @@ class ExpiringCacheTags {
    */
   public static function add(array $cache_tags, int $max_age): void {
     $expiry = time() + $max_age;
-    $records = \Drupal::configFactory()
-      ->getEditable(self::$cid);
-    $cache_tags = Cache::mergeTags($records->get($expiry) ?? [], $cache_tags);
-    $records->set($expiry, $cache_tags)->save();
+    $records = \Drupal::state()->get(self::$cid, []);
+    $records[$expiry] = Cache::mergeTags($records[$expiry] ?? [], $cache_tags);
+    \Drupal::state()->set(self::$cid, $records);
   }
 
   /**
@@ -70,21 +69,19 @@ class ExpiringCacheTags {
    * hook_cron implementation.
    */
   public static function expire(): void {
-    $settings = \Drupal::configFactory()
-      ->getEditable(self::$cid);
-    if (!($items = $settings->get() ?? [])) {
+    if (!($records = \Drupal::state()->get(self::$cid, []))) {
       return;
     }
     $needs_save = FALSE;
-    foreach ($items as $expiry => $cache_tags) {
+    foreach ($records as $expiry => $cache_tags) {
       if (time() >= $expiry) {
         Cache::invalidateTags($cache_tags);
-        $settings->clear($expiry);
+        unset($records[$expiry]);
         $needs_save = TRUE;
       }
     }
     if ($needs_save) {
-      $settings->save();
+      \Drupal::state()->set(self::$cid, $records);
     }
   }
 
@@ -95,9 +92,7 @@ class ExpiringCacheTags {
    * you want or just rebuild the Drupal cache.
    */
   public static function removeAll() {
-    \Drupal::configFactory()
-      ->getEditable(self::$cid)
-      ->delete();
+    \Drupal::state()->delete(self::$cid);
   }
 
   /**
