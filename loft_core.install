@@ -5,6 +5,9 @@
  * Functions that have to do with installation and updates.
  */
 
+use AKlump\LoftDataGrids\JSONExporter;
+use Drupal\Core\File\FileSystemInterface;
+
 /**
  * Create an archive of entities.
  *
@@ -52,7 +55,7 @@ function loft_core_update__archive_entities(
   try {
     $query = db_query($sql);
     $query->execute();
-    file_prepare_directory($destination_dir, FILE_CREATE_DIRECTORY);
+    file_prepare_directory($destination_dir, FileSystemInterface::CREATE_DIRECTORY);
     $header = NULL;
 
     $data = new \AKlump\LoftDataGrids\ExportData();
@@ -70,10 +73,10 @@ function loft_core_update__archive_entities(
           if ($key === $path_key) {
             $add_to_export = FALSE;
             $file_dir = "$destination_dir/files/";
-            file_prepare_directory($file_dir, FILE_CREATE_DIRECTORY);
+            file_prepare_directory($file_dir, FileSystemInterface::CREATE_DIRECTORY);
             $destination = $file_dir . '/' . $record[$basename_key];
             if (!file_exists($destination)) {
-              if (!file_unmanaged_copy($value, $destination, FILE_EXISTS_REPLACE)) {
+              if (!file_unmanaged_copy($value, $destination, FileSystemInterface::EXISTS_REPLACE)) {
                 throw new \RuntimeException("Could not copy: $value.");
               }
             }
@@ -93,7 +96,7 @@ function loft_core_update__archive_entities(
       throw new \RuntimeException("Could not save: $destination_dir/$filename");
     }
 
-    $exporter = new \AKlump\LoftDataGrids\JSONExporter($data, $filename);
+    $exporter = new JSONExporter($data, $filename);
     $path = $exporter->saveFile($destination_dir);
     if (!file_exists($path)) {
       throw new \RuntimeException("Could not save: $destination_dir/$filename");
@@ -293,8 +296,8 @@ function loft_core_update__delete_entity_fields($entity_type, $bundle, array $fi
       // @FIXME
 // Fields and field instances are now exportable configuration entities, and
 // the Field Info API has been removed.
-// 
-// 
+//
+//
 // @see https://www.drupal.org/node/2012896
 // field_delete_instance($instance);
 

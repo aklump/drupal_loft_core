@@ -4,6 +4,7 @@ namespace Drupal\loft_core;
 
 use AKlump\LoftLib\Code\Cache;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\loft_core\Service\ImageService;
 
 /**
  * A utility class provided by loft_core.
@@ -133,6 +134,16 @@ class Loft {
       ->loadMultiple($found);
 
     return array_values($references);
+  }
+
+  /**
+   * Service wrapper.
+   *
+   * @return \Drupal\loft_core\Service\ImageService
+   *   An instance of the service instance
+   */
+  public static function images(): ImageService {
+    return \Drupal::service('loft_core.images');
   }
 
 }

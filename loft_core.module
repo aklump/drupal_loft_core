@@ -107,7 +107,7 @@ function loft_core_element_add_test_classes(array &$element, array $paths): void
       $s = data_api();
       $path .= '.#attributes.class';
       $classes = $s->get($element, $path, []);
-      $classes[] = loft_core_test_class($test_class);
+      $classes[] = TestingMarkup::id($test_class);
       $s->set($element, $path, $classes);
     }
   }
@@ -376,8 +376,7 @@ function loft_core_trackjs_echo_drupal_messages(array &$commands, array $severit
   'error',
 ]
 ) {
-  $groups = drupal_get_messages(NULL,
-    FALSE);
+  $groups = \Drupal::messenger()->all();
   foreach ($groups as $level => $messages) {
     if (!in_array($level, $severities)) {
       continue;
