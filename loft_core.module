@@ -8,6 +8,7 @@
  */
 
 use Drupal\Core\Template\Attribute;
+use Drupal\Core\Url;
 use Drupal\loft_core\StaticContentStreamWrapper;
 use Drupal\loft_core\Utility\RenderInPageBottom;
 use Drupal\loft_core_testing\Component\Utility\TestingMarkup;
@@ -550,6 +551,27 @@ function loft_core_menu_local_actions_alter(array &$local_actions) {
  * Implements hook_contextual_links_view_alter().
  */
 function loft_core_contextual_links_view_alter(array &$element, array $items) {
+  $id = NULL;
+  foreach ($items as $item) {
+   if (isset($item['route_parameters']['node'])) {
+      $id = $item['route_parameters']['node'];
+      $url = Url::fromRoute('entity.node.canonical', ['node' => $id]);
+      break;
+    }
+  }
+
+  if ($id) {
+    $element['#links'] = array_merge(
+      [
+        'loft_core_id' => [
+          'title' => $id,
+          'url' => $url,
+        ],
+      ],
+      $element['#links'],
+    );
+  }
+
 }
 
 /**
