@@ -85,6 +85,17 @@ class ImageService {
     return Markup::create($svg);
   }
 
+  /**
+   * Get the data URI for an image to be used in inline CSS.
+   *
+   * @param string $file_resource
+   *   The path to an image file.
+   *
+   * @return string
+   *   The data URI.
+   *
+   * @link https://css-tricks.com/data-uris
+   */
   public function getBase64DataSrc($file_resource): string {
     $this->validateResourceExists($file_resource);
     $path = parse_url($file_resource, PHP_URL_PATH);
@@ -92,6 +103,10 @@ class ImageService {
     switch ($extension) {
       case 'png':
         $mime = 'image/png';
+        break;
+
+      case 'svg':
+        $mime = 'image/svg+xml';
         break;
 
       case 'jpg':
