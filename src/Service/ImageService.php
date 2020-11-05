@@ -13,6 +13,22 @@ use Drupal\image\Entity\ImageStyle;
 class ImageService {
 
   /**
+   * Determine if an image is taller than the width by at least 10%.
+   *
+   * @param string $uri
+   *   The image URI.
+   *
+   * @return bool
+   *   True if the image is taller than wide.
+   */
+  public function isImageTall(string $uri) {
+    $image = \Drupal::service('image.factory')->get($uri);
+    $width = $image->getWidth();
+
+    return $width + 0.1 * $width < $image->getHeight();
+  }
+
+  /**
    * Adds image_src as an web-accessible URL using image_uri/style_name.
    *
    * @param array $vars
