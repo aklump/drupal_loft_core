@@ -4,4 +4,3 @@ use_redirect_api: false
 loft_core_cache_bust_token: cb
 send_registration_mail_from: ''
 smart_url_regex: ''
-permalink_type: relative

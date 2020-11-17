@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [8.x-1.2.7] - 2020-11-16
+### Added
+- _Share link_ tab.
+  
+### Removed
+- `$config['loft_core.settings']['permalink_type'] = 'absolute';`
+  
 ## [8.x-1.2.1] - 2020-07-02
 ### Deprecated
 - \Drupal\loft_core\Utility\BemTrait  - Use \Drupal\front_end_components\BemTrait instead and declare a dependency on that module.

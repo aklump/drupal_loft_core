@@ -1,12 +1,13 @@
 # Permalink or "Copy link" tab
 
-For users with the correct permissions a tab will be added to node pages, which when clicked copies a canonical link to the clipboard.
+For users with the correct permissions two tabs will be added to node pages, which when clicked copies a canonical link to the clipboard.  The first tab _Copy link_ copies a canonical internal link (no domain), and should be used for page to page linking within the website.  The second tab _Share link_ should be used links to embed in emails, social sharing, etc; outside of the website context, because it contains an absolute URL.
 
-## Absolute links
+## Hide/show tabs by role
 
-By default the copy link is relative. To make the copied value absolute add the following to _settings.php_.
-
-    $config['loft_core.settings']['permalink_type'] = 'absolute';
+Toggle the permissions as necessary to hide/show one or both tabs:
+    
+    * loft_core access local link tab (Copy link)
+    * loft_core access permalink tab (Share link)
 
 ## Change tab label
 

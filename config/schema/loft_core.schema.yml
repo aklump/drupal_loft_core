@@ -14,5 +14,3 @@ loft_core.settings:
       type: string
     smart_url_regex:
       type: string
-    permalink_type:
-      type: string

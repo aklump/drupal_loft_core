@@ -553,7 +553,7 @@ function loft_core_menu_local_actions_alter(array &$local_actions) {
 function loft_core_contextual_links_view_alter(array &$element, array $items) {
   $id = NULL;
   foreach ($items as $item) {
-   if (isset($item['route_parameters']['node'])) {
+    if (isset($item['route_parameters']['node'])) {
       $id = $item['route_parameters']['node'];
       $url = Url::fromRoute('entity.node.canonical', ['node' => $id]);
       break;
@@ -624,17 +624,24 @@ function loft_core_preprocess_links__dropbutton__operations__paragraphs(&$vars) 
  */
 function loft_core_preprocess_menu_local_task(&$vars) {
   $route_name = $vars['link']['#url']->getRouteName();
-  if ($route_name === 'loft_core.node.permalink') {
-    $vars['#attached']['library'][] = 'loft_core/clipboard';
-
-    $is_absolute = Drupal::config('loft_core.settings')
-        ->get('permalink_type') === 'absolute';
-
-    $vars['link']['#url']
-      ->setOption('path_processing', FALSE)
-      ->setOption('absolute', $is_absolute);
-    $vars['link']['#options']['attributes']['data-loft-core-clipboard'] = $vars['link']['#url']->toString();
-    $vars['link']['#options']['attributes']['data-loft-core-clipboard-confirm'] = t('Copied!', ['@value' => $vars['link']['#url']->toString()]);
-    $vars['link']['#options']['attributes']['data-loft-core-clipboard-confirm-duration'] = 2000;
+  if (!in_array($route_name, [
+    'loft_core.node.permalink',
+    'loft_core.node.local_link',
+  ])) {
+    return;
   }
+
+  $is_absolute = $route_name === 'loft_core.node.permalink';
+
+  $vars['#attached']['library'][] = 'loft_core/clipboard';
+  $vars['link']['#url']
+    ->setOption('path_processing', FALSE)
+    ->setOption('absolute', $is_absolute);
+  $vars['link']['#options']['attributes']['data-loft-core-clipboard'] = $vars['link']['#url']->toString();
+  $vars['link']['#options']['attributes']['data-loft-core-clipboard-confirm'] = t('Copied!', ['@value' => $vars['link']['#url']->toString()]);
+  $vars['link']['#options']['attributes']['data-loft-core-clipboard-confirm-duration'] = 2000;
+
+  // It's awkward to see the View tab and both of these tabs all active at the
+  // same time, due to the shared route id.  So let's not make these active.
+  $vars['link']['#options']['set_active_class'] = FALSE;
 }
