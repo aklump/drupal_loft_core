@@ -11,6 +11,8 @@ use Drupal\Core\Template\Attribute;
  */
 abstract class CoreBase implements CoreInterface {
 
+  use \Drupal\data_api\DataTrait;
+
   /**
    * CoreBase constructor.
    *
@@ -18,6 +20,7 @@ abstract class CoreBase implements CoreInterface {
    *   An instance of DataInterface.
    */
   public function __construct(DataInterface $dataApiData) {
+    // TODO Get rid of this dependency.
     $this->setDataApiData($dataApiData);
   }
 
