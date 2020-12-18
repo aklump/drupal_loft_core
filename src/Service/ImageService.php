@@ -320,4 +320,29 @@ class ImageService {
     }
   }
 
+  /**
+   * Get a render array for SVG text.
+   *
+   * @link https://www.w3schools.com/graphics/svg_text.asp
+   *
+   * @param string $text
+   *   The text to render.
+   * @param $viewbox_width
+   *   The width of the viewbox.
+   * @param $font_size
+   *   The font size to use.
+   * @param $line_height
+   *   The line height to use.
+   *
+   * @return array
+   *   A render array for an SVG text element.
+   */
+  public function getSvgText(string $text, $viewbox_width, $font_size, $line_height) {
+    return [
+      '#prefix' => Markup::create(sprintf('<svg viewBox="0 0 %d %d" xmlns="http://www.w3.org/2000/svg"><text x="0" y="%d">', $viewbox_width, $line_height, $font_size)),
+      '#markup' => $text,
+      '#suffix' => Markup::create('</text></svg>'),
+    ];
+  }
+
 }
