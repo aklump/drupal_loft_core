@@ -19,7 +19,10 @@ class NoOrphansFilter extends FilterBase {
    * {@inheritdoc}
    */
   public function process($text, $langcode) {
-    $space = strrpos($text, ' ');
+
+    // Find the last space, which is followed by a non-space, this we will
+    // replace with a nbsp.
+    $space = strrpos(trim($text), ' ');
     if ($space !== FALSE) {
       $text = substr_replace($text, '&nbsp;', $space, 1);
     }
