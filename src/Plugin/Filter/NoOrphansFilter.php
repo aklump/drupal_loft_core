@@ -20,7 +20,9 @@ class NoOrphansFilter extends FilterBase {
    */
   public function process($text, $langcode) {
     $space = strrpos($text, ' ');
-    $text = substr_replace($text, '&nbsp;', $space, 1);
+    if ($space !== FALSE) {
+      $text = substr_replace($text, '&nbsp;', $space, 1);
+    }
 
     return new FilterProcessResult($text);
   }
