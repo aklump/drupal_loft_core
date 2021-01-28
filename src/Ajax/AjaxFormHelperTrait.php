@@ -85,10 +85,17 @@ trait AjaxFormHelperTrait {
    *   An AJAX response to handle the failed form submission.
    */
   protected function failedAjaxSubmit(array $form, FormStateInterface $form_state): AjaxResponse {
-    $form['status_messages'] = [
-      '#type' => 'status_messages',
-      '#weight' => -1000,
-    ];
+
+    // If you want to suppress the display of status_messages then you need to
+    // set #access = false before you get to this point.  You probably only need
+    // to worry about this element if you want to change the weight from being
+    // at the top of the form.
+    if (empty($form['status_messages'])) {
+      $form['status_messages'] = [
+        '#type' => 'status_messages',
+        '#weight' => -1000,
+      ];
+    }
     $form['#sorted'] = FALSE;
     $response = new AjaxResponse();
     $response->addCommand(new ReplaceCommand('[data-drupal-selector="' . $form['#attributes']['data-drupal-selector'] . '"]', $form));
