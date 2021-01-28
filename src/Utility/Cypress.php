@@ -63,7 +63,7 @@ final class Cypress {
    */
   public function with(string $element): void {
     $this->element = $element;
-    if (empty($this->targetElement)) {
+    if (is_null($this->targetElement)) {
       throw new \RuntimeException("You must call ::tag() first.");
     }
     if (is_array($this->targetElement)) {
