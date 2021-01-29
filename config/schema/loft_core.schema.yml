@@ -10,7 +10,5 @@ loft_core.settings:
       type: boolean
     loft_core_cache_bust_token:
       type: string
-    send_registration_mail_from:
-      type: string
     smart_url_regex:
       type: string

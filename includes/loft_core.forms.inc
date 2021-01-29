@@ -260,46 +260,6 @@ function loft_core_get_form_during_ajaxing($form_id) {
 }
 
 /**
- * Implements hook_form_alter().
- *
- * Add an additional configuration variable for defining an email from address
- * for when a user is cancelled.
- *
- * @see loft_core_mail_alter
- *
- * @d8
- */
-function loft_core_form_user_admin_settings_alter(&$form, &$form_state, $form_id) {
-  Arrays::insertAfterKey($form, 'mail_notification_address', [
-    'loft_core_mail_registration_from' => [
-      '#title' => t('Registration email address'),
-      '#type' => 'email',
-      '#description' => t('If supplied, this email will be used as the from address for registration emails only, instead of the default.', array(
-        ':url' => Url::fromRoute('system.site_information_settings')
-          ->toString(),
-      )),
-      '#default_value' => \Drupal::config('loft_core.settings')
-        ->get('mail_registration_from'),
-    ],
-  ]);
-
-  $form['#submit'][] = 'loft_core_form_user_admin_settings_submit';
-}
-
-/**
- * Form submission handler for user_admin_settings().
- *
- * @see loft_core_form_user_admin_settings_alter()
- *
- * @d8
- */
-function loft_core_form_user_admin_settings_submit($form, FormStateInterface $form_state) {
-  \Drupal::configFactory()->getEditable('loft_core.settings')
-    ->set('mail_registration_from', $form_state->getValue('loft_core_mail_registration_from'))
-    ->save();
-}
-
-/**
  * Add test classes to a paragraphs element.
  *
  * @code

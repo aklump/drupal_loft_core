@@ -191,7 +191,7 @@ function loft_core_preprocess_html(&$vars) {
 <script type="text/javascript">window._trackJs = {$config};</script>
 <script type="text/javascript" src="https://cdn.trackjs.com/releases/current/tracker.js"></script>
 <script type="text/javascript">{$meta};</script>
-<!-- END TRACKJS -->        
+<!-- END TRACKJS -->
 EOD;
   }
 }
@@ -441,27 +441,6 @@ function loft_core_user_stash($temporary_user = NULL, callable $callback = NULL)
   if ($stashed && $needs_unstash) {
     $user = $stashed;
     $stashed = NULL;
-  }
-}
-
-/**
- * Implements hook_mail_alter().
- *
- * Allow for a custom from address for registration emails.
- */
-function loft_core_mail_alter(&$message) {
-  if (($from = \Drupal::config('loft_core.settings')
-    ->get('send_registration_mail_from'))) {
-    switch ($message['key']) {
-      case 'register_admin_created':
-      case 'register_no_approval_required':
-      case 'register_pending_approval':
-        $message['from'] = $from;
-        foreach (['Return-Path', 'Sender', 'From'] as $key) {
-          $message['headers'][$key] = $from;
-        }
-        break;
-    }
   }
 }
 

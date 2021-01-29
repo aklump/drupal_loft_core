@@ -4,10 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
+
 ## [8.x-1.3] - 2020-12-23
 ### Added
 - No Orphans filter to prevent single word orphans.  Add it to your text format(s).  Learn more at \Drupal\loft_core\Plugin\Filter\NoOrphansFilter
-  
+
+### Removed
+- The extra email from address "Registration email address".  There is no upgrade path, this simple breaks implementations.
+
 ## [8.x-1.2.7] - 2020-11-16
 ### Added
 - _Share link_ tab.
