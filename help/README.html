@@ -3,16 +3,20 @@
 
 <h2>Installation</h2>
 
-<p>Add the following to <em>composer.json</em> above web root.  Making sure you have done <code>composer require wikimedia/composer-merge-plugin</code></p>
+<ol>
+<li><p>Add the following to the application's <em>composer.json</em> above web root.</p>
 
-<pre><code>    "merge-plugin": {
-        "require": [
-            "web/modules/custom/loft_core/composer.json"
-        ]
-    },
-</code></pre>
-
-<p>Then do <code>composer update --lock</code>.</p>
+<pre><code class="json">{
+  "repositories": [
+    {
+      "type": "path",
+      "url": "web/modules/custom/loft_core"
+    }
+  ]
+}
+</code></pre></li>
+<li><p>Now run <code>composer require drupal/loft-core</code></p></li>
+</ol>
 
 <h2>Contact</h2>
 

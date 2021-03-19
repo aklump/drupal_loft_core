@@ -6,15 +6,18 @@
 
 Installation
 
-   Add the following to composer.json above web root. Making sure you have
-   done composer require wikimedia/composer-merge-plugin
-    "merge-plugin": {
-        "require": [
-            "web/modules/custom/loft_core/composer.json"
-        ]
-    },
+    1. Add the following to the application's composer.json above web
+       root.
+{
+  "repositories": [
+    {
+      "type": "path",
+      "url": "web/modules/custom/loft_core"
+    }
+  ]
+}
 
-   Then do composer update --lock.
+    2. Now run composer require drupal/loft-core
 
 Contact
 
