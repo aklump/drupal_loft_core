@@ -4,15 +4,20 @@ This module contains features that I wish were in core, and which I often use fo
 
 ## Installation
 
-Add the following to _composer.json_ above web root.  Making sure you have done `composer require wikimedia/composer-merge-plugin`
+1. Add the following to the application's _composer.json_ above web root.
 
-        "merge-plugin": {
-            "require": [
-                "web/modules/custom/loft_core/composer.json"
-            ]
-        },
+    ```json
+    {
+      "repositories": [
+        {
+          "type": "path",
+          "url": "web/modules/custom/loft_core"
+        }
+      ]
+    }
+    ```
 
-Then do `composer update --lock`.
+1. Now run `composer require drupal/loft-core`
 
 ## Contact
 

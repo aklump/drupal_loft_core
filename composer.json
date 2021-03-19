@@ -1,8 +1,8 @@
 {
     "license": "GPL-2.0-or-later",
-    "name": "aklump/loft_core",
-    "description": "Missing Drupal core functionality, IMHO.",
-    "type": "library",
+    "name": "drupal/loft_core",
+    "description": "Additional Drupal toolbox and features.",
+    "type": "private",
     "authors": [
         {
             "name": "aklump",
