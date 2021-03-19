@@ -1,6 +1,6 @@
 {
     "license": "GPL-2.0-or-later",
-    "name": "drupal/loft_core",
+    "name": "drupal/loft-core",
     "description": "Additional Drupal toolbox and features.",
     "type": "private",
     "authors": [
