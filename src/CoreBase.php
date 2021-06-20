@@ -104,4 +104,37 @@ abstract class CoreBase implements CoreInterface {
     return $element[$key];
   }
 
+  /**
+   * Get a datetime object formated by drupal date time format name.
+   *
+   * @param $date_time
+   *   A \DateTime or \Drupal\Core\Datetime\DrupalDateTime instance.
+   * @param string $format_name
+   *   The date time Drupal format name.
+   * @param string $fallback_pattern
+   *   The fallback pattern to use to format if the $format_name is not found.
+   *
+   * @return string
+   *   The formated string representing $date_time.
+   */
+  public function getFormattedByDateFormatName($date_time, string $format_name, string $fallback_pattern): string {
+    if (!is_object($date_time) || !method_exists($date_time, 'format')) {
+      throw new \InvalidArgumentException(sprintf('\$date_time must be a date object with a format method.'));
+    }
+
+    if ($format_name) {
+
+      // TODO DI inject to contstructor.
+      $loaded = \Drupal::service('entity_type.manager')
+        ->getStorage('date_format')
+        ->load($format_name);
+      if ($loaded) {
+        $pattern = $loaded->getPattern();
+      }
+    }
+    $pattern = !empty($loaded) ? $loaded->getPattern() : $fallback_pattern;
+
+    return strval($date_time->format($pattern));
+  }
+
 }
