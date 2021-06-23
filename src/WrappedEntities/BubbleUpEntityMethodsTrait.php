@@ -31,13 +31,15 @@ trait BubbleUpEntityMethodsTrait {
    */
   public function __call($name, $arguments) {
     $bubble_up_methods = $this->bubbleUpMethods ?? [
-        'toUrl',
-        'toLink',
+        'bundle',
         'getTitle',
         'getType',
-        'bundle',
+        'getOwnerId',
+        'id',
         'isPromoted',
         'isSticky',
+        'toLink',
+        'toUrl',
       ];
     if (in_array($name, $bubble_up_methods)
       && method_exists($this->getEntity(), $name)) {
