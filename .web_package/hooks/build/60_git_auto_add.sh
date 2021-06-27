@@ -10,5 +10,4 @@ if [ "$git" ]; then
     (cd $7/docs && git add .)
     (cd $7/help && git add .)
     (cd $7/vendor && git add .)
-    (cd $7 && git add composer.lock)
 fi
