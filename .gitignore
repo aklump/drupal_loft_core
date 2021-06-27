@@ -6,3 +6,4 @@ docs/core/cache
 code-coverage/
 /documentation/core
 /documentation/README.md
+/.gitignore
