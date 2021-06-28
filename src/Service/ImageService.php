@@ -263,14 +263,24 @@ class ImageService {
    * @endcode
    */
   public function copyRemoteImageByUrl($remote_url) {
-    $extensions = 'jpg jpeg gif png';
-
-    $info = explode('?', $remote_url);
-    $info = pathinfo($info[0]);
+    $allowed_extensions = [
+      'jpg' => IMAGETYPE_JPEG,
+      'jpeg' => IMAGETYPE_JPEG,
+      'gif' => IMAGETYPE_GIF,
+      'png' => IMAGETYPE_PNG,
+    ];
+    list($remote_path) = explode('?', $remote_url);
+    $info = pathinfo($remote_path);
+    if (empty($info['extension'])) {
+      $file_type = exif_imagetype($remote_url);
+      $extension = array_search($file_type, $allowed_extensions);
+      $remote_path = rtrim($remote_path, '.') . ".$extension";
+      $info = pathinfo($remote_path);
+    }
 
     $file['uid'] = \Drupal::currentUser()->id();
     $file['status'] = 0;
-    $file['filename'] = file_munge_filename($info['basename'], $extensions);
+    $file['filename'] = file_munge_filename($info['basename'], implode(' ', array_keys($allowed_extensions)));
     $file['uri'] = 'temporary://' . $file['filename'];
     if (!copy($remote_url, $file['uri'])) {
       return FALSE;

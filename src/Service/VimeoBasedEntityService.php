@@ -158,6 +158,10 @@ final class VimeoBasedEntityService {
    * @param $entity
    * @param $field_name
    * @param $remote_url
+   *
+   * @link https://developer.vimeo.com/api/reference/videos#get_video_thumbnails
+   * @link https://developer.vimeo.com/api/upload/thumbnails#returning-the-link-to-a-thumbnail
+   * @link https://developer.vimeo.com/api/reference/responses/picture
    */
   private function handleImageField($entity, $field_name, $remote_url) {
     $temp_file = $this->imageService
