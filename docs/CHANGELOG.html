@@ -27,21 +27,28 @@
 
 <p>All notable changes to this project will be documented in this file.</p>
 
-<p>The format is based on <a href="https://keepachangelog.com/en/1.0.0/">Keep a Changelog</a>,
-and this project adheres to <a href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
+<p>The format is based on <a href="https://keepachangelog.com/en/1.0.0/">Keep a Changelog</a>, and this project adheres to <a href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
+
+<h2>[8.x-1.3.10] - 2021-06-27</h2>
+
+<h3>Fixed</h3>
+
+<ul>
+<li>Remote images without extensions will now have extensions added when copying them, by detecting the image type. This fixes an issue with vimeo thumbnails being saved without file extensions.</li>
+</ul>
 
 <h2>[8.x-1.3] - 2020-12-23</h2>
 
 <h3>Added</h3>
 
 <ul>
-<li>No Orphans filter to prevent single word orphans.  Add it to your text format(s).  Learn more at \Drupal\loft_core\Plugin\Filter\NoOrphansFilter</li>
+<li>No Orphans filter to prevent single word orphans. Add it to your text format(s). Learn more at \Drupal\loft_core\Plugin\Filter\NoOrphansFilter</li>
 </ul>
 
 <h3>Removed</h3>
 
 <ul>
-<li>The extra email from address "Registration email address".  There is no upgrade path, this simple breaks implementations.</li>
+<li>The extra email from address "Registration email address". There is no upgrade path, this simple breaks implementations.</li>
 </ul>
 
 <h2>[8.x-1.2.7] - 2020-11-16</h2>
@@ -63,7 +70,7 @@ and this project adheres to <a href="https://semver.org/spec/v2.0.0.html">Semant
 <h3>Deprecated</h3>
 
 <ul>
-<li>\Drupal\loft_core\Utility\BemTrait  - Use \Drupal\front_end_components\BemTrait instead and declare a dependency on that module.</li>
+<li>\Drupal\loft_core\Utility\BemTrait - Use \Drupal\front_end_components\BemTrait instead and declare a dependency on that module.</li>
 </ul>
 
 <h2>[8.x-1.2] - 2020-07-01</h2>
@@ -97,7 +104,7 @@ and this project adheres to <a href="https://semver.org/spec/v2.0.0.html">Semant
 <h2>8.x-1.0-rc1</h2>
 
 <ul>
-<li><p>The API for the redirect hooks have changed.  You must update the following implementations per <em>loft_core.api.php</em>.</p>
+<li><p>The API for the redirect hooks have changed. You must update the following implementations per <em>loft_core.api.php</em>.</p>
 
 <ul>
 <li><code>HOOK_loft_core_redirect_node_BUNDLE_TYPE_view</code></li>
@@ -124,7 +131,7 @@ and this project adheres to <a href="https://semver.org/spec/v2.0.0.html">Semant
 <footer>
   <div class="pager"><a href="breadcrumb.html" class="prev breadcrumb">&laquo;Breadcrumb</a><a href="index.html" class="index pager__book-title">Loft Drupal Core</a><a href="clipboard.html" class="next clipboard">Clipboard API&raquo;</a></div>  
   <div id="footer-legaleeze">
-    <p class="legaleeze center">Version: 1.0 &bull; Last Updated: Sun, 27 Jun 2021 15:39:40 -0700</p>
+    <p class="legaleeze center">Version: 1.0 &bull; Last Updated: Sun, 27 Jun 2021 21:20:46 -0700</p>
   </div>
 </footer>
 
