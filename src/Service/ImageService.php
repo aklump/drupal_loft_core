@@ -36,8 +36,11 @@ class ImageService {
    *   - image_uri REQUIRED
    *   - style_name OPTIONAL
    *   - image_src FORBIDDEN.
+   *
+   * @return self
+   *   Self for chaining.
    */
-  public function preprocessImageVars(array &$vars) {
+  public function preprocessImageVars(array &$vars): self {
     if (empty($vars['image_uri'])) {
       throw new \InvalidArgumentException("Empty value for image_uri");
     }
@@ -56,6 +59,8 @@ class ImageService {
     else {
       $vars['image_src'] = file_create_url($vars['image_uri']);
     }
+
+    return $this;
   }
 
   /**
@@ -353,6 +358,25 @@ class ImageService {
       '#markup' => $text,
       '#suffix' => Markup::create('</text></svg>'),
     ];
+  }
+
+  /**
+   * Given an URL without a multiplier, return the same with @2x added.
+   *
+   * @param string $url
+   *   An URL without a multiplier (magnification value), e.g. foo/bar.jpg.
+   * @param string $multiplier
+   *   E.g. '2x', '.1x', etc.
+   *
+   * @return string
+   *   E.g., 'foo/bar@2x.jpg'
+   */
+  public function getUrlWithMultiplier(string $url, string $multiplier): string {
+    $multiplier = ltrim($multiplier, '@');
+    $multiplier = rtrim($multiplier, 'x');
+    $i = pathinfo($url);
+
+    return sprintf("%s/%s@%sx.%s", $i['dirname'], $i['filename'], $multiplier, $i['extension']);
   }
 
 }
