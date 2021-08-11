@@ -2,7 +2,8 @@ tests/build
 docs/core/cache
 /.idea
 /node_modules/
-/vendor/
+vendor
+composer.lock
 code-coverage/
 /documentation/core
 /documentation/README.md

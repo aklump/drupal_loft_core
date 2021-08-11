@@ -6,6 +6,8 @@ use Drupal\Component\Utility\Xss;
 use Drupal\Core\Render\Markup;
 use Drupal\file\Entity\File;
 use Drupal\image\Entity\ImageStyle;
+use League\ColorExtractor\Color;
+use League\ColorExtractor\Palette;
 
 /**
  * Functions for working with images.
@@ -119,8 +121,9 @@ class ImageService {
    */
   public function getBase64DataSrc($file_resource): string {
     $this->validateResourceExists($file_resource);
-    $path = parse_url($file_resource, PHP_URL_PATH);
-    $extension = pathinfo($path, PATHINFO_EXTENSION);
+    list($path) = explode('?', $file_resource . '?');
+    preg_match('/\.(jpg|jpeg|png|svg)$/', $path, $matches);
+    $extension = $matches[1] ?? null;
     switch ($extension) {
       case 'png':
         $mime = 'image/png';
@@ -136,7 +139,7 @@ class ImageService {
         break;
 
       default:
-        throw new \RuntimeException("URI is not yet supported.");
+        throw new \RuntimeException(sprintf('URI is not yet supported for files with extension: %s.', $extension));
     }
     if (!file_exists($file_resource)) {
       throw new \InvalidArgumentException(sprintf('Provided URI: %s does not exist.', $file_resource));
@@ -374,9 +377,33 @@ class ImageService {
   public function getUrlWithMultiplier(string $url, string $multiplier): string {
     $multiplier = ltrim($multiplier, '@');
     $multiplier = rtrim($multiplier, 'x');
-    $i = pathinfo($url);
+    $info = pathinfo($url);
 
-    return sprintf("%s/%s@%sx.%s", $i['dirname'], $i['filename'], $multiplier, $i['extension']);
+    return sprintf("%s/%s@%sx.%s", $info['dirname'], $info['filename'], $multiplier, $info['extension']);
   }
 
+  /**
+   * Get the dominant color of an image.
+   *
+   * @param string $uri
+   *   The URI to the image to analyze.
+   * @param string $default
+   *   A default color if the analysis fails.
+   *
+   * @return string
+   *   The dominant color ready for CSS style, e.g. "#ff0000" or $default.
+   *
+   * @throws \InvalidArgumentException
+   *   If the file at $uri does not exist.
+   */
+  public function getDominantColor(string $uri, string $default = 'transparent'): string {
+    if (!file_exists($uri)) {
+      throw new \InvalidArgumentException(sprintf('File not found: %s', $uri));
+    }
+    $palette = Palette::fromFilename($uri);
+    $colors = $palette->getMostUsedColors(1);
+    $color = Color::fromIntToHex(key($colors));
+
+    return $color ?? $default;
+  }
 }
