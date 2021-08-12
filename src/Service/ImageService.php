@@ -3,16 +3,55 @@
 namespace Drupal\loft_core\Service;
 
 use Drupal\Component\Utility\Xss;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Image\ImageFactory;
 use Drupal\Core\Render\Markup;
-use Drupal\file\Entity\File;
 use Drupal\image\Entity\ImageStyle;
 use League\ColorExtractor\Color;
 use League\ColorExtractor\Palette;
+use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesserInterface;
 
 /**
  * Functions for working with images.
  */
 class ImageService {
+
+  /**
+   * An image factory service.
+   *
+   * @var \Drupal\Core\Image\ImageFactory
+   */
+  protected $imageFactory;
+
+  /**
+   * A mime type guesser.
+   *
+   * @var \Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesserInterface
+   */
+  protected $mimeTypeGuesser;
+
+  /**
+   * Entity type manager service.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
+
+  /**
+   * Class constructor.
+   *
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   Service instance.
+   * @param \Drupal\Core\Image\ImageFactory $image_factory
+   *   Service instance.
+   * @param \Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesserInterface $mime_type_guesser
+   *   Service instance.
+   */
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, ImageFactory $image_factory, MimeTypeGuesserInterface $mime_type_guesser) {
+    $this->entityTypeManager = $entity_type_manager;
+    $this->imageFactory = $image_factory;
+    $this->mimeTypeGuesser = $mime_type_guesser;
+  }
 
   /**
    * Determine if an image is taller than the width by at least 10%.
@@ -23,8 +62,8 @@ class ImageService {
    * @return bool
    *   True if the image is taller than wide.
    */
-  public function isImageTall(string $uri) {
-    $image = \Drupal::service('image.factory')->get($uri);
+  public function isImageTall(string $uri): bool {
+    $image = $this->imageFactory->get($uri);
     $width = $image->getWidth();
 
     return $width + 0.1 * $width < $image->getHeight();
@@ -41,6 +80,10 @@ class ImageService {
    *
    * @return self
    *   Self for chaining.
+   *
+   * @throws \InvalidArgumentException
+   *   If image_uri is empty or missing; if image_src is already set; if style_name is
+   *   invalid.
    */
   public function preprocessImageVars(array &$vars): self {
     if (empty($vars['image_uri'])) {
@@ -53,7 +96,9 @@ class ImageService {
       throw new \InvalidArgumentException("image_src is already set; it must be empty to use this method.");
     }
     if (!empty($vars['style_name'])) {
-      if (!($style = ImageStyle::load($vars['style_name']))) {
+      $style = $this->entityTypeManager->getStorage('image_style')
+        ->load($vars['style_name']);
+      if (!$style) {
         throw new \InvalidArgumentException(sprintf('Invalid image style: %s', $vars['style_name']));
       }
       $vars['image_src'] = $style->buildUrl($vars['image_uri']);
@@ -122,27 +167,9 @@ class ImageService {
   public function getBase64DataSrc($file_resource): string {
     $this->validateResourceExists($file_resource);
     list($path) = explode('?', $file_resource . '?');
-    preg_match('/\.(jpg|jpeg|png|svg)$/', $path, $matches);
-    $extension = $matches[1] ?? null;
-    switch ($extension) {
-      case 'png':
-        $mime = 'image/png';
-        break;
-
-      case 'svg':
-        $mime = 'image/svg+xml';
-        break;
-
-      case 'jpg':
-      case 'jpeg':
-        $mime = 'image/jpeg';
-        break;
-
-      default:
-        throw new \RuntimeException(sprintf('URI is not yet supported for files with extension: %s.', $extension));
-    }
-    if (!file_exists($file_resource)) {
-      throw new \InvalidArgumentException(sprintf('Provided URI: %s does not exist.', $file_resource));
+    $mime = $this->mimeTypeGuesser->guess($path);
+    if (is_null($mime)) {
+      throw new \RuntimeException(sprintf('Unable to determine mimetype for: %s.', $path));
     }
 
     return sprintf('data:%s;base64,%s', $mime, base64_encode(file_get_contents($file_resource)));
@@ -260,7 +287,7 @@ class ImageService {
    * @param string $remote_url
    *   The remote URL of the image.
    *
-   * @return \stdClass|false
+   * @return object|false
    *   The temporary file instance.  You should use file_copy() with this as
    *   the first argument to save this to a permanent file.
    *
@@ -286,6 +313,7 @@ class ImageService {
       $info = pathinfo($remote_path);
     }
 
+    $file = [];
     $file['uid'] = \Drupal::currentUser()->id();
     $file['status'] = 0;
     $file['filename'] = file_munge_filename($info['basename'], implode(' ', array_keys($allowed_extensions)));
@@ -294,11 +322,10 @@ class ImageService {
       return FALSE;
     }
 
-    $file['filemime'] = \Drupal::service('file.mime_type.guesser')
-      ->guess($file['uri']);
+    $file['filemime'] = $this->mimeTypeGuesser->guess($file['uri']);
     $file['filesize'] = filesize($file['uri']);
 
-    return File::create($file);
+    return $this->entityTypeManager->getStorage('file')->create($file);
   }
 
   /**
@@ -317,8 +344,9 @@ class ImageService {
   public function getStyleWidth(ImageStyle $image_style): int {
     $width = NULL;
     foreach ($image_style->getEffects() as $effect) {
-      if (($w = ($effect->getConfiguration()['data']['width'] ?? NULL))) {
-        $width = $w;
+      $effect_width = $effect->getConfiguration()['data']['width'] ?? NULL;
+      if ($effect_width) {
+        $width = $effect_width;
       }
     }
 
@@ -406,4 +434,47 @@ class ImageService {
 
     return $color ?? $default;
   }
+
+  /**
+   * Get an images's width, height and aspect ratio.
+   *
+   * @code
+   *   list($width, $height, $ratio) = $foo->getImageDimensionAndAspectRatio($uri);
+   * @endcode
+   *
+   * @return int[]
+   *   - 0 The aspect ratio or NULL if height is empty.  Note that you need to use
+   *   1/ratio for the CSS padding bottom trick, e.g. `'padding-bottom', 1 /
+   *   $aspect_ratio * 100 . '%'`.
+   *   - 1 The native image width.
+   *   - 2 The native image height.
+   */
+  public function getAspectRatioWidthAndHeight(string $uri, string $image_style = NULL): array {
+    if (!file_exists($uri)) {
+      throw new \RuntimeException(sprintf('The provided URI does not exist: %s', $uri));
+    }
+    if ($image_style) {
+      $image_style = $this->entityTypeManager->getStorage('image_style')
+        ->load($image_style);
+      if (!$image_style) {
+        throw new \InvalidArgumentException(sprintf('Failed to load image style: %s', $image_style));
+      }
+      $original_uri = $uri;
+      $uri = $image_style->buildUri($original_uri);
+      $exists = file_exists($uri);
+      if (!$exists) {
+        $exists = $image_style->createDerivative($original_uri, $uri);
+      }
+      if (!$exists) {
+        throw new \RuntimeException(sprintf('The image style derivative URI does not exist and cannot be created: %s', $uri));
+      }
+    }
+
+    $image = $this->imageFactory->get($uri);
+    $data = [$image->getWidth(), $image->getHeight()];
+    array_unshift($data, !empty($data[0]) ? $data[0] / $data[1] : NULL);
+
+    return $data;
+  }
+
 }

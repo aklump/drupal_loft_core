@@ -9,6 +9,7 @@ services:
       - { name: twig.extension }
   loft_core.images:
     class: Drupal\loft_core\Service\ImageService
+    arguments: ["@entity_type.manager", "@image.factory", "@file.mime_type.guesser"]
   loft_core.vimeo_based_entity:
     shared: false
     class: Drupal\loft_core\Service\VimeoBasedEntityService
