@@ -449,24 +449,27 @@ class ImageService {
    *   - 1 The native image width.
    *   - 2 The native image height.
    */
-  public function getAspectRatioWidthAndHeight(string $uri, string $image_style = NULL): array {
+  public function getAspectRatioWidthAndHeight(string $uri, string $style_name = NULL): array {
     if (!file_exists($uri)) {
       throw new \RuntimeException(sprintf('The provided URI does not exist: %s', $uri));
     }
-    if ($image_style) {
+    if ($style_name) {
       $image_style = $this->entityTypeManager->getStorage('image_style')
-        ->load($image_style);
+        ->load($style_name);
       if (!$image_style) {
-        throw new \InvalidArgumentException(sprintf('Failed to load image style: %s', $image_style));
+        throw new \InvalidArgumentException(sprintf('Failed to load image style: %s', $style_name));
       }
       $original_uri = $uri;
       $uri = $image_style->buildUri($original_uri);
       $exists = file_exists($uri);
       if (!$exists) {
         $exists = $image_style->createDerivative($original_uri, $uri);
+        if (!$exists) {
+          throw new \RuntimeException(sprintf('Failed to create "%s" derivative from: %s ', $style_name, $original_uri));
+        }
       }
       if (!$exists) {
-        throw new \RuntimeException(sprintf('The image style derivative URI does not exist and cannot be created: %s', $uri));
+        throw new \RuntimeException(sprintf('Image derivative is missing: %s', $uri));
       }
     }
 
