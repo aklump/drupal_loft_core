@@ -23,6 +23,7 @@ class TwigExtension extends \Twig_Extension {
         '\AKlump\LoftLib\Code\Strings',
         'splitBy',
       ]),
+      new \Twig_SimpleFunction('is_live', 'is_live'),
       new \Twig_SimpleFunction('loft_core_test_class', 'loft_core_test_class'),
       new \Twig_SimpleFunction('testing_id', 'loft_core_test_class'),
       new \Twig_SimpleFunction('has_output', [
