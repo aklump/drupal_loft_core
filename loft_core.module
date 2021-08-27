@@ -35,7 +35,7 @@ function is_live($feature) {
     $features[$feature]['is_live'] = isset($features[$feature]) ? $features[$feature]['is_live'] : TRUE;
   }
 
-  return $features[$feature]['is_live'];
+  return $features[$feature]['is_live'] ?? FALSE;
 }
 
 /**
