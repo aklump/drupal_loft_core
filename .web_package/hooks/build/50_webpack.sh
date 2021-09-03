@@ -9,4 +9,4 @@ test -e "$7/dist" && rm -rf "$7/dist"
 cd "$7" && yarn && yarn build
 
 # Verify the minified assets were built.
-wp_wait_for_exists "$7/dist/loft_core.min.js"
+wp_wait_for_exists "$7/dist/clipboard.min.js"

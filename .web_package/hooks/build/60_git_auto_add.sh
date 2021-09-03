@@ -9,5 +9,4 @@ if [ "$git" ]; then
     # Note to support symlinks, we should cd first (per git).
     (cd $7/docs && git add .)
     (cd $7/help && git add .)
-    (cd $7/vendor && git add .)
 fi
