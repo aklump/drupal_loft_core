@@ -53,9 +53,23 @@ final class Rendering {
     return $has_output;
   }
 
-  private function hasOutputHelper($value, &$output, $key = NULL) {
+  private function hasOutputHelperFilterEmptyArrays(array $array) {
+    foreach ($array as &$value) {
+      if (is_array($value)) {
+        $value = $this->hasOutputHelperFilterEmptyArrays($value);
+      }
+    }
 
-    if (!is_array($value)) {
+    return array_filter($array, function ($item) {
+      return !is_array($item) || count($item) > 0;
+    });
+  }
+
+  private function hasOutputHelper($value, &$output, $key = NULL) {
+    if (is_array($value)) {
+      $value = $this->hasOutputHelperFilterEmptyArrays($value);
+    }
+    else {
 
       // Ignore properties because they will not render anything.
       if (is_string($key) && '#' === $key[0]) {
@@ -69,7 +83,7 @@ final class Rendering {
       $output = !empty($value);
     }
 
-    elseif (!is_null($key) && is_array($value) && (is_int($key) || $key === '' || $key[0] !== '#')) {
+    if (!empty($value) && is_array($value) && !is_null($key) && (is_int($key) || $key === '' || $key[0] !== '#')) {
       $rendered = trim(strip_tags($this->renderer->renderPlain($value)));
       $output = boolval($rendered);
     }
