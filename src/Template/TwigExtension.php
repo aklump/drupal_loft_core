@@ -46,9 +46,8 @@ class TwigExtension extends \Twig_Extension {
    *   The array to test.
    */
   public function hasOutput(array $render_array) {
-    $output = \Drupal::service('renderer')->renderPlain($render_array);
-
-    return boolval(trim(strip_tags($output)));
+    return \Drupal::service('loft_core.rendering')
+      ->hasOutput($render_array);
   }
 
 }

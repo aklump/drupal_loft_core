@@ -9,11 +9,14 @@ services:
       - { name: twig.extension }
   loft_core.images:
     class: Drupal\loft_core\Service\ImageService
-    arguments: ["@entity_type.manager", "@image.factory", "@file.mime_type.guesser"]
+    arguments: [ "@entity_type.manager", "@image.factory", "@file.mime_type.guesser" ]
   loft_core.vimeo_based_entity:
     shared: false
     class: Drupal\loft_core\Service\VimeoBasedEntityService
-    arguments: ["@loft_core.images", "@entity_field.manager", "@file_system"]
+    arguments: [ "@loft_core.images", "@entity_field.manager", "@file_system" ]
   loft_core.entity_protection:
     class: Drupal\loft_core\Service\EntityProtectionService
-    arguments: ["@config.factory", "@tempstore.private", "@current_user"]
+    arguments: [ "@config.factory", "@tempstore.private", "@current_user" ]
+  loft_core.rendering:
+    class: \Drupal\loft_core\Service\Rendering
+    arguments: [ "@renderer" ]
