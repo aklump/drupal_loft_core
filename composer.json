@@ -13,7 +13,8 @@
         "sunra/php-simple-html-dom-parser": "^1.5",
         "aklump/loft-lib": "^1",
         "vlucas/phpdotenv": "^2.4",
-        "league/color-extractor": "^0.3.2"
+        "league/color-extractor": "^0.3.2",
+        "vimeo/vimeo-api": "^3.0"
     },
     "autoload-dev": {
         "psr-4": {
