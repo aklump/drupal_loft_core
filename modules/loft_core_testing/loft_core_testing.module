@@ -64,13 +64,11 @@ function loft_core_testing_preprocess_menu_local_action(&$vars) {
  * Implements hook_preprocess_menu_link().
  */
 function loft_core_testing_preprocess_menu(&$vars) {
-  $vars['items'] = array_map(function ($item) use ($vars) {
-    $id = loft_core_css_safe('menu--' . $vars['menu_name'] . '--' . _loft_core_testing_get_link_id($item['url']));
+  foreach ($vars['items'] as $menu_name => $item) {
+    $id = loft_core_css_safe('menu--' . $menu_name . '--' . _loft_core_testing_get_link_id($item['url']));
     $class = TestingMarkup::id($id);
-    $item['attributes']->addClass($class);
-
-    return $item;
-  }, $vars['items']);
+    $vars['items'][$menu_name]['attributes']->addClass($class);
+  }
 }
 
 /**
@@ -121,23 +119,13 @@ function loft_core_testing_preprocess_views_view_table(array &$vars) {
  * @param \Drupal\Core\Block\BlockPluginInterface $block
  */
 function loft_core_testing_block_view_alter(array &$build, BlockPluginInterface $block) {
-  $build['#pre_render'][] = '_loft_core_testing_block_view_alter';
+  $build['#pre_render'][] = [\Drupal\loft_core_testing\RenderHelper::class, 'addTestingClasses'];
   if (!empty($build['#base_plugin_id'])) {
     $build['#loft_core_testing'][] = TestingMarkup::id($build['#base_plugin_id']);
   }
   if (!empty($build['#derivative_plugin_id'])) {
     $build['#loft_core_testing'][] = TestingMarkup::id($build['#base_plugin_id'] . '--' . $build['#derivative_plugin_id']);
   }
-}
-
-function _loft_core_testing_block_view_alter($element) {
-  if (isset($element['#loft_core_testing'])) {
-    foreach ($element['#loft_core_testing'] as $class) {
-      $element['#attributes']['class'][] = $class;
-    }
-  }
-
-  return $element;
 }
 
 /**

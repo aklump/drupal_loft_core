@@ -10,6 +10,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Url;
+use \Drupal\Component\Utility\NestedArray;
 
 /**
  * Implements hook_form_BASE_FORM_ID_alter().
@@ -22,8 +23,6 @@ use Drupal\Core\Url;
  *   The state of the form.
  * @param string $form_id
  *   The form id.
- *
- * @d8
  */
 function loft_core_form_node_form_alter(array &$form, FormStateInterface $form_state, string $form_id) {
   // Call our special combined hook.
@@ -76,37 +75,44 @@ function loft_core_form_tabindex(array &$element, &$index, $key = '#attributes')
  * @param array &$form
  *   The form definition.
  * @param array $paths
- *   An array of paths to be used by data_api().
+ *   An array of: nested array keys or dot-separated strings, e.g.
+ *   ["foo.bar.baz", "do.re"] or [['foo', 'bar', 'baz'], ['do', 're']], pointing
+ *   to the form elements to disable.
  * @param string $module_name
  *   This will be used in the default message.
  * @param null $message
  *   If the default message is not sufficient, enter a custom message here.
  */
 function loft_core_form_disable_elements(array &$form, array $paths, $module_name = NULL, $message = NULL) {
-  $g = data_api();
   if (is_null($message)) {
     $module_name = empty($module_name) ? 'Loft Core' : $module_name;
     $message = t('This field is controlled by the %module module and cannot be modified in the UI.',
       array('%module' => $module_name));
   }
   foreach ($paths as $path) {
-    if ($g->get($form, $path)) {
-      $type = $g->get($form, "$path.#type");
-      $g->set($form, "$path.#required", FALSE);
-      $g->set($form, "$path.#disabled", TRUE);
-      // Address fields seem to require this as well.
-      $g->set($form, "$path.#attributes.disabled", 'disabled');
+    $parents = is_array($path) ? $path : explode('.', $path);
+    if (!empty(NestedArray::getValue($form, $parents))) {
+      $required = boolval(NestedArray::getValue($form, array_merge($parents, ['#required'])));
+      NestedArray::setValue($form, array_merge($parents, ['#required']), FALSE);
+      NestedArray::setValue($form, array_merge($parents, ['#disabled']), TRUE);
 
+      // Address fields seem to require this as well.
+      NestedArray::setValue($form, array_merge($parents, [
+        '#attributes',
+        'disabled',
+      ]), TRUE);
+
+      $type = NestedArray::getValue($form, array_merge($parents, ['#type']));
       switch ($type) {
         case 'container':
-          $message_path = "$path.#suffix";
+          $message_path = array_merge($parents, ['#suffix']);
           break;
 
         default:
-          $message_path = "$path.#description";
+          $message_path = array_merge($parents, ['#description']);
           break;
       }
-      $g->set($form, $message_path, $message);
+      NestedArray::setValue($form, $message_path, $message);
     }
   }
 }
@@ -117,20 +123,19 @@ function loft_core_form_disable_elements(array &$form, array $paths, $module_nam
  * @param array $form
  *   The FAPI form definition.
  * @param array $paths
- *   An array of paths for data_api pointing to the form element to hide.
+ *   An array of: nested array keys or dot-separated strings, e.g.
+ *   ["foo.bar.baz", "do.re"] or [['foo', 'bar', 'baz'], ['do', 're']], pointing
+ *   to the form element to hide.
  */
 function loft_core_form_hide_elements(array &$form, array $paths) {
-  $g = data_api();
   foreach ($paths as $path) {
-    if ($g->get($form,
-      $path)
-    ) {
-      $g->onlyIfHas($form, "$path.#required")->call(function () {
-        return FALSE;
-      })->set($form);
-      $g->set($form,
-        "$path.#access",
-        FALSE);
+    $parents = is_array($path) ? $path : explode('.', $path);
+    if (!empty(NestedArray::getValue($form, $parents))) {
+      $required = boolval(NestedArray::getValue($form, array_merge($parents, ['#required'])));
+      if (!is_null($required)) {
+        NestedArray::setValue($form, array_merge($parents, ['#required']), FALSE);
+      }
+      NestedArray::setValue($form, array_merge($parents, ['#access']), FALSE);
     }
   }
 }
@@ -141,20 +146,19 @@ function loft_core_form_hide_elements(array &$form, array $paths) {
  * @param array $form
  *   The FAPI form definition.
  * @param array $paths
- *   An array of paths for data_api pointing to the form element to show.
+ *   An array of: nested array keys or dot-separated strings, e.g.
+ *   ["foo.bar.baz", "do.re"] or [['foo', 'bar', 'baz'], ['do', 're']], pointing
+ *   to the form element to show.
  */
 function loft_core_form_show_elements(array &$form, array $paths) {
-  $g = data_api();
   foreach ($paths as $path) {
-    if ($g->get($form,
-      $path)
-    ) {
-      $g->onlyIfHas($form, "$path.#required")->call(function () {
-        return FALSE;
-      })->set($form);
-      $g->set($form,
-        "$path.#access",
-        TRUE);
+    $parents = is_array($path) ? $path : explode('.', $path);
+    if (!empty(NestedArray::getValue($form, $parents))) {
+      $required = boolval(NestedArray::getValue($form, array_merge($parents, ['#required'])));
+      if (!is_null($required)) {
+        NestedArray::setValue($form, array_merge($parents, ['#required']), FALSE);
+      }
+      NestedArray::setValue($form, array_merge($parents, ['#access']), TRUE);
     }
   }
 }
@@ -186,13 +190,15 @@ function loft_core_form_hide_groups(array &$form, array $group_paths) {
  * @param array $form
  *   The FAPI form definition.
  * @param array $paths
- *   An array of paths for data_api pointing to the form element to require.
+ *   An array of: nested array keys or dot-separated strings, e.g.
+ *   ["foo.bar.baz", "do.re"] or [['foo', 'bar', 'baz'], ['do', 're']], pointing
+ *   to the form element to require.
  */
 function loft_core_form_require_elements(array &$form, array $paths) {
-  $g = data_api();
   foreach ($paths as $path) {
-    if ($g->get($form, $path)) {
-      $g->set($form, "$path.#required", TRUE);
+    $parents = is_array($path) ? $path : explode('.', $path);
+    if (NestedArray::getValue($form, $parents)) {
+      NestedArray::setValue($form, array_merge($parents, ['#required']), TRUE);
     }
   }
 }
@@ -203,14 +209,15 @@ function loft_core_form_require_elements(array &$form, array $paths) {
  * @param array $form
  *   The FAPI form definition.
  * @param array $paths
- *   An array of paths for data_api pointing to the form element to make
- *   optional.
+ *   An array of: nested array keys or dot-separated strings, e.g.
+ *   ["foo.bar.baz", "do.re"] or [['foo', 'bar', 'baz'], ['do', 're']], pointing
+ *   to the form element to make optional.
  */
 function loft_core_form_optional_elements(array &$form, array $paths) {
-  $g = data_api();
   foreach ($paths as $path) {
-    if ($g->get($form, $path)) {
-      $g->set($form, "$path.#required", FALSE);
+    $parents = is_array($path) ? $path : explode('.', $path);
+    if (NestedArray::getValue($form, $parents)) {
+      NestedArray::setValue($form, array_merge($parents, ['#required']), FALSE);
     }
   }
 }
@@ -221,19 +228,19 @@ function loft_core_form_optional_elements(array &$form, array $paths) {
  * @param array $form
  *   The FAPI form definition.
  * @param array $paths
- *   An array of paths for data_api pointing to the form element to make
- *   optional.
+ *   An array of: nested array keys or dot-separated strings, e.g.
+ *   ["foo.bar.baz", "do.re"] or [['foo', 'bar', 'baz'], ['do', 're']], pointing
+ *   to the form element to add state to.
  */
 function loft_core_form_add_state_conditions(array &$form, array $paths, string $state, array $condition) {
-  $g = data_api();
   foreach ($paths as $path) {
-    $path = is_string($path) ? explode('.', $path) : $path;
-    if ($g->get($form, $path)) {
-      $path[] = '#states';
-      $path[] = $state;
-      $existing_conditions = $g->get($form, $path, []);
+    $parents = is_array($path) ? $path : explode('.', $path);
+    if (NestedArray::getValue($form, $parents)) {
+      $parents[] = '#states';
+      $parents[] = $state;
+      $existing_conditions = NestedArray::getValue($form, $parents) ?? [];
       $existing_conditions[][] = $condition;
-      $g->set($form, $path, $existing_conditions);
+      NestedArray::setValue($form, $parents, $existing_conditions);
     }
   }
 }

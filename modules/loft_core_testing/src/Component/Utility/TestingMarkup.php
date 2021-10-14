@@ -277,9 +277,9 @@ class TestingMarkup {
           break;
       }
       if ($path && $class) {
-        $s = data_api();
         $test_class = self::id(implode('__', $class));
-        $attributes = $s->get($element, $path);
+        $parents = is_array($path) ? $path : explode('.', $path);
+        $attributes = \Drupal\Component\Utility\NestedArray::getValue($element, $parents);
         if (is_null($attributes)) {
 
           switch ($element['#type']) {
@@ -297,7 +297,7 @@ class TestingMarkup {
         elseif (is_array($attributes)) {
           $attributes['class'][] = $test_class;
         }
-        $s->set($element, $path, $attributes);
+        \Drupal\Component\Utility\NestedArray::setValue($element, $parents, $attributes);
       }
     }
 

@@ -351,7 +351,8 @@ function loft_core_users_robotrap_page_callback() {
     loft_core_users_set_user_status(LOFT_CORE_USERS_STATUS_ROBOT, $user->uid);
     module_load_include('inc', 'user', 'user.pages');
     user_logout_current_user();
-    drupal_set_message(t('You have visited a forbidden url; your account has been locked for review.  Please contact us using the form below to unlock your account.', ['!url' => url('contact', ['query' => ['cid' => 6]])]), 'warning', FALSE);
+    \Drupal::messenger()
+      ->addWarning(t('You have visited a forbidden url; your account has been locked for review.  Please contact us using the form below to unlock your account.', ['!url' => url('contact', ['query' => ['cid' => 6]])]), FALSE);
     $path = module_exists('contact') ? 'contact' : '<front>';
     unset($_GET['destination']);
     $options = [];
@@ -419,8 +420,8 @@ function loft_core_users_user_restrictions_alter(&$denied, &$error, &$context) {
  * Make a note of this email address/user as a honeybear.
  */
 function loft_core_users_honeypot_reject($form_id, $uid, $type) {
-  $g = data_api();
-  if (($mail = $g->get($_POST, 'mail'))) {
+  $mail = $_POST['mail'] ?? NULL;
+  if ($mail) {
     $domain = _loft_core_users_get_email_domain($mail);
     $default = explode(',', LOFT_CORE_USERS_DOMAIN_WHITELIST);
     $may_block = !in_array($domain, variable_get('loft_core_users_domain_whitelist', $default));
@@ -495,7 +496,6 @@ function _loft_core_users_form_add_remember_me(&$form) {
     return;
   }
 
-  $g = data_api();
   $form['#loft_core_users_remember_key'] = 'loft_core_users_remember_username';
   $form['loft_core_users_remember_username'] = [
     '#type' => 'value',
@@ -508,7 +508,8 @@ function _loft_core_users_form_add_remember_me(&$form) {
   }
 
   // If we have the name as a cookie then retrieve it.
-  if (($name = $g->get($_COOKIE, 'loft_core_users_remember_me'))) {
+  $name = $_COOKIE['loft_core_users_remember_me'] ?? NULL;
+  if ($name) {
     $form['name']['#default_value'] = $name;
   }
 
@@ -519,10 +520,10 @@ function _loft_core_users_form_add_remember_me(&$form) {
  * Form submission handler.
  */
 function loft_core_users_form_user_login_submit($form, &$form_state) {
-  $g = data_api();;
-  if (($value_key = $g->get($form, '#loft_core_users_remember_key'))
-    && $g->get($form_state, ['values', $value_key])
-    && ($cookie_value = $g->get($form_state, 'values.name'))) {
+  $value_key = $form['#loft_core_users_remember_key'] ?? NULL;
+  if ($value_key
+    && ($form_state->getValue($value_key))
+    && ($cookie_value = $form_state->getValue('name'))) {
     _loft_core_users_persist_username($cookie_value);
   }
   else {

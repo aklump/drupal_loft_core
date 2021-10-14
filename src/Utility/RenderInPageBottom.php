@@ -2,6 +2,8 @@
 
 namespace Drupal\loft_core\Utility;
 
+use Drupal\Core\Security\TrustedCallbackInterface;
+
 /**
  * A utility to move markup to the bottom of the page and reduce duplication.
  *
@@ -23,7 +25,7 @@ namespace Drupal\loft_core\Utility;
  *   '#pre_render' => [[RenderInPageBottom::class, 'add']],
  * @endcode
  */
-class RenderInPageBottom {
+final class RenderInPageBottom implements TrustedCallbackInterface {
 
   /**
    * Holds the delayed render arrays.
@@ -113,4 +115,10 @@ class RenderInPageBottom {
     return static::$build;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public static function trustedCallbacks() {
+    return ['get'];
+  }
 }

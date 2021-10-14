@@ -2,7 +2,6 @@
 
 namespace Drupal\loft_core;
 
-use AKlump\Data\DataInterface;
 use Drupal\block_content\Entity\BlockContent;
 use Drupal\Core\Template\Attribute;
 
@@ -11,24 +10,10 @@ use Drupal\Core\Template\Attribute;
  */
 abstract class CoreBase implements CoreInterface {
 
-  use \Drupal\data_api\DataTrait;
-
-  /**
-   * CoreBase constructor.
-   *
-   * @param \AKlump\Data\DataInterface $dataApiData
-   *   An instance of DataInterface.
-   */
-  public function __construct(DataInterface $dataApiData) {
-    // TODO Get rid of this dependency.
-    $this->setDataApiData($dataApiData);
-  }
-
   /**
    * {@inheritdoc}
    */
   public function getBlockRenderable($bid, array $tvars = array()) {
-
     $block = BlockContent::load($bid);
     $viewer = \Drupal::service('entity_type.manager')
       ->getViewBuilder('block_content');
@@ -55,10 +40,9 @@ abstract class CoreBase implements CoreInterface {
    */
   public function getBlockTitle($bid) {
     $theme = \Drupal::theme()->getActiveTheme()->getName();
-    $g = $this->g;
     $titles = &drupal_static(__CLASS__ . '::' . __FUNCTION__, []);
     if (empty($titles)) {
-      $query = db_select('block', 'b');
+      $query = \Drupal::database()->select('block', 'b');
       $result = $query
         ->fields('b', ['delta', 'title'])
         ->condition('module', 'block')
@@ -69,10 +53,7 @@ abstract class CoreBase implements CoreInterface {
       $titles = $result->fetchAllAssoc('delta');
     }
 
-    return $g->get($titles, [
-      $bid,
-      'title',
-    ]);
+    return $titles[$bid]['title'] ?? '';
   }
 
   /**

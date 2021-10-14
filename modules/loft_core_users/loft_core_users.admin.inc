@@ -14,12 +14,12 @@
  * @param array &$form_state
  *   Array representing the state of the form.
  *
- * @see loft_core_users_settings_form_validate()
+ * @return array
+ *   The form array.
  * @see loft_core_users_settings_form_submit()
  * @ingroup forms
  *
- * @return array
- *   The form array.
+ * @see loft_core_users_settings_form_validate()
  */
 function loft_core_users_settings_form(array $form, array &$form_state) {
   $whitelist = loft_core_users_get_domain_whitelist();
@@ -337,9 +337,10 @@ function loft_core_users_settings_form_submit($form, &$form_state) {
         ->condition('domain', $honeybears, 'IN')
         ->condition('status', LOFT_CORE_USERS_STATUS_HONEYBEAR)
         ->execute();
-      drupal_set_message(t("@subject have been blocked.", [
-        '@subject' => format_plural($num_updated, '1 honeybear', '@count honeybears'),
-      ]), 'status', FALSE);
+      \Drupal::messenger()->addStatus(
+        t("@subject have been blocked.", [
+          '@subject' => format_plural($num_updated, '1 honeybear', '@count honeybears'),
+        ]), FALSE);
     }
     catch (Exception $e) {
       watchdog_exception('loft_core_admin', $e);

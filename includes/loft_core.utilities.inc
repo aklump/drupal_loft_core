@@ -64,11 +64,11 @@ function loft_core_twiglike_token_scan(string $text): array {
  *
  */
 function loft_core_twiglike_replace($text, array $data = []) {
-  $g = data_api();
   $token_data = loft_core_twiglike_token_scan($text);
   foreach ($token_data['tokens'] as $type => $items) {
     foreach ($items as $key => $drupal) {
-      if ($replace = $g->get($data, [$type, $key], '')) {
+      $replace = $data[$type][$key] ?? '';
+      if ($replace) {
         $text = str_replace($token_data['map'][$drupal], $replace, $text);
       }
     }

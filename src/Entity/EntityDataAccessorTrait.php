@@ -178,7 +178,6 @@ trait EntityDataAccessorTrait {
    *   $obj->format('m/Y')->date(NULL, 'field_dates');
    * @endcode
    *
-   * @d8
    */
   public function date($default, string $field_name = '') {
     // Detect the arguments from those passed.
