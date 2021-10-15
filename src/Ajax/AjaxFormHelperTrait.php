@@ -59,7 +59,8 @@ trait AjaxFormHelperTrait {
    *   successful submission.
    */
   public function ajaxSubmit(array &$form, FormStateInterface $form_state): AjaxResponse {
-    if ($form_state->hasAnyErrors() || ($messages = $this->getPostValidationErrors($form_state))) {
+    $messages = $this->getPostValidationErrors($form_state);
+    if ($messages || $form_state->hasAnyErrors()) {
       foreach ($messages as $message) {
         \Drupal::messenger()->addError($message);
       }
