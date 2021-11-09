@@ -331,7 +331,7 @@ class ImageService {
   /**
    * Detect the final width of an image style.
    *
-   * This is not perfect but should work in most cases.  It looks at all the
+   * This is not bulletproof but should work in most cases.  It looks at all the
    * image effects for a configured width value, and takes the final one found.
    *
    * @param \Drupal\image\Entity\ImageStyle $image_style
@@ -351,6 +351,31 @@ class ImageService {
     }
 
     return (int) $width;
+  }
+
+  /**
+   * Detect the final height of an image style.
+   *
+   * This is not bulletproof but should work in most cases.  It looks at all the
+   * image effects for a configured height value, and takes the final one found.
+   *
+   * @param \Drupal\image\Entity\ImageStyle $image_style
+   *   An image style to decipher.
+   *
+   * @return int|null
+   *   The configured width for the final effect having a width configuration
+   *   value.
+   */
+  public function getStyleHeight(ImageStyle $image_style) {
+    $height = NULL;
+    foreach ($image_style->getEffects() as $effect) {
+      $effect_height = $effect->getConfiguration()['data']['height'] ?? NULL;
+      if ($effect_height) {
+        $height = $effect_height;
+      }
+    }
+
+    return $height;
   }
 
   /**
@@ -436,48 +461,81 @@ class ImageService {
   }
 
   /**
-   * Get an images's width, height and aspect ratio.
+   * Get the aspect ratio of an image or style derivative.
+   *
+   * @param string $uri
+   * @param string|null $style_name
+   *   Include this if $uri is the original and you wish to determine the aspect
+   *   ratio when applying $style_name.
+   *
+   * @return float
+   *   The aspect ratio.  Note that you need to use the reciprocal (1/$ratio)
+   *   for the CSS padding bottom trick, including computing as a percentage
+   *   (100%/$ratio), e.g. `'padding-bottom', 100 / $ratio . '%'
+   */
+  public function getAspectRatio(string $uri, string $style_name = NULL): float {
+    list($ratio) = $this->getAspectRatioWidthAndHeight($uri, $style_name);
+
+    return floatval($ratio);
+  }
+
+  /**
+   * Get an image or style derivative aspect ratio.
    *
    * @code
-   *   list($width, $height, $ratio) = $foo->getImageDimensionAndAspectRatio($uri);
+   *   list($ratio, $width, $height) = $foo->getImageDimensionAndAspectRatio($uri);
+   *   list($ratio, $original_width, $original_height) = $foo->getImageDimensionAndAspectRatio($uri, 'small');
    * @endcode
    *
    * @return int[]
-   *   - 0 The aspect ratio or NULL if height is empty.  Note that you need to use
-   *   1/ratio for the CSS padding bottom trick, e.g. `'padding-bottom', 1 /
-   *   $aspect_ratio * 100 . '%'`.
-   *   - 1 The native image width.
-   *   - 2 The native image height.
+   *   - 0 The aspect ratio or NULL if height is empty.  Note that you need to
+   *   use the reciprocal (1/$ratio) for the CSS padding bottom trick, including
+   *   computing as a percentage (100%/$ratio), e.g. `'padding-bottom', 100 /
+   *   $aspect_ratio . '%'`.
+   *   - 1 The original image width.
+   *   - 2 The original image height.
+   *
+   * @deprecated Use getAspectRatio() instead.
    */
   public function getAspectRatioWidthAndHeight(string $uri, string $style_name = NULL): array {
     if (!file_exists($uri)) {
       throw new \RuntimeException(sprintf('The provided URI does not exist: %s', $uri));
     }
-    if ($style_name) {
-      $image_style = $this->entityTypeManager->getStorage('image_style')
+
+    $image = $this->imageFactory->get($uri);
+    $response = [$image->getWidth(), $image->getHeight()];
+
+    // It's possible that the orientation of the image is 90 degrees off, which
+    // results in the height coming back as the width, and visa versa.  We try
+    // to fix that by looking for the orientation information.
+    // @link https://stackoverflow.com/a/13963783/3177610
+    $exif = @exif_read_data($uri, 'EXIF');
+    $orientation = $exif['Orientation'] ?? NULL;
+    if ($orientation === 6 || $orientation === 8) {
+      $response = array_reverse($response);
+    }
+
+    // Create our native response, only to be changed by the image style if it
+    // has a different aspect ratio.
+    $response = [$response[0] / $response[1], $response[0], $response[1]];
+
+    if (!empty($style_name)) {
+      /** @var ImageStyle $image_style */
+      $image_style = $this->entityTypeManager
+        ->getStorage('image_style')
         ->load($style_name);
       if (!$image_style) {
         throw new \InvalidArgumentException(sprintf('Failed to load image style: %s', $style_name));
       }
-      $original_uri = $uri;
-      $uri = $image_style->buildUri($original_uri);
-      $exists = file_exists($uri);
-      if (!$exists) {
-        $exists = $image_style->createDerivative($original_uri, $uri);
-        if (!$exists) {
-          throw new \RuntimeException(sprintf('Failed to create "%s" derivative from: %s ', $style_name, $original_uri));
-        }
-      }
-      if (!$exists) {
-        throw new \RuntimeException(sprintf('Image derivative is missing: %s', $uri));
+
+      // If the style provides a height then the aspect ratio needs to be
+      // recalculated and the native one replaced by it.
+      if (NULL !== $this->getStyleHeight($image_style)) {
+        $response[0] = $this->getStyleWidth($image_style) / $this->getStyleHeight($image_style);
       }
     }
 
-    $image = $this->imageFactory->get($uri);
-    $data = [$image->getWidth(), $image->getHeight()];
-    array_unshift($data, !empty($data[0]) ? $data[0] / $data[1] : NULL);
-
-    return $data;
+    return $response;
   }
 
 }
