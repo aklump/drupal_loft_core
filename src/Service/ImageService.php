@@ -467,14 +467,60 @@ class ImageService {
    * @param string|null $style_name
    *   Include this if $uri is the original and you wish to determine the aspect
    *   ratio when applying $style_name.
+   * @param &$width
+   *   Will be set with the width of the style; when $style_name is null the
+   *   native image width will be set.
+   * @param &$height
+   *   Will be set with the height of the style; when $style_name is null the
+   *   native image height will be set.  Be aware that if $style_name has null
+   *   as a height, then the aspect ratio is based on the native image
+   *   dimensions, yet this will be null.
    *
    * @return float
    *   The aspect ratio.  Note that you need to use the reciprocal (1/$ratio)
    *   for the CSS padding bottom trick, including computing as a percentage
    *   (100%/$ratio), e.g. `'padding-bottom', 100 / $ratio . '%'
    */
-  public function getAspectRatio(string $uri, string $style_name = NULL): float {
-    list($ratio) = $this->getAspectRatioWidthAndHeight($uri, $style_name);
+  public function getAspectRatio(string $uri, string $style_name = NULL, &$width = NULL, &$height = NULL): float {
+    if (!file_exists($uri)) {
+      throw new \RuntimeException(sprintf('The provided URI does not exist: %s', $uri));
+    }
+
+    $image = $this->imageFactory->get($uri);
+    $width = $image->getWidth();
+    $height = $image->getHeight();
+
+    // It's possible that the orientation of the image is 90 degrees off, which
+    // results in the height coming back as the width, and visa versa.  We try
+    // to fix that by looking for the orientation information.
+    // @link https://stackoverflow.com/a/13963783/3177610
+    $exif = @exif_read_data($uri, 'EXIF');
+    $orientation = $exif['Orientation'] ?? NULL;
+    if ($orientation === 6 || $orientation === 8) {
+      list($width, $height) = [$height, $width];
+    }
+
+    // Create our native response, only to be changed by the image style if it
+    // has a different aspect ratio.
+    $ratio = $width / $height;
+
+    if (!empty($style_name)) {
+      /** @var ImageStyle $image_style */
+      $image_style = $this->entityTypeManager
+        ->getStorage('image_style')
+        ->load($style_name);
+      if (!$image_style) {
+        throw new \InvalidArgumentException(sprintf('Failed to load image style: %s', $style_name));
+      }
+
+      // If the style provides a height then the aspect ratio needs to be
+      // recalculated and the native one replaced by it.
+      $width = $this->getStyleWidth($image_style);
+      $height = $this->getStyleHeight($image_style);
+      if (NULL !== $height) {
+        $ratio = $width / $height;
+      }
+    }
 
     return floatval($ratio);
   }
