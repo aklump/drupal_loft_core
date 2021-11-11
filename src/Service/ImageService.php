@@ -471,10 +471,9 @@ class ImageService {
    *   Will be set with the width of the style; when $style_name is null the
    *   native image width will be set.
    * @param &$height
-   *   Will be set with the height of the style; when $style_name is null the
-   *   native image height will be set.  Be aware that if $style_name has null
-   *   as a height, then the aspect ratio is based on the native image
-   *   dimensions, yet this will be null.
+   *   Will be set with the height based on the aspect ratio and $width.  So if
+   *   style is omitted this will be the native height, but if style is present,
+   *   this will be the aspect ratio applied to the style width.
    *
    * @return float
    *   The aspect ratio.  Note that you need to use the reciprocal (1/$ratio)
@@ -520,6 +519,11 @@ class ImageService {
       if (NULL !== $height) {
         $ratio = $width / $height;
       }
+    }
+
+    $width = intval($width);
+    if (empty($height)) {
+      $height = intval(round($ratio * $width, 0));
     }
 
     return floatval($ratio);
