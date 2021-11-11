@@ -485,15 +485,23 @@ class ImageService {
       throw new \RuntimeException(sprintf('The provided URI does not exist: %s', $uri));
     }
 
-    $image = $this->imageFactory->get($uri);
-    $width = $image->getWidth();
-    $height = $image->getHeight();
 
     // It's possible that the orientation of the image is 90 degrees off, which
     // results in the height coming back as the width, and visa versa.  We try
     // to fix that by looking for the orientation information.
     // @link https://stackoverflow.com/a/13963783/3177610
     $exif = @exif_read_data($uri, 'EXIF');
+    $width = $exif['ExifImageWidth'] ?? NULL;
+    $height = $exif['ExifImageLength'] ?? NULL;
+
+    // The EXIF data is not present on some images, so we need to fallback to
+    // the image API for dimensions.
+    if (empty($width) || empty($height)) {
+      $image = $this->imageFactory->get($uri);
+      $width = $image->getWidth();
+      $height = $image->getHeight();
+    }
+
     $orientation = $exif['Orientation'] ?? NULL;
     if ($orientation === 6 || $orientation === 8) {
       list($width, $height) = [$height, $width];
@@ -512,10 +520,11 @@ class ImageService {
         throw new \InvalidArgumentException(sprintf('Failed to load image style: %s', $style_name));
       }
 
-      // If the style provides a height then the aspect ratio needs to be
-      // recalculated and the native one replaced by it.
       $width = $this->getStyleWidth($image_style);
       $height = $this->getStyleHeight($image_style);
+
+      // If the style provides a height then the aspect ratio needs to be
+      // recalculated based on the image style.
       if (NULL !== $height) {
         $ratio = $width / $height;
       }
@@ -523,7 +532,8 @@ class ImageService {
 
     $width = intval($width);
     if (empty($height)) {
-      $height = intval(round($ratio * $width, 0));
+      // This will happen if the image style has a null height.
+      $height = intval(round($ratio * $width));
     }
 
     return floatval($ratio);
