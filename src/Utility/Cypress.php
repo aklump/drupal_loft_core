@@ -27,12 +27,7 @@ final class Cypress {
   /**
    * @var string
    */
-  private $block = '';
-
-  /**
-   * @var string
-   */
-  private $element = '';
+  private $block;
 
   /**
    * Cypress constructor.
@@ -62,10 +57,10 @@ final class Cypress {
    *   The suffix to use combined with the construction prefix.
    */
   public function with(string $element): void {
-    $this->element = $element;
     if (is_null($this->targetElement)) {
       throw new \RuntimeException("You must call ::tag() first.");
     }
+    $test_id = empty($element) ? $this->bemBlock() : $this->bemElement($element);
     if (is_array($this->targetElement)) {
 
       // We assume we have a render array.
@@ -75,10 +70,10 @@ final class Cypress {
       if (isset($this->targetElement['attributes'])) {
         $key = 'attributes';
       }
-      $this->targetElement[$key]['data-testid'] = $this->bemElement($this->element);
+      $this->targetElement[$key]['data-testid'] = $test_id;
     }
     elseif ($this->targetElement instanceof Attribute) {
-      $this->targetElement->setAttribute('data-testid', $this->bemElement($this->element));
+      $this->targetElement->setAttribute('data-testid', $test_id);
     }
     unset($this->targetElement);
   }
