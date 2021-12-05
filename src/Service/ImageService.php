@@ -533,7 +533,7 @@ class ImageService {
     $width = intval($width);
     if (empty($height)) {
       // This will happen if the image style has a null height.
-      $height = intval(round($ratio * $width));
+      $height = intval(round($width / $ratio));
     }
 
     return floatval($ratio);
