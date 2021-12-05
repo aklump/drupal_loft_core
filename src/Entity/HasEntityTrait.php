@@ -115,6 +115,16 @@ trait HasEntityTrait {
   }
 
   /**
+   * Return all entities without any validation.
+   *
+   * @return EntityInterface[]
+   *   All existing entities, keyed by type.
+   */
+  public function getEntities(): array {
+    return $this->_entities;
+  }
+
+  /**
    * Return a string to be used as a unique cache key for an entity.
    *
    * @param string $entity_type_id
@@ -191,6 +201,37 @@ trait HasEntityTrait {
     }
 
     return [$entity_type_id, $entity, $entity->bundle(), $entity->id()];
+  }
+
+  /**
+   * Like requireEntity(), but allows for matching at least one of several entity types.
+   *
+   * @param array $type_bundles
+   *   Each argument is an array that matches the arguments to requireEntity().
+   *
+   * @return array
+   *   See ::requireEntity.
+   *
+   * @code
+   *   $data = $this->requireEntityMultiple(['node', ['page']], ['paragraph']);
+   *   list($entity, $bundle, $entity_type_id) = $data;
+   * @endcode
+   *
+   * @throws \Drupal\loft_core\Entity\MissingRequiredEntityException
+   *   If there are no entities matching at least one type.
+   *
+   * @see \Drupal\loft_core\Entity\HasEntityTrait::requireEntity()
+   */
+  public function requireEntityMultiple(array ...$type_bundles): array {
+    foreach ($type_bundles as $arguments) {
+      try {
+        return call_user_func_array([$this, 'requireEntity'], $arguments);
+      }
+      catch (\Exception $exception) {
+        continue;
+      }
+    }
+    throw new MissingRequiredEntityException(implode(', ', $entity_type_ids));
   }
 
   /**
