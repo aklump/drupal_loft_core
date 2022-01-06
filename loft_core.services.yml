@@ -20,3 +20,6 @@ services:
   loft_core.rendering:
     class: \Drupal\loft_core\Service\Rendering
     arguments: [ "@renderer" ]
+  loft_core.dates:
+    class: \Drupal\loft_core\Service\DatesService
+    arguments: [ '@config.factory' ]

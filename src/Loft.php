@@ -4,6 +4,7 @@ namespace Drupal\loft_core;
 
 use AKlump\LoftLib\Code\Cache;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\loft_core\Service\DatesService;
 use Drupal\loft_core\Service\ImageService;
 
 /**
@@ -144,6 +145,13 @@ class Loft {
    */
   public static function images(): ImageService {
     return \Drupal::service('loft_core.images');
+  }
+
+  /**
+   * @return \Drupal\loft_core\Service\DatesService
+   */
+  public static function dates(): DatesService {
+    return \Drupal::service('loft_core.dates');
   }
 
 }
