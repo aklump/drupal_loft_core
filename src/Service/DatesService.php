@@ -16,6 +16,11 @@ class DatesService {
 
   public function __construct(ConfigFactoryInterface $config_factory) {
     $this->config = $config_factory;
+
+    // TODO DI.
+    $name = \Drupal::config('system.date')
+      ->get('timezone.default');
+    $this->localTimeZone = new \DateTimeZone($name);
   }
 
   /**
@@ -82,16 +87,33 @@ class DatesService {
   /**
    * Merges a date object with a Time field timestamp.
    *
+   * Be aware that that date object timezone is ignored, as is it's time.  So
+   * just the date portion will be used.  The $timestamp is local time.  The
+   * final object will be adjusted for UTC.
+   *
    * @param \Drupal\Core\Datetime\DrupalDateTime $date
    * @param int $timestamp
    *   This is assumed to be in the site's default timezone.
    *
    * @return \DateTime
    */
-  public function getUtcDrupalDateTimeByMergingDrupalDateTimeAndTimeFieldValue(DrupalDateTime $date, int $timestamp) {
-    return Time::createFromTimestamp($timestamp)
-      ->on($date->getPhpDateTime())
+  public function getUtcDrupalDateTimeByMergingDrupalDateAndTimeFieldValue(DrupalDateTime $date, int $timestamp) {
+    $combined = new DrupalDateTime($date->format('Y-m-d'), $this->localTimeZone);
+    $time = Time::createFromTimestamp($timestamp);
+
+    return $combined
+      ->setTime($time->getHour(), $time->getMinute(), $time->getSecond())
       ->setTimezone(new \DateTimeZone('UTC'));
+  }
+
+  public function getLocalDateTimeByUtcString(string $datetime): DrupalDateTime {
+    $date = new DrupalDateTime($datetime, 'UTC');
+
+    return $date->setTimeZone($this->localTimeZone);
+  }
+
+  public function getLocalDateTimeByLocalString(string $datetime): DrupalDateTime {
+    return new DrupalDateTime($datetime, $this->localTimeZone);
   }
 
 }
