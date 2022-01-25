@@ -488,26 +488,35 @@ class ImageService {
       throw new \RuntimeException(sprintf('The provided URI does not exist: %s', $uri));
     }
 
-
-    // It's possible that the orientation of the image is 90 degrees off, which
-    // results in the height coming back as the width, and visa versa.  We try
-    // to fix that by looking for the orientation information.
-    // @link https://stackoverflow.com/a/13963783/3177610
-    $exif = @exif_read_data($uri, 'EXIF');
-    $width = $exif['ExifImageWidth'] ?? NULL;
-    $height = $exif['ExifImageLength'] ?? NULL;
-
-    // The EXIF data is not present on some images, so we need to fallback to
-    // the image API for dimensions.
-    if (empty($width) || empty($height)) {
-      $image = $this->imageFactory->get($uri);
-      $width = $image->getWidth();
-      $height = $image->getHeight();
+    $mime = \Drupal::service('file.mime_type.guesser')->guess($uri);
+    if ('image/svg+xml' === $mime) {
+      preg_match_all('/(width|height)="(\d+)"/', file_get_contents($uri), $matches);
+      $width = array_search('width', $matches[1]);
+      $width = $matches[2][$width] * 1;
+      $height = array_search('height', $matches[1]);
+      $height = $matches[2][$height] * 1;
     }
+    else {
+      // It's possible that the orientation of the image is 90 degrees off, which
+      // results in the height coming back as the width, and visa versa.  We try
+      // to fix that by looking for the orientation information.
+      // @link https://stackoverflow.com/a/13963783/3177610
+      $exif = @exif_read_data($uri, 'EXIF');
+      $width = $exif['ExifImageWidth'] ?? NULL;
+      $height = $exif['ExifImageLength'] ?? NULL;
 
-    $orientation = $exif['Orientation'] ?? NULL;
-    if ($orientation === 6 || $orientation === 8) {
-      list($width, $height) = [$height, $width];
+      // The EXIF data is not present on some images, so we need to fallback to
+      // the image API for dimensions.
+      if (empty($width) || empty($height)) {
+        $image = $this->imageFactory->get($uri);
+        $width = $image->getWidth();
+        $height = $image->getHeight();
+      }
+
+      $orientation = $exif['Orientation'] ?? NULL;
+      if ($orientation === 6 || $orientation === 8) {
+        list($width, $height) = [$height, $width];
+      }
     }
 
     // Create our native response, only to be changed by the image style if it
