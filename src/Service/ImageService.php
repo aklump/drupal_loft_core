@@ -127,10 +127,13 @@ class ImageService {
    */
   public function getMarkup(string $file_resource, callable $processor = NULL) {
     $this->validateResourceExists($file_resource);
-    $extension = pathinfo($file_resource, PATHINFO_EXTENSION);
-    if ($extension === 'svg') {
+    $mime = $this->mimeTypeGuesser->guess($file_resource);
+    if ('image/svg+xml' === $mime) {
       $dom = new \DOMDocument();
-      $dom->load($file_resource);
+      $contents = file_get_contents($file_resource);
+      if (!$dom->loadXML($contents)) {
+        throw new \RuntimeException(sprintf('Failed to load SVG XML from %s', $file_resource));
+      }
 
       // Strip XML header.
       $svg = '';
