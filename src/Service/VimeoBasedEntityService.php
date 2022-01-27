@@ -74,6 +74,10 @@ final class VimeoBasedEntityService {
     return $this;
   }
 
+  public function getPosterField(): string {
+    return $this->fields['poster'] ?? '';
+  }
+
   /**
    * Use this to set the duration on an entity field.
    *
@@ -85,13 +89,20 @@ final class VimeoBasedEntityService {
     $this->fields['duration'] = $field_name;
 
     return $this;
+  }
 
+  public function getDurationField(): string {
+    return $this->fields['duration'] ?? '';
   }
 
   public function setTitleField(string $field_name): VimeoBasedEntityService {
     $this->fields['name'] = $field_name;
 
     return $this;
+  }
+
+  public function getTitleField(): string {
+    return $this->fields['name'] ?? '';
   }
 
   /**
