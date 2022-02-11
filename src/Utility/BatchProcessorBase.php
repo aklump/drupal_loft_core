@@ -57,7 +57,7 @@ abstract class BatchProcessorBase implements ContainerInjectionInterface {
       $sandbox['finished'] = 1;
     }
     else {
-      $sandbox['finished'] = $sandbox['total'] / count($sandbox['stack']);
+      $sandbox['finished'] = 1 - count($sandbox['stack']) / $sandbox['total'];
     }
   }
 
