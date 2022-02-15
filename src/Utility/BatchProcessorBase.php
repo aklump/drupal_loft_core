@@ -123,6 +123,7 @@ abstract class BatchProcessorBase implements ContainerInjectionInterface {
    * @return void
    */
   protected function addStatus($message, $repeat = FALSE) {
+    $this->sandbox['messages'] = $this->sandbox['messages'] ?? [];
     if ($repeat || array_search($message, $this->sandbox['messages']) === FALSE) {
       $this->sandbox['messages'][] = $message;
     }
