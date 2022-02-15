@@ -25,27 +25,15 @@
 
 <h2>Disable elements</h2>
 
-<p>It is nice to be able to keep an element visible, yet disable it.  Making this easy is the goal of <code>loft_core_form_disable_elements()</code>.</p>
+<p>It is nice to be able to keep an element visible, yet disable it. Making this easy is the goal of <code>loft_core_form_disable_elements()</code>.</p>
 
 <h2>Form help</h2>
 
-<p>This module defines a new element called 'form_help'. It can also take <code>#weight</code> and <code>#attributes</code> (not shown).</p>
-
-<pre><code>    &lt;?php
-    $form['help'] = [
-        '#type'    =&gt; 'form_help',
-
-        // Notice an array, where each value is a separate paragraph and will be themed as such. It does not have to be an array, and passing a string is considered a single paragraph.
-        '#message' =&gt; array(
-            t("You are editing the template for all user collections."),
-            t("When a user account is created, the values of this node at the time the user account is created will be copied to the users's account as a Sample Collection.  Changes made to the node are not retroactive and only affect the user collections created from that point forward."),
-        ),
-    ];
-</code></pre>
+<p>This module defines a new element called 'form_help'. See <code>\Drupal\loft_core\Element\FormHelp</code> for usage examples.</p>
 
 <h2>Tabindex</h2>
 
-<pre><code>loft_core_form_tabindex()
+<pre><code class="php">loft_core_form_tabindex()
 </code></pre>
 </section>
 
@@ -55,7 +43,7 @@
 
 <footer><div class="pager"><a href="database.html" class="prevdatabase">&laquo;Database</a><a href="index.html" class="index pager__book-title">Loft Drupal Core</a><a href="loft_core_users.html" class="nextloft_core_users">Loft Core: Users&raquo;</a></div>  
   <div id="footer-legaleeze">
-    <p class="legaleeze center">Version:1.0 &bull; Last Updated:Mon, 14 Feb 2022 16:20:54 -0800</p>
+    <p class="legaleeze center">Version:1.0 &bull; Last Updated:Mon, 14 Feb 2022 21:42:56 -0800</p>
   </div>
 </footer>
 
