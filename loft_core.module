@@ -236,82 +236,34 @@ function loft_core_static_content_stream($target) {
 }
 
 /**
- * Implements hook_element_info().
- */
-function loft_core_element_info() {
-  $types = [];
-  $types['form_help'] = [
-    '#weight' => -99,
-
-    // string|array If array,
-    //elements are separate paragraphs,
-    //without <p> tag wrappers.
-    '#message' => [],
-    '#theme_wrappers' => [
-      'form_help',
-      'form_element',
-    ],
-  ];
-
-  return $types;
-}
-
-/**
  * Implements hook_theme().
- *
  */
 function loft_core_theme($existing, $type, $theme, $path) {
   return [
     'form_help' => [
-      'function' => 'theme_form_help',
       'render element' => 'element',
     ],
   ];
 }
 
 /**
- * Implements hook_preprocess_form_help().
+ * Preprocess callback for form_help.
  *
- * @d8
+ * @param array &$vars
+ *
+ * @return void
  */
-function loft_core_preprocess_form_help(&$vars) {
-  $element =& $vars['element'];
-
-  // Wrap all elements of #message in p tags,
-  //if array.
-  if (is_array($element['#message'])) {
-    array_walk($element['#message'],
-      function (&$value) {
-        if (strpos($value,
-            '<p') !== 0
-        ) {
-          $value = '<p>' . $value . '</p>';
-        }
-      });
-    $element['#message'] = implode('',
-      $element['#message']);
-  }
-}
-
-
-/**
- * Provides output for form help.
- *
- * DO NOT CALL DIRECTLY USE ['#type' => 'form_help',...] INSTEAD!
- *
- * @ingroup themeable
- *
- */
-function theme_form_help($vars) {
+function template_preprocess_form_help(array &$vars) {
   $element = $vars['element'];
-  $attributes = new Attribute($element['#attributes']);
-
-  return '<blockquote' . $attributes . '>' . $element['#message'] . $element['#children'] . '</blockquote>';
+  $vars['messages'] = $element['#message'];
+  if (!is_array($vars['messages'])) {
+    $vars['messages'] = [$vars['messages']];
+  }
+  $vars['children'] = $element['#children'];
 }
 
-
 /**
- * Invokes a hook on the default them if that implements it.
+ * Invokes a hook on the default theme if that implements it.
  *
  * @param $hook
  *   The name of the hook to invoke.
