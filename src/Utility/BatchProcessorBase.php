@@ -75,8 +75,9 @@ abstract class BatchProcessorBase implements ContainerInjectionInterface {
         return $messages[0] ?? '';
       }
 
+      // The PHP_EOL are important for CLI usage with drush updb.
       // Don't try to use an <ol> here, it doesn't seem to work. Feb 10, 2022, aklump.
-      return sprintf('<ul><li>%s</li></ul>', implode('</li><li>', $messages));
+      return sprintf('<ul><li>%s</li></ul>', implode('</li>' . PHP_EOL . '<li>', $messages)) . PHP_EOL;
     }
 
     $sandbox['#finished'] = 1 - count($sandbox['stack']) / $sandbox['total'];
