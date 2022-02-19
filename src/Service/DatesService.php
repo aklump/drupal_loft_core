@@ -64,6 +64,41 @@ class DatesService {
   }
 
   /**
+   * Return a date object from a date entity field in the local timezone.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param string $field_name
+   * @param bool $end_time
+   *
+   * @return \Drupal\Core\Datetime\DrupalDateTime
+   */
+  public function getLocalDateTimeByEntity(EntityInterface $entity, string $field_name, bool $end_time = FALSE): DrupalDateTime {
+    $date = $this->getUtcDateTimeByEntity($entity, $field_name, $end_time);
+
+    return $date->setTimeZone($this->localTimeZone);
+  }
+
+  /**
+   * Get local now.
+   *
+   * @return \Drupal\Core\Datetime\DrupalDateTime
+   *   The current moment in the local timezone.
+   */
+  public function getLocalNow(): DrupalDateTime {
+    return new DrupalDateTime('now', $this->localTimeZone);
+  }
+
+  /**
+   * Get UTC Now.
+   *
+   * @return \Drupal\Core\Datetime\DrupalDateTime
+   *   The current moment in UTC.
+   */
+  public function getUtcNow(): DrupalDateTime {
+    return new DrupalDateTime('now', 'UTC');
+  }
+
+  /**
    * Returns date object with time set to 00:00:00 or 23:59:59.
    *
    * The date portion is pulled from the field entity, but the time is ignored.
