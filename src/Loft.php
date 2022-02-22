@@ -154,4 +154,53 @@ class Loft {
     return \Drupal::service('loft_core.dates');
   }
 
+  /**
+   * Safely sets #access on a render array.
+   *
+   * "Safely" means that the #cache will still be processed even if #access is
+   * false.  Normally, if #access and #cache coexist at the same level, #cache
+   * gets ignored when #access if false.  This can lead to unexpecte results
+   * with caching.  This method solves this by bubbling up #cache to a parent
+   * level so it will always be processed.
+   *
+   * @code
+   *   // Simple, boolean value.  $build['#access'] is unset.  Of course this is
+   *   // contrived and you will use some dynamic value as the second argument.
+   *   $build = Loft::renderAccess($build, FALSE);
+   *
+   *   // Variation, using \Drupal\Core\Access\AccessResultInterface.
+   *   $build = Loft::renderAccess($build, \Drupal\Core\Access\AccessResult::forbiddenIf($foo));
+   *
+   *   // $build['#access'], if set, must agree with the second argument.  This example
+   *   // shows that we have to overwrite $build['#access'] to match the second
+   *   // argument.  Alternately, one might unset($build['#access']) if that seems more
+   *   // clear.
+   *   $build['#access'] = $this->access($item->getEntity());
+   *   $build = Loft::renderAccess($build, $build['#access']);
+   * @endcode
+   *
+   * @param array $renderable
+   *   A render array.
+   * @param bool|\Drupal\Core\Access\AccessResultInterface $access
+   *   The value to use for $renderable['#access'].
+   *
+   * @return array
+   *   The array or adjusted-for-caching array.
+   */
+  public static function renderAccess(array $renderable, $access): array {
+    if (array_key_exists('#access', $renderable) && $access !== $renderable['#access']) {
+      throw new \InvalidArgumentException('$renderable has #access with differs from $access; you must remove $renderable["#access"], or make it the same as $access');
+    }
+    if (array_key_exists('#cache', $renderable)) {
+      $renderable = [
+        // If we don't bubble this up, #access === false will prevent it from
+        // getting processed in $build.
+        '#cache' => $renderable['#cache'],
+        $renderable,
+      ];
+    }
+
+    return $renderable;
+  }
+
 }
