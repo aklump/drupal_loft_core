@@ -41,9 +41,9 @@ class DatesService {
     }
     $date->setTimeZone(new \DateTimeZone(DateTimeItemInterface::STORAGE_TIMEZONE));
     $key = $end_time ? 'end_value' : 'value';
-    $entity->set($field_name, [
-      $key => $date->format($format),
-    ]);
+    $value = $entity->get($field_name)->getValue();
+    $value[0][$key] = $date->format($format);
+    $entity->set($field_name, $value);
   }
 
   /**
