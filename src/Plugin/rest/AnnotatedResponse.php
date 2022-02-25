@@ -1,9 +1,28 @@
 <?php
 
-namespace Drupal\check_pages_api;
+namespace Drupal\loft_core\Plugin\rest;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
 
+/**
+ * Provides an annotated structure for REST responses.
+ *
+ * @code
+ *   return AnnotatedResponse::create()
+ *     ->setHttpStatus(406)
+ *     ->setMessage("Event can't be loaded.")
+ *     ->asJson();
+ * @endcode
+ *
+ * @code
+ *   try {
+ *     // Perform something that might throw...
+ *   }
+ *   catch (\Exception $exception) {
+ *     return AnnotatedResponse::fromException($exception)->asJson();
+ *   }
+ * @endcode
+ */
 final class AnnotatedResponse {
 
   /**
@@ -26,20 +45,62 @@ final class AnnotatedResponse {
     $this->setHttpStatus(500);
   }
 
+  /**
+   * Create a new instance.
+   *
+   * @return static
+   *   A new response instance.
+   */
   public static function create() {
     return new static();
   }
 
-  public function setResult(string $status): self {
-    if (strlen($status) > 30) {
-      throw new \InvalidArgumentException('The length of $status may not exceed 30 characters');
+  /**
+   * Create a new instance from an exception.
+   *
+   * If the exception code is in the HTTP response status code range, it will be
+   * used.  It outside of this range it will be ignored.
+   *
+   * @return static
+   *   A new response instance.
+   */
+  public static function fromException(\Exception $exception) {
+    $response = new static();
+    $code = $exception->getCode();
+
+    // @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status#client_error_responses
+    if ($code >= 100 && $code < 600) {
+      $response->setHttpStatus($code);
     }
-    $this->responseBody['result'] = $status;
+
+    return $response->setMessage($exception->getMessage());
+  }
+
+  /**
+   * Set a result word or phrase.
+   *
+   * @param string $result
+   *   A word or phrase to indicate the result.  Use message to augment.
+   *
+   * @return $this
+   */
+  public function setResult(string $result): self {
+    if (strlen($result) > 30) {
+      throw new \InvalidArgumentException('The length may not exceed 30 characters');
+    }
+    $this->responseBody['result'] = $result;
 
     return $this;
   }
 
 
+  /**
+   * @param int $code
+   *   The status code to be returned in the HTTP responses.
+   *
+   * @return $this
+   *   Self for chaining.
+   */
   public function setHttpStatus(int $code): self {
     if (empty($this->responseBody['result'])) {
       $this->setResult(substr($code, 0, 1) == 2 ? 'success' : 'failed');
@@ -52,7 +113,7 @@ final class AnnotatedResponse {
   /**
    * Set a message to describe the result to the client.
    *
-   * Compare this to \Drupal\check_pages_api\AnnotatedResponse::addUserMessage.
+   * Compare this to AnnotatedResponse::addUserMessage()
    *
    * @param string $message
    *
@@ -84,12 +145,24 @@ final class AnnotatedResponse {
     return $this;
   }
 
+  /**
+   * @param array $data
+   *   Arbitrary data to send back in response.
+   *
+   * @return $this
+   *   Self for chaining.
+   */
   public function setData(array $data): self {
     $this->responseBody['data'] = $data;
 
     return $this;
   }
 
+  /**
+   * Return this as a JsonResponse instance.
+   *
+   * @return \Symfony\Component\HttpFoundation\JsonResponse
+   */
   public function asJson(): JsonResponse {
     return new JsonResponse($this->responseBody, $this->statusCode);
   }
