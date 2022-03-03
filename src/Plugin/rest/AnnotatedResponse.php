@@ -3,6 +3,7 @@
 namespace Drupal\loft_core\Plugin\rest;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Provides an annotated structure for REST responses.
@@ -42,7 +43,7 @@ final class AnnotatedResponse {
       'user_messages' => [],
       'data' => [],
     ];
-    $this->setHttpStatus(500);
+    $this->setHttpStatus(200);
   }
 
   /**
@@ -61,13 +62,16 @@ final class AnnotatedResponse {
    * If the exception code is in the HTTP response status code range, it will be
    * used.  It outside of this range it will be ignored.
    *
+   * @param \Exception $exception
+   *   The exception instance.
+   *
    * @return static
    *   A new response instance.
    */
   public static function fromException(\Exception $exception) {
     $response = new static();
+    $response->setHttpStatus(500);
     $code = $exception->getCode();
-
     // @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Status#client_error_responses
     if ($code >= 100 && $code < 600) {
       $response->setHttpStatus($code);
@@ -80,7 +84,9 @@ final class AnnotatedResponse {
    * Set a result word or phrase.
    *
    * @param string $result
-   *   A word or phrase to indicate the result.  Use message to augment.
+   *   A word or phrase to finished this sentence "The request has ____", e.g.
+   *   "succeeded", "failed", "created", "deleted".  This will be set by the
+   *   http status code when possible, unless explicitly set with this method.
    *
    * @return $this
    */
@@ -103,7 +109,13 @@ final class AnnotatedResponse {
    */
   public function setHttpStatus(int $code): self {
     if (empty($this->responseBody['result'])) {
-      $this->setResult(substr($code, 0, 1) == 2 ? 'success' : 'failed');
+      $this->setResult(substr($code, 0, 1) == 2 ? 'succeeded' : 'failed');
+      if ($code == Response::HTTP_CREATED) {
+        $this->setResult('created');
+      }
+      if ($code == Response::HTTP_NO_CONTENT) {
+        $this->setResult('deleted');
+      }
     }
     $this->statusCode = $code;
 
