@@ -8,16 +8,21 @@
 </head>
 
 <body class="page--smart_url">
-<header><div class="pager"><a href="ROADMAP.html" class="prevROADMAP">&laquo;Roadmap and Todo List</a><a href="index.html" class="index pager__book-title">Loft Drupal Core</a><a href="static_content.html" class="nextstatic_content">Stream wrapper &quot;static-content://&quot;&raquo;</a></div></header>
-<section class="sub-header"><div class="breadcrumbs"><a href="index.html">Index</a> &raquo</div><div class="search__wrapper">
+<header>
+  <div class="pager"><a href="ROADMAP.html" class="prev ROADMAP">&laquo;Roadmap and Todo List</a><a href="index.html" class="index pager__book-title">Loft Drupal Core</a><a href="static_content.html" class="next static_content">Stream wrapper &quot;static-content://&quot;&raquo;</a></div></header>
+<section class="sub-header">
+  <div class="breadcrumbs"><a href="index.html">Index</a>
+         &raquo
+      </div>      <div class="search__wrapper">
   <form action="search--results.html">
     <input type="text" class="search-input" name="q" id="tipue_search_input" autocomplete="off" required>
   </form>
 </div>
-</section>
+  </section>
 
-
-<h1>Smart Urls</h1><section><h1>Smart Urls</h1>
+<section>
+  <h1>Smart Urls</h1>
+  
 
 <ul>
 <li><p>User enters: <code>http://www.mysite.com/some-cool-aliased-title</code></p></li>
@@ -39,26 +44,29 @@
 
 <pre><code>$config['loft_core.settings']['smart_url_regex'] = '/mysite.(?:org|loft)$/i';
 </code></pre>
+
 </section>
 
 <div class="search__results">
   <div id="tipue_search_content"></div>
 </div>
 
-<footer><div class="pager"><a href="ROADMAP.html" class="prevROADMAP">&laquo;Roadmap and Todo List</a><a href="index.html" class="index pager__book-title">Loft Drupal Core</a><a href="static_content.html" class="nextstatic_content">Stream wrapper &quot;static-content://&quot;&raquo;</a></div>  
+<footer>
+  <div class="pager"><a href="ROADMAP.html" class="prev ROADMAP">&laquo;Roadmap and Todo List</a><a href="index.html" class="index pager__book-title">Loft Drupal Core</a><a href="static_content.html" class="next static_content">Stream wrapper &quot;static-content://&quot;&raquo;</a></div>  
   <div id="footer-legaleeze">
-    <p class="legaleeze center">Version:1.0 &bull; Last Updated:Tue, 22 Feb 2022 11:30:25 -0800</p>
+    <p class="legaleeze center">Version: 1.0 &bull; Last Updated: Wed, 02 Mar 2022 22:41:10 -0800</p>
   </div>
 </footer>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>  <script src="search/tipuesearch_content.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script src="search/tipuesearch_content.js"></script>
   <script src="search/tipuesearch_set.js"></script>
   <script src="search/tipuesearch.min.js"></script>
   <script>
     $(document).ready(function() {
       $('#tipue_search_input').tipuesearch()
     })
-  </script><script src="js/core.js"></script>
+  </script>
+<script src="js/core.js"></script>
 </body>
 </html>
-

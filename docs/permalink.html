@@ -8,16 +8,21 @@
 </head>
 
 <body class="page--permalink">
-<header><div class="pager"><a href="html_parsing.html" class="prevhtml_parsing">&laquo;Parsing HTML/DOM in PHP</a><a href="index.html" class="index pager__book-title">Loft Drupal Core</a><a href="entity_protection.html" class="nextentity_protection">Protecting Critical Entities&raquo;</a></div></header>
-<section class="sub-header"><div class="breadcrumbs"><a href="index.html">Index</a> &raquo</div><div class="search__wrapper">
+<header>
+  <div class="pager"><a href="html_parsing.html" class="prev html_parsing">&laquo;Parsing HTML/DOM in PHP</a><a href="index.html" class="index pager__book-title">Loft Drupal Core</a><a href="entity_protection.html" class="next entity_protection">Protecting Critical Entities&raquo;</a></div></header>
+<section class="sub-header">
+  <div class="breadcrumbs"><a href="index.html">Index</a>
+         &raquo
+      </div>      <div class="search__wrapper">
   <form action="search--results.html">
     <input type="text" class="search-input" name="q" id="tipue_search_input" autocomplete="off" required>
   </form>
 </div>
-</section>
+  </section>
 
-
-<h1>Permalink or &quot;Copy link&quot; tab</h1><section><h1>Permalink or "Copy link" tab</h1>
+<section>
+  <h1>Permalink or &quot;Copy link&quot; tab</h1>
+  
 
 <p>For users with the correct permissions two tabs will be added to node pages, which when clicked copies a canonical link to the clipboard.  The first tab <em>Copy link</em> copies a canonical internal link (no domain), and should be used for page to page linking within the website.  The second tab <em>Share link</em> should be used links to embed in emails, social sharing, etc; outside of the website context, because it contains an absolute URL.</p>
 
@@ -32,26 +37,29 @@
 <h2>Change tab label</h2>
 
 <p>To change the tab label implement <code>hook_local_task_alter</code>.  See <em>loft_core.api.php</em> for an example implementation.</p>
+
 </section>
 
 <div class="search__results">
   <div id="tipue_search_content"></div>
 </div>
 
-<footer><div class="pager"><a href="html_parsing.html" class="prevhtml_parsing">&laquo;Parsing HTML/DOM in PHP</a><a href="index.html" class="index pager__book-title">Loft Drupal Core</a><a href="entity_protection.html" class="nextentity_protection">Protecting Critical Entities&raquo;</a></div>  
+<footer>
+  <div class="pager"><a href="html_parsing.html" class="prev html_parsing">&laquo;Parsing HTML/DOM in PHP</a><a href="index.html" class="index pager__book-title">Loft Drupal Core</a><a href="entity_protection.html" class="next entity_protection">Protecting Critical Entities&raquo;</a></div>  
   <div id="footer-legaleeze">
-    <p class="legaleeze center">Version:1.0 &bull; Last Updated:Tue, 22 Feb 2022 11:30:23 -0800</p>
+    <p class="legaleeze center">Version: 1.0 &bull; Last Updated: Wed, 02 Mar 2022 22:41:08 -0800</p>
   </div>
 </footer>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>  <script src="search/tipuesearch_content.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script src="search/tipuesearch_content.js"></script>
   <script src="search/tipuesearch_set.js"></script>
   <script src="search/tipuesearch.min.js"></script>
   <script>
     $(document).ready(function() {
       $('#tipue_search_input').tipuesearch()
     })
-  </script><script src="js/core.js"></script>
+  </script>
+<script src="js/core.js"></script>
 </body>
 </html>
-

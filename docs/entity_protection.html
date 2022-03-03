@@ -8,16 +8,21 @@
 </head>
 
 <body class="page--entity_protection">
-<header><div class="pager"><a href="permalink.html" class="prevpermalink">&laquo;Permalink or &quot;Copy link&quot; tab</a><a href="index.html" class="index pager__book-title">Loft Drupal Core</a><a href="remember_users.html" class="nextremember_users">Remember Usernames in Login Form&raquo;</a></div></header>
-<section class="sub-header"><div class="breadcrumbs"><a href="index.html">Index</a> &raquo</div><div class="search__wrapper">
+<header>
+  <div class="pager"><a href="permalink.html" class="prev permalink">&laquo;Permalink or &quot;Copy link&quot; tab</a><a href="index.html" class="index pager__book-title">Loft Drupal Core</a><a href="remember_users.html" class="next remember_users">Remember Usernames in Login Form&raquo;</a></div></header>
+<section class="sub-header">
+  <div class="breadcrumbs"><a href="index.html">Index</a>
+         &raquo
+      </div>      <div class="search__wrapper">
   <form action="search--results.html">
     <input type="text" class="search-input" name="q" id="tipue_search_input" autocomplete="off" required>
   </form>
 </div>
-</section>
+  </section>
 
-
-<h1>Protecting Critical Entities</h1><section><h1>Protecting Critical Entities</h1>
+<section>
+  <h1>Protecting Critical Entities</h1>
+  
 
 <p>With Loft Core, it's easy to protect critical entities that should not be deleted through the admin UI.  Learn more by looking at the docblocks in <code>\Drupal\loft_core\Service\EntityProtectionService</code>.</p>
 
@@ -64,26 +69,29 @@ function se_core_entity_predelete(EntityInterface $entity) {
 </code></pre></li>
 <li><p>The delete UI for these entities will be removed from Drupal.</p></li>
 </ol>
+
 </section>
 
 <div class="search__results">
   <div id="tipue_search_content"></div>
 </div>
 
-<footer><div class="pager"><a href="permalink.html" class="prevpermalink">&laquo;Permalink or &quot;Copy link&quot; tab</a><a href="index.html" class="index pager__book-title">Loft Drupal Core</a><a href="remember_users.html" class="nextremember_users">Remember Usernames in Login Form&raquo;</a></div>  
+<footer>
+  <div class="pager"><a href="permalink.html" class="prev permalink">&laquo;Permalink or &quot;Copy link&quot; tab</a><a href="index.html" class="index pager__book-title">Loft Drupal Core</a><a href="remember_users.html" class="next remember_users">Remember Usernames in Login Form&raquo;</a></div>  
   <div id="footer-legaleeze">
-    <p class="legaleeze center">Version:1.0 &bull; Last Updated:Tue, 22 Feb 2022 11:30:21 -0800</p>
+    <p class="legaleeze center">Version: 1.0 &bull; Last Updated: Wed, 02 Mar 2022 22:41:06 -0800</p>
   </div>
 </footer>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>  <script src="search/tipuesearch_content.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script src="search/tipuesearch_content.js"></script>
   <script src="search/tipuesearch_set.js"></script>
   <script src="search/tipuesearch.min.js"></script>
   <script>
     $(document).ready(function() {
       $('#tipue_search_input').tipuesearch()
     })
-  </script><script src="js/core.js"></script>
+  </script>
+<script src="js/core.js"></script>
 </body>
 </html>
-

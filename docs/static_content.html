@@ -8,16 +8,21 @@
 </head>
 
 <body class="page--static_content">
-<header><div class="pager"><a href="smart_url.html" class="prevsmart_url">&laquo;Smart Urls</a><a href="index.html" class="index pager__book-title">Loft Drupal Core</a><a href="testing.html" class="nexttesting">Testing&raquo;</a></div></header>
-<section class="sub-header"><div class="breadcrumbs"><a href="index.html">Index</a> &raquo</div><div class="search__wrapper">
+<header>
+  <div class="pager"><a href="smart_url.html" class="prev smart_url">&laquo;Smart Urls</a><a href="index.html" class="index pager__book-title">Loft Drupal Core</a><a href="testing.html" class="next testing">Testing&raquo;</a></div></header>
+<section class="sub-header">
+  <div class="breadcrumbs"><a href="index.html">Index</a>
+         &raquo
+      </div>      <div class="search__wrapper">
   <form action="search--results.html">
     <input type="text" class="search-input" name="q" id="tipue_search_input" autocomplete="off" required>
   </form>
 </div>
-</section>
+  </section>
 
-
-<h1>Stream wrapper &quot;static-content://&quot;</h1><section><h1>Stream wrapper "static-content://"</h1>
+<section>
+  <h1>Stream wrapper &quot;static-content://&quot;</h1>
+  
 
 <p>In some cases you may want to provide static content to your website, which is source controlled; not publicly accessible; is programatically appended to content; not editable by the CMS.  For all of these reasons the <code>private://</code> and <code>public://</code> stream wrappers will not suffice.  And example use case is your sites "Privacy Policy", with HTML that is too detailed to simply drop into a node body field.  Also in this case you may want to protect it from being altered except by your developers.</p>
 
@@ -70,26 +75,29 @@ function my_module_form_page_node_form_alter(&amp;$form, &amp;$form_state, $form
   }
 }
 </code></pre>
+
 </section>
 
 <div class="search__results">
   <div id="tipue_search_content"></div>
 </div>
 
-<footer><div class="pager"><a href="smart_url.html" class="prevsmart_url">&laquo;Smart Urls</a><a href="index.html" class="index pager__book-title">Loft Drupal Core</a><a href="testing.html" class="nexttesting">Testing&raquo;</a></div>  
+<footer>
+  <div class="pager"><a href="smart_url.html" class="prev smart_url">&laquo;Smart Urls</a><a href="index.html" class="index pager__book-title">Loft Drupal Core</a><a href="testing.html" class="next testing">Testing&raquo;</a></div>  
   <div id="footer-legaleeze">
-    <p class="legaleeze center">Version:1.0 &bull; Last Updated:Tue, 22 Feb 2022 11:30:26 -0800</p>
+    <p class="legaleeze center">Version: 1.0 &bull; Last Updated: Wed, 02 Mar 2022 22:41:11 -0800</p>
   </div>
 </footer>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>  <script src="search/tipuesearch_content.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script src="search/tipuesearch_content.js"></script>
   <script src="search/tipuesearch_set.js"></script>
   <script src="search/tipuesearch.min.js"></script>
   <script>
     $(document).ready(function() {
       $('#tipue_search_input').tipuesearch()
     })
-  </script><script src="js/core.js"></script>
+  </script>
+<script src="js/core.js"></script>
 </body>
 </html>
-
