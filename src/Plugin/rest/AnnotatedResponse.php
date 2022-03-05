@@ -113,9 +113,6 @@ final class AnnotatedResponse {
       if ($code == Response::HTTP_CREATED) {
         $this->setResult('created');
       }
-      if ($code == Response::HTTP_NO_CONTENT) {
-        $this->setResult('deleted');
-      }
     }
     $this->statusCode = $code;
 
