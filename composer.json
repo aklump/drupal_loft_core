@@ -14,7 +14,8 @@
         "aklump/loft-lib": "^1",
         "vlucas/phpdotenv": "^2.4",
         "league/color-extractor": "^0.3.2",
-        "vimeo/vimeo-api": "^3.0"
+        "vimeo/vimeo-api": "^3.0",
+        "clwu/php-read-mp4info": "^2.0"
     },
     "autoload-dev": {
         "psr-4": {

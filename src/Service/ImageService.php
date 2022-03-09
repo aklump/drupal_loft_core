@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesserInterface;
 /**
  * Functions for working with images.
  */
-class ImageService {
+class ImageService implements VisualMediaInterface {
 
   /**
    * An image factory service.
@@ -61,12 +61,32 @@ class ImageService {
    *
    * @return bool
    *   True if the image is taller than wide.
+   *
+   * @deprecated
+   * @see \Drupal\loft_core\Service\ImageService::getOrientation()
    */
   public function isImageTall(string $uri): bool {
     $image = $this->imageFactory->get($uri);
     $width = $image->getWidth();
 
     return $width + 0.1 * $width < $image->getHeight();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getOrientation(string $uri): int {
+    $image = $this->imageFactory->get($uri);
+    $width = $image->getWidth();
+    $height = $image->getHeight();
+    if ($width == $height) {
+      return VisualMediaInterface::SQUARE;
+    }
+    if ($width < $image->getHeight()) {
+      return VisualMediaInterface::PORTRAIT;
+    }
+
+    return VisualMediaInterface::LANDSCAPE;
   }
 
   /**
@@ -146,7 +166,7 @@ class ImageService {
       $svg = $this->filterXssSvg($svg);
     }
     else {
-      throw new \RuntimeException("Unsupported filetype: $extension");
+      throw new \RuntimeException("Unsupported filetype: $mime");
     }
 
     if (is_callable($processor)) {
@@ -549,6 +569,21 @@ class ImageService {
     }
 
     return floatval($ratio);
+  }
+
+  public function getWidth(string $uri): float {
+    $width = NULL;
+    $this->getAspectRatio($uri, NULL, $width);
+
+    return floatval($width);
+  }
+
+  public function getHeight(string $uri): float {
+    $width = NULL;
+    $height = NULL;
+    $this->getAspectRatio($uri, NULL, $width, $height);
+
+    return floatval($height);
   }
 
   /**
