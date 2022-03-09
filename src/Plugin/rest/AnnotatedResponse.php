@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\Response;
  *     // Perform something that might throw...
  *   }
  *   catch (\Exception $exception) {
- *     return AnnotatedResponse::fromException($exception)->asJson();
+ *     return AnnotatedResponse::createFromException($exception)->asJson();
  *   }
  * @endcode
  */
@@ -37,13 +37,13 @@ final class AnnotatedResponse {
   private $statusCode;
 
   public function __construct() {
+    $this->statusCode = 200;
     $this->responseBody = [
       'result' => '',
       'message' => '',
       'user_messages' => [],
       'data' => [],
     ];
-    $this->setHttpStatus(200);
   }
 
   /**
@@ -68,7 +68,7 @@ final class AnnotatedResponse {
    * @return static
    *   A new response instance.
    */
-  public static function fromException(\Exception $exception) {
+  public static function createFromException(\Exception $exception) {
     $response = new static();
     $response->setHttpStatus(500);
     $code = $exception->getCode();
