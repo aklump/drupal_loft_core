@@ -57,7 +57,7 @@ class VideoService implements VisualMediaInterface {
     }
 
     $get_info = function ($uri) {
-      $fd = fopen($uri, 'r');
+      $fd = @fopen($uri, 'r');
       if (!$fd) {
         throw new \DomainException('$uri cannot be opened.');
       }
@@ -81,7 +81,7 @@ class VideoService implements VisualMediaInterface {
       list($extension) = explode('?', $uri, 2);
       $extension = pathinfo($extension, PATHINFO_EXTENSION);
       $local_temp = 'temporary://' . $cid . ".$extension";
-      if (copy($uri, $local_temp)) {
+      if (@copy($uri, $local_temp)) {
         $this->cache[$cid] = $get_info($local_temp);
       }
     }
