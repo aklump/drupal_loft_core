@@ -58,6 +58,9 @@ class VideoService implements VisualMediaInterface {
 
     $get_info = function ($uri) {
       $fd = fopen($uri, 'r');
+      if (!$fd) {
+        throw new \DomainException('$uri cannot be opened.');
+      }
       $file_info = fstat($fd);
       fclose($fd);
       if (!$file_info) {
@@ -70,7 +73,7 @@ class VideoService implements VisualMediaInterface {
       return $info;
     };
 
-    $this->cache[$cid] = [];
+    $this->cache[$cid] = ['height' => 0, 'width' => 0];
     try {
       $this->cache[$cid] = $get_info($uri);
     }
