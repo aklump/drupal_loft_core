@@ -24,7 +24,7 @@ use Symfony\Component\HttpFoundation\Response;
  *   }
  * @endcode
  */
-final class AnnotatedResponse {
+final class AnnotatedResponse implements AnnotatedResponseInterface {
 
   /**
    * @var array
@@ -119,6 +119,10 @@ final class AnnotatedResponse {
     return $this;
   }
 
+  public function getHttpStatus(): int {
+    return $this->statusCode;
+  }
+
   /**
    * Set a message to describe the result to the client.
    *
@@ -173,7 +177,10 @@ final class AnnotatedResponse {
    * @return \Symfony\Component\HttpFoundation\JsonResponse
    */
   public function asJson(): JsonResponse {
-    return new JsonResponse($this->responseBody, $this->statusCode);
+    return new JsonResponse($this->jsonSerialize(), $this->getHttpStatus());
   }
 
+  public function jsonSerialize() {
+    return $this->responseBody;
+  }
 }
