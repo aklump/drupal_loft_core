@@ -14,6 +14,8 @@ class DatesService {
 
   protected $config;
 
+  protected $localTimeZone;
+
   public function __construct(ConfigFactoryInterface $config_factory) {
     $this->config = $config_factory;
 
@@ -21,6 +23,10 @@ class DatesService {
     $name = \Drupal::config('system.date')
       ->get('timezone.default');
     $this->localTimeZone = new \DateTimeZone($name);
+  }
+
+  public function getLocalTimeZone(): \DateTimeZone {
+    return $this->localTimeZone;
   }
 
   /**
@@ -150,5 +156,6 @@ class DatesService {
   public function getLocalDateTimeByLocalString(string $datetime): DrupalDateTime {
     return new DrupalDateTime($datetime, $this->localTimeZone);
   }
+
 
 }
