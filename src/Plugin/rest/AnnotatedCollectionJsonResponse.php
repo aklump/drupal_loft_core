@@ -47,6 +47,10 @@ final class AnnotatedCollectionJsonResponse implements AnnotatedResponseInterfac
       $items = [$items];
     }
 
+    if (!array_key_exists('data', $items[0])) {
+      throw new \InvalidArgumentException('$items[0][data] must be set.');
+    }
+
     $data = [
       'version' => $this->version,
       'href' => $this->href,
