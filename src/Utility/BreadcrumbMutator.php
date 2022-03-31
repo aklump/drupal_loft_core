@@ -95,6 +95,26 @@ final class BreadcrumbMutator {
   }
 
   /**
+   * Filter links by callback.
+   *
+   * The callback receives ($position, $link)
+   *
+   * @param callable $callback
+   *
+   * @return $this
+   */
+  public function filter(callable $callback): self {
+    foreach ($this->links as $index => $link) {
+      $position = $index + 1;
+      if (!$callback($position, $link)) {
+        $this->at($position)->removeLink();
+      }
+    }
+
+    return $this;
+  }
+
+  /**
    * Return the mutated breadcrumb object.
    *
    * @return \Drupal\Core\Breadcrumb\Breadcrumb
@@ -124,7 +144,7 @@ final class BreadcrumbMutator {
    * @return $this
    *   Self for chaining.
    */
-  public function at(int $position) {
+  public function at(int $position): self {
     $this->validatePosition($position - 1);
 
     return $this;
@@ -136,7 +156,7 @@ final class BreadcrumbMutator {
    * @return $this
    *   Self for chaining.
    */
-  public function atEnd() {
+  public function atEnd(): self {
     $this->position = self::END;
 
     return $this;
@@ -151,7 +171,7 @@ final class BreadcrumbMutator {
    * @return $this
    *   Self for chaining.
    */
-  public function after(int $position) {
+  public function after(int $position): self {
     $this->validatePosition($position);
 
     return $this;
@@ -166,7 +186,7 @@ final class BreadcrumbMutator {
    * @return $this
    *   Self for chaining.
    */
-  public function before(int $position) {
+  public function before(int $position): self {
     $this->validatePosition($position - 1);
 
     return $this;
@@ -175,7 +195,7 @@ final class BreadcrumbMutator {
   /**
    * Remove link at current position.
    */
-  public function removeLink() {
+  public function removeLink(): self {
     if ($this->position === self::END) {
       array_pop($this->links);
     }
@@ -194,7 +214,7 @@ final class BreadcrumbMutator {
    *
    * @return $this
    */
-  public function replaceLink(Link $link) {
+  public function replaceLink(Link $link): self {
     $position = $this->position === self::END ? count($this->links) - 1 : $this->position;
     $this->links[$position] = $link;
 
@@ -243,7 +263,7 @@ final class BreadcrumbMutator {
    * @see self::before
    * @see self::after
    */
-  public function addLink(Link $link) {
+  public function addLink(Link $link): self {
     if ($this->position === self::END) {
       $this->links[] = $link;
     }
@@ -265,7 +285,7 @@ final class BreadcrumbMutator {
    * @throws \OutOfRangeException
    *   If the position is invalid.
    */
-  private function validatePosition(int $position) {
+  private function validatePosition(int $position): self {
     if ($position > ($c = count($this->links))) {
       throw new \OutOfRangeException("\$position cannot be greater than %s", $c);
     }
