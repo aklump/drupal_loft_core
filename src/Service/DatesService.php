@@ -5,6 +5,7 @@ namespace Drupal\loft_core\Service;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\datetime\Plugin\Field\FieldType\DateTimeItem;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\time_field\Time;
@@ -50,6 +51,34 @@ class DatesService {
     $value = $entity->get($field_name)->getValue();
     $value[0][$key] = $date->format($format);
     $entity->set($field_name, $value);
+  }
+
+  /**
+   * Helper to add properly formatted date queries based on field storage definition.
+   *
+   * @param \Drupal\Core\Entity\Query\QueryInterface $query
+   * @param string $field_name
+   * @param \Drupal\Core\Datetime\DrupalDateTime $date
+   * @param $operator
+   * @param bool $end_time
+   *
+   * @return \Drupal\loft_core\Service\DatesService
+   *   Self for chaining.
+   */
+  public function addEntityQueryDateCondition(QueryInterface $query, string $field_name, DrupalDateTime $date, $operator = NULL, bool $end_time = FALSE): self {
+    $definition = FieldStorageConfig::loadByName($query->getEntityTypeId(), $field_name);
+    $format = DateTimeItemInterface::DATETIME_STORAGE_FORMAT;
+    if ($definition->getSetting('datetime_type') === DateTimeItem::DATETIME_TYPE_DATE) {
+      $format = DateTimeItemInterface::DATE_STORAGE_FORMAT;
+    }
+    $date->setTimeZone(new \DateTimeZone(DateTimeItemInterface::STORAGE_TIMEZONE));
+    //    $key = $end_time ? 'end_value' : 'value';
+
+    $value = $date->format($format);
+
+    $query->condition($field_name, $value, $operator);
+
+    return $this;
   }
 
   /**
