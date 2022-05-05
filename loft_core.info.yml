@@ -2,7 +2,7 @@ name: 'Loft Core'
 description: 'Missing Drupal core functionality, IMHO.'
 package: 'In the Loft Studios'
 core_version_requirement: '^8 || ^9'
-version: 8.x-1.6.2
+version: 8.x-1.6.3
 php: '7.1'
 homepage: 'http://www.intheloftstudios.com/packages/drupal/drupal_loft_core'
 author: aklump
