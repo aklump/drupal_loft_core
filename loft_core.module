@@ -24,7 +24,7 @@ require_once dirname(__FILE__) . '/includes/loft_core.utilities.inc';
  * If $feature is not registered it defaults to live.
  *
  * @param string $feature The id of the feature as declared by
- *                        HOOK_loft_core_features_switch().
+ * HOOK_loft_core_code_release_info().
  *
  * @return bool
  */

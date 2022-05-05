@@ -149,7 +149,7 @@ final class AnnotatedResponse implements AnnotatedResponseInterface {
    * @return $this
    */
   public function addUserMessage(string $log_level, string $message, array $context = []): self {
-    $this->responseBody['user_message'][] = [
+    $this->responseBody['user_messages'][] = [
       'level' => $log_level,
       'message' => $message,
       'context' => $context,
