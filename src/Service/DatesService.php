@@ -13,8 +13,16 @@ use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
 
 class DatesService {
 
+  /**
+   * @string Date format based on ISO8601 for the date only, no time.
+   */
+  const ISO8601_DATE_ONLY = 'Y-m-d';
+
   protected $config;
 
+  /**
+   * @var \DateTimeZone
+   */
   protected $localTimeZone;
 
   public function __construct(ConfigFactoryInterface $config_factory) {
@@ -96,11 +104,7 @@ class DatesService {
    * @return \Drupal\Core\Datetime\DrupalDateTime
    */
   public function getUtcDateTimeByEntity(EntityInterface $entity, string $field_name, bool $end_time = FALSE): DrupalDateTime {
-    $value = $end_time ? 'end_value' : 'value';
-    $date_value = $entity->$field_name->$value;
-    $date = new DrupalDateTime($date_value, DateTimeItemInterface::STORAGE_TIMEZONE);
-
-    return $date->setTimeZone(new \DateTimeZone('UTC'));
+    return $this->_dateTimeFromField(timezone_open('UTC'), $entity, $field_name, $end_time);
   }
 
   /**
@@ -113,9 +117,7 @@ class DatesService {
    * @return \Drupal\Core\Datetime\DrupalDateTime
    */
   public function getLocalDateTimeByEntity(EntityInterface $entity, string $field_name, bool $end_time = FALSE): DrupalDateTime {
-    $date = $this->getUtcDateTimeByEntity($entity, $field_name, $end_time);
-
-    return $date->setTimeZone($this->localTimeZone);
+    return $this->_dateTimeFromField($this->localTimeZone, $entity, $field_name, $end_time);
   }
 
   /**
@@ -139,10 +141,11 @@ class DatesService {
   }
 
   /**
-   * Returns date object with time set to 00:00:00 or 23:59:59.
+   * Returns date with local time set to 00:00:00 or 23:59:59 then converted to UTC.
    *
-   * The date portion is pulled from the field entity, but the time is ignored.
-   * If $end_time is true then the time value is set to 23:59:59.
+   * 1. The date is loaded from the entity with it's configured timezone.
+   * 1. The time value is set to 0 or 23:59:59, depending on $end_time
+   * 1. The timezone is set to UTC.
    *
    * @param \Drupal\Core\Entity\EntityInterface $entity
    * @param string $field_name
@@ -150,8 +153,8 @@ class DatesService {
    *
    * @return \Drupal\Core\Datetime\DrupalDateTime
    */
-  public function getUtcDrupalDateTimeWithExtremeTimeByEntity(EntityInterface $entity, string $field_name, bool $end_time = FALSE): DrupalDateTime {
-    $date = $this->getUtcDateTimeByEntity($entity, $field_name, $end_time);
+  public function getLocalDateWithExtremeTimeByEntity(EntityInterface $entity, string $field_name, bool $end_time = FALSE): DrupalDateTime {
+    $date = $this->getLocalDateTimeByEntity($entity, $field_name, $end_time);
     if ($end_time) {
       return $date->setTime(23, 59, 59);
     }
@@ -191,5 +194,28 @@ class DatesService {
     return new DrupalDateTime($datetime, $this->localTimeZone);
   }
 
+  /**
+   * Internal helper to get object from entity field in a target timezone.
+   *
+   * @param \DateTimeZone $target
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param string $field_name
+   * @param bool $end_time
+   *
+   * @return \Drupal\Core\Datetime\DrupalDateTime
+   */
+  private function _dateTimeFromField(\DateTimeZone $target, EntityInterface $entity, string $field_name, bool $end_time = FALSE): DrupalDateTime {
+    $value = $end_time ? 'end_value' : 'value';
+    $date_value = $entity->$field_name->$value;
+    $definition = FieldStorageConfig::loadByName($entity->getEntityTypeId(), $field_name);
+    $supports_time = $definition->getSetting('datetime_type') === DateTimeItem::DATETIME_TYPE_DATETIME;
+    if ($supports_time) {
+      $date = new DrupalDateTime($date_value, DateTimeItemInterface::STORAGE_TIMEZONE);
+
+      return $date->setTimeZone($target);
+    }
+
+    return new DrupalDateTime($date_value, $target);
+  }
 
 }
