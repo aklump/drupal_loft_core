@@ -90,7 +90,7 @@ final class AnnotatedResponse implements AnnotatedResponseInterface {
    *
    * @return $this
    */
-  public function setResult(string $result): self {
+  public function setResult(string $result): AnnotatedResponseInterface {
     if (strlen($result) > 30) {
       throw new \InvalidArgumentException('The length may not exceed 30 characters');
     }
@@ -107,7 +107,7 @@ final class AnnotatedResponse implements AnnotatedResponseInterface {
    * @return $this
    *   Self for chaining.
    */
-  public function setHttpStatus(int $code): self {
+  public function setHttpStatus(int $code): AnnotatedResponseInterface {
     if (empty($this->responseBody['result'])) {
       $this->setResult(substr($code, 0, 1) == 2 ? 'succeeded' : 'failed');
       if ($code == Response::HTTP_CREATED) {
@@ -132,7 +132,7 @@ final class AnnotatedResponse implements AnnotatedResponseInterface {
    *
    * @return $this
    */
-  public function setMessage(string $message): self {
+  public function setMessage(string $message): AnnotatedResponseInterface {
     $this->responseBody['message'] = $message;
 
     return $this;
@@ -148,7 +148,7 @@ final class AnnotatedResponse implements AnnotatedResponseInterface {
    *
    * @return $this
    */
-  public function addUserMessage(string $log_level, string $message, array $context = []): self {
+  public function addUserMessage(string $log_level, string $message, array $context = []): AnnotatedResponseInterface {
     $this->responseBody['user_messages'][] = [
       'level' => $log_level,
       'message' => $message,
@@ -165,7 +165,7 @@ final class AnnotatedResponse implements AnnotatedResponseInterface {
    * @return $this
    *   Self for chaining.
    */
-  public function setData(array $data): self {
+  public function setData(array $data): AnnotatedResponseInterface {
     $this->responseBody['data'] = $data;
 
     return $this;
