@@ -12,72 +12,74 @@ use Drupal\loft_core\Loft;
 final class EntityReferenceFinder {
 
   /**
-   * @var \Drupal\Core\Field\EntityReferenceFieldItemListInterface
+   * @var \Drupal\Core\Entity\EntityInterface
    */
-  private $list;
+  private $entity;
 
   /**
-   * @param \Drupal\Core\Field\EntityReferenceFieldItemListInterface $list
+   * @var string
    */
-  public function __construct(EntityReferenceFieldItemListInterface $list) {
-    $this->list = $list;
+  private $fieldName;
+
+  /**
+   * @param EntityInterface $entity
+   * @param string $field_name
+   *   The field name to recurse with.
+   */
+  public function __construct(EntityInterface $entity, string $field_name) {
+    $this->entity = $entity;
+    $this->fieldName = $field_name;
   }
 
   /**
    * Find all ancestor relationships sharing the same field.
    *
-   * @return \Drupal\Core\Field\EntityReferenceFieldItemListInterface
+   * @return int[]
    *   A new instance with all ancestors included.
    */
-  public function withAllAncestors(): EntityReferenceFieldItemListInterface {
+  public function getEntityIdsReferencingThis(): array {
     return $this->find(TRUE, FALSE);
   }
 
   /**
    * Find all child relationships sharing the same field.
    *
-   * @return \Drupal\Core\Field\EntityReferenceFieldItemListInterface
+   * @return int[]
    *   A new instance with all children included.
    */
-  public function withAllChildren(): EntityReferenceFieldItemListInterface {
+  public function getEntityIdsThisReferences(): array {
     return $this->find(FALSE, TRUE);
   }
 
   /**
    * Find all ancestor and child relationships sharing the same field.
    *
-   * @return \Drupal\Core\Field\EntityReferenceFieldItemListInterface
+   * @return int[]
    *   A new instance with all children and ancestors included.
    */
-  public function withAllRelatives(): EntityReferenceFieldItemListInterface {
+  public function getEntityIdsOfAllReferences(): array {
     return $this->find(TRUE, TRUE);
   }
 
-  private function find(bool $ancestors, bool $children) {
-    $id = $this->list->getEntity()->id();
+  private function find(bool $inbound, bool $outbound) {
     $context = [
-      'field_name' => $this->list->getFieldDefinition()->getName(),
-      'ids' => [$id],
-      'list' => [['target_id' => $id]],
-    ];
-    if ($children) {
-      $this->findChildren($this->list->getValue(), $context);
-    }
-    if ($ancestors) {
-      $this->findAncestors($this->list->getEntity(), $context);
-    }
 
-    uasort($context['list'], function ($a, $b) {
-      return $a['target_id'] - $b['target_id'];
+      // We ignore the id that was used to begin the search.  The caller can add
+      // this in if it wants.
+      'ignore' => [$this->entity->id()],
+      'ids' => [],
+    ];
+    if ($outbound) {
+      $this->findOutboundReferences([$this->entity->id()], $context);
+    }
+    if ($inbound) {
+      $this->findInboundReferences($this->entity, $context);
+    }
+    uasort($context['ids'], function ($a, $b) {
+      return $a - $b;
     });
 
-    $list = clone $this->list;
-    $list->filter('is_null');
-    foreach ($context['list'] as $item) {
-      $list->appendItem($item['target_id']);
-    }
-
-    return $list;
+    return $context['ids'];
   }
 
   /**
@@ -90,37 +92,34 @@ final class EntityReferenceFinder {
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
-  private function findAncestors(EntityInterface $target_entity, array &$context): void {
-    $ancestors = Loft::entityReverseReference($target_entity, [$context['field_name']], $target_entity->getEntityTypeId());
-    foreach ($ancestors as $ancestor) {
-      if (!in_array($ancestor->id(), $context['ids'])) {
-        $context['ids'][] = $ancestor->id();
-        $context['list'][] = ['target_id' => $ancestor->id()];
-        $this->findAncestors($ancestor, $context);
+  private function findInboundReferences(EntityInterface $target_entity, array &$context): void {
+    $inbound = Loft::entityReverseReference($target_entity, [$this->fieldName], $target_entity->getEntityTypeId());
+    foreach ($inbound as $ancestor) {
+      if (!in_array($ancestor->id(), $context['ignore'])) {
+        $context['ignore'][] = $ancestor->id();
+        $context['ids'][] = intval($ancestor->id());
+        $this->findInboundReferences($ancestor, $context);
       }
     }
   }
 
-  /**
-   * Search out all dependent equipment IDs and present as one array.
-   *
-   * @param $value
-   *   An array as coming from field_equipment->getValue(), where each item is
-   *   an array with the key "target_id".
-   * @param array $context
-   */
-  private function findChildren($value, array &$context): void {
+  private function findOutboundReferences($value, array &$context): void {
     if (is_array($value) and !empty($value)) {
-      foreach (array_keys($value) as $k) {
+      foreach ($value as $id) {
         $node = \Drupal::entityTypeManager()
           ->getStorage('node')
-          ->load($value[$k]['target_id']);
-        if (!in_array($value[$k]['target_id'], $context['ids'])) {
-          $context['ids'][] = $value[$k]['target_id'];
-          $context['list'][] = ['target_id' => $value[$k]['target_id']];
+          ->load($id);
+        if (!in_array($id, $context['ignore'])) {
+          $context['ignore'][] = $id;
+          $context['ids'][] = intval($id);
         }
-        $v = $node->{$context['field_name']}->getValue();
-        $this->findChildren($v, $context);
+        $list = $node->{$this->fieldName};
+        if ($list) {
+          $v = array_map(function ($item) {
+            return $item['target_id'];
+          }, $list->getValue());
+          $this->findOutboundReferences($v, $context);
+        }
       }
     }
   }
