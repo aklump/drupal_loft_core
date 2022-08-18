@@ -118,6 +118,10 @@ final class EntityReferenceFinder {
           $v = array_map(function ($item) {
             return $item['target_id'];
           }, $list->getValue());
+
+          // This will prevent infinite recursion.
+          $v = array_diff($v, $context['ignore']);
+
           $this->findOutboundReferences($v, $context);
         }
       }
