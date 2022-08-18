@@ -75,11 +75,11 @@ final class EntityReferenceFinder {
     if ($inbound) {
       $this->findInboundReferences($this->entity, $context);
     }
-    uasort($context['ids'], function ($a, $b) {
+    usort($context['ids'], function ($a, $b) {
       return $a - $b;
     });
 
-    return $context['ids'];
+    return ['node' => $context['ids']];
   }
 
   /**
