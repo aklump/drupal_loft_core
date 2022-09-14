@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [1.7] - 2022-05-18
 
+### Changed
+
+- `Cypress::with('0')` will now print `0` in the element portion instead of dropping. Before the output was `foo`; now the output is `foo__0`.
+
 ### Removed
 
 - HtmlDomParser library (sunra/php-simple-html-dom-parser)
