@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>User Persistent Dismiss</title>
+  <link href="search/tipuesearch.css" rel="stylesheet">
+  <link href="style.css" rel="stylesheet">
+</head>
+
+<body class="page--user-persistent-dismiss">
+<header>
+  <div class="pager"><a href="testing.html" class="prev testing">&laquo;Testing</a><a href="index.html" class="index pager__book-title">Loft Drupal Core</a><a href="vimeo.html" class="next vimeo">Vimeo&raquo;</a></div></header>
+<section class="sub-header">
+  <div class="breadcrumbs"><a href="index.html">Index</a>
+         &raquo
+      </div>      <div class="search__wrapper">
+  <form action="search--results.html">
+    <input type="text" class="search-input" name="q" id="tipue_search_input" autocomplete="off" required>
+  </form>
+</div>
+  </section>
+
+<section>
+  <h1>User Persistent Dismiss</h1>
+  
+
+<p>This API provides a means of clicking and element and remembering that it was clicked so that element can be hidden on next page visit.</p>
+
+<p>An example of this is a popup modal that should hide for 1 month when it's closed.</p>
+
+<p>Implementation code follows:</p>
+
+<h2>Block Scenario</h2>
+
+<p>This example shows how to use this API to track the appearance of a Drupal block.</p>
+
+<h3>Access Check</h3>
+
+<pre><code class="php">function my_module_block_access(\Drupal\block\Entity\Block $block, $operation, \Drupal\Core\Session\AccountInterface $account) {
+  list($provider, $uuid) = explode(':', $block-&gt;getPluginId() . ':');
+
+  // First check that we have a block_content entity...
+  if ('view' === $operation &amp;&amp; 'block_content' === $provider) {
+    $block_content = array_values(\Drupal::entityTypeManager()
+        -&gt;getStorage('block_content')
+        -&gt;loadByProperties([
+          'uuid' =&gt; $uuid,
+        ]))[0] ?? NULL;
+
+    // ... then check if it's the bundle we want to track.
+    if ('foobar' === $block_content-&gt;bundle()) {
+      $dismiss = new \Drupal\loft_core\Utility\UserPersistentDismiss($block-&gt;getPluginId());
+      if ($dismiss-&gt;isDismissed()) {
+        return \Drupal\Core\Access\AccessResult::forbidden('Cookie exists with previous dismissal.');
+      }
+    }
+  }
+
+  // No opinion.
+  return \Drupal\Core\Access\AccessResult::neutral();
+}
+</code></pre>
+
+<h3>Block Build</h3>
+
+<pre><code class="php">function my_module_block_content_view_alter(array &amp;$build, \Drupal\Core\Entity\EntityInterface $entity, \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display) {
+  if ($entity-&gt;bundle() == 'foobar') {
+    $dismiss = new \Drupal\loft_core\Utility\UserPersistentDismiss($entity-&gt;getEntityTypeId() . ':' . $entity-&gt;uuid());
+    $build['close_button']['#attributes'] += $dismiss-&gt;getJavascriptDismiss()-&gt;toArray();
+    $dismiss-&gt;applyTo($build);
+  }
+}
+</code></pre>
+
+</section>
+
+<div class="search__results">
+  <div id="tipue_search_content"></div>
+</div>
+
+<footer>
+  <div class="pager"><a href="testing.html" class="prev testing">&laquo;Testing</a><a href="index.html" class="index pager__book-title">Loft Drupal Core</a><a href="vimeo.html" class="next vimeo">Vimeo&raquo;</a></div>  
+  <div id="footer-legaleeze">
+    <p class="legaleeze center">Version: 1.0 &bull; Last Updated: Wed, 21 Sep 2022 20:30:17 -0700</p>
+  </div>
+</footer>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script src="search/tipuesearch_content.js"></script>
+  <script src="search/tipuesearch_set.js"></script>
+  <script src="search/tipuesearch.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      $('#tipue_search_input').tipuesearch()
+    })
+  </script>
+<script src="js/core.js"></script>
+</body>
+</html>
