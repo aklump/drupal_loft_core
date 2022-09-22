@@ -60,7 +60,12 @@ final class Cypress {
     if (is_null($this->targetElement)) {
       throw new \RuntimeException("You must call ::tag() first.");
     }
-    $test_id = $this->bemElement($element);
+    if (empty($element) && !is_numeric($element)) {
+      $test_id = $this->bemBlock();
+    }
+    else {
+      $test_id = $this->bemElement($element);
+    }
     if (is_array($this->targetElement)) {
 
       // We assume we have a render array.
