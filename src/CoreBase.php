@@ -63,9 +63,10 @@ abstract class CoreBase implements CoreInterface {
    *   An array that will receive $key as an attribute instance.
    * @param string $key
    *   Defaults to '#attributes'.
-   * @param null $attribute_classname
+   * @param null|string|object $attribute_classname
    *   You may pass an alternative classname to use, e.g.,
-   *   \Drupal\loft_core\Attribute.
+   *   \Drupal\loft_core\Attribute or an instance of a class that will be used
+   *   to determine the classname (the instance will not be used).
    *
    * @return \Drupal\Core\Template\Attribute
    *   The attribute instance at $key so you can call methods in one line.
@@ -75,11 +76,14 @@ abstract class CoreBase implements CoreInterface {
    *     ->addClass('js-autofocus');
    * @endcode
    */
-  public static function ensureAttribute(array &$element, $key = '#attributes', $attribute_classname = NULL) {
+  public static function ensureAttribute(array &$element, $key = '#attributes', $attribute_class = NULL) {
     $element[$key] = $element[$key] ?? [];
     if (is_array($element[$key])) {
-      $attribute_classname = $attribute_classname ?? Attribute::class;
-      $element[$key] = new $attribute_classname($element[$key]);
+      $attribute_class = $attribute_class ?? Attribute::class;
+      if (is_object($attribute_class)) {
+        $attribute_class = get_class($attribute_class);
+      }
+      $element[$key] = new $attribute_class($element[$key]);
     }
 
     return $element[$key];
