@@ -22,7 +22,7 @@ use Drupal\Core\Template\Attribute;
  */
 final class Cypress {
 
-  use \Drupal\front_end_components\BemTrait;
+  use \Drupal\front_end_components\Traits\BemTrait;
 
   /**
    * @var string
