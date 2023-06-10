@@ -1,40 +1,35 @@
 {
-    "license": "GPL-2.0-or-later",
-    "name": "drupal/loft_core",
-    "description": "Additional Drupal toolbox and features.",
-    "type": "drupal-custom-module",
-    "authors": [
-        {
-            "name": "aklump",
-            "email": "sourcecode@intheloftstudios.com"
-        }
-    ],
-    "repositories": [
-        {
-"type": "path", "url": "/Users/aklump/Code/Packages/php/bem"
-        }
-    ],
-    "require": {
-        "aklump/loft-lib": "^1",
-        "vlucas/phpdotenv": "^2.4",
-        "league/color-extractor": "^0.3.2",
-        "vimeo/vimeo-api": "^3.0",
-        "owen-oj/laravel-getid3": "^1.3",
-        "clwu/php-read-mp4info": "^2.0",
-        "aklump/bem": "^0.0.0"
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Drupal\\loft_core\\": [
-                "src/",
-                "tests/src/"
-            ],
-            "Drupal\\loft_core_testing\\": [
-                "modules/loft_core_testing/src/"
-            ],
-            "Drupal\\loft_core_users\\": [
-                "modules/loft_core_users/src/"
-            ]
-        }
+  "license": "GPL-2.0-or-later",
+  "name": "drupal/loft_core",
+  "description": "Additional Drupal toolbox and features.",
+  "type": "drupal-custom-module",
+  "authors": [
+    {
+      "name": "aklump",
+      "email": "sourcecode@intheloftstudios.com"
     }
+  ],
+  "require": {
+    "aklump/loft-lib": "^1",
+    "vlucas/phpdotenv": "^2.4",
+    "league/color-extractor": "^0.3.2",
+    "vimeo/vimeo-api": "^3.0",
+    "owen-oj/laravel-getid3": "^1.3",
+    "clwu/php-read-mp4info": "^2.0",
+    "aklump/bem": "^0.0.0"
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Drupal\\loft_core\\": [
+        "src/",
+        "tests/src/"
+      ],
+      "Drupal\\loft_core_testing\\": [
+        "modules/loft_core_testing/src/"
+      ],
+      "Drupal\\loft_core_users\\": [
+        "modules/loft_core_users/src/"
+      ]
+    }
+  }
 }

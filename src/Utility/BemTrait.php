@@ -2,6 +2,8 @@
 
 namespace Drupal\loft_core\Utility;
 
+use AKlump\Bem\Fluent\Bem;
+
 /**
  * Trait BemTrait handles block/element/modifier CSS.
  *
@@ -14,8 +16,7 @@ namespace Drupal\loft_core\Utility;
  *   }
  * @endcode
  *
- * @deprecated Use \Drupal\front_end_components\BemTrait instead and declare a
- *   dependency on that module.
+ * @deprecated See https://packagist.org/packages/aklump/bem for replacement options.
  */
 trait BemTrait {
 
@@ -37,9 +38,9 @@ trait BemTrait {
    *   The element string.
    */
   public function bemElement(string $suffix): string {
-    list($callback) = loft_core_bem($this->bemBlock());
+    $bem = new Bem($this->bemBlock());
 
-    return $callback($suffix);
+    return $bem->element($suffix);
   }
 
   /**
@@ -52,9 +53,9 @@ trait BemTrait {
    *   The modifier string.
    */
   public function bemModifier(string $suffix): string {
-    list(, $callback) = loft_core_bem($this->bemBlock());
+    $bem = new Bem($this->bemBlock());
 
-    return $callback($suffix);
+    return $bem->block()->modifier($suffix);
   }
 
 }

@@ -5,6 +5,7 @@
  * Utility functions.
  */
 
+use AKlump\Bem\Fluent\Bem;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Url;
 
@@ -232,19 +233,27 @@ function loft_core_taxonomy_unique(array $items) {
  *
  * @return callable
  *
- * @deprecated Use loft_core_bem() instead.
+ * @deprecated See https://packagist.org/packages/aklump/bem for replacement.
  */
 function loft_core_cl($base, $pass_through = FALSE) {
   if (!$pass_through) {
     $base = preg_replace('/[_ ]/', '-', $base);
   }
+  $bem = new Bem($base);
 
-  return function ($name = '', $isComponent = TRUE) use ($base) {
-    $names = is_array($name) ? $name : [$name];
-    $glue = $isComponent ? '_' : '-';
+  return function ($value = '', $is_element = TRUE) use ($bem) {
+    $values = is_array($value) ? $value : [$value];
     $classes = [];
-    foreach ($names as $name) {
-      $classes[] = $base . ($name ? str_repeat($glue, 2) . $name : '');
+    foreach ($values as $value) {
+      if (!$value) {
+        $classes[] = $bem->block()->toString();
+      }
+      elseif ($is_element) {
+        $classes[] = $bem->element($value)->toString();
+      }
+      else {
+        $classes[] = $bem->block()->modifier($value)->toString();
+      }
     }
 
     return implode(' ', $classes);
@@ -439,20 +448,21 @@ function loft_core_min_weight($render_array) {
  * @code
  *   list($bem, $bem_mod) = loft_core_bem('resource-hero');
  * @endcode
+ *
+ * @deprecated See https://packagist.org/packages/aklump/bem for replacement.
  */
 function loft_core_bem(string $block): array {
-
-  // Single underscores should not exist in a block name.
-  if (preg_match('/[^_]_[^_]/', $block)) {
+  $bem = new Bem($block);
+  if ($bem->block()->toString() !== $block) {
     throw new \InvalidArgumentException("This BEM block name contains invalid characters: \"$block\".");
   }
 
   return [
-    function ($element = '') use ($block) {
-      return $element ? $block . '__' . $element : $block;
+    function ($element = '') use ($bem) {
+      return $element ? $bem->element($element) : $bem->block();
     },
-    function ($modifier = '') use ($block) {
-      return $modifier ? $block . '--' . $modifier : $block;
+    function ($modifier = '') use ($bem) {
+      return $modifier ? $bem->block()->modifier($modifier) : $bem->block();
     },
   ];
 }
