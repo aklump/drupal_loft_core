@@ -2,6 +2,7 @@
 
 namespace Drupal\loft_core\Utility;
 
+use AKlump\Bem\Fluent\Bem;
 use Drupal\Core\Template\Attribute;
 
 /**
@@ -21,8 +22,6 @@ use Drupal\Core\Template\Attribute;
  * @link https://www.cypress.io/
  */
 final class Cypress {
-
-  use \Drupal\front_end_components\Traits\BemTrait;
 
   /**
    * @var string
@@ -60,11 +59,13 @@ final class Cypress {
     if (is_null($this->targetElement)) {
       throw new \RuntimeException("You must call ::tag() first.");
     }
+
+    $bem = new Bem($this->block);
     if (empty($element) && !is_numeric($element)) {
-      $test_id = $this->bemBlock();
+      $test_id = $bem->block()->toString();
     }
     else {
-      $test_id = $this->bemElement($element);
+      $test_id = $bem->element($element)->toString();
     }
     if (is_array($this->targetElement)) {
 
@@ -97,13 +98,6 @@ final class Cypress {
     $this->targetElement =& $targetElement;
 
     return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function bemBlock(): string {
-    return $this->block;
   }
 
 }

@@ -459,10 +459,10 @@ function loft_core_bem(string $block): array {
 
   return [
     function ($element = '') use ($bem) {
-      return $element ? $bem->element($element) : $bem->block();
+      return strval($element ? $bem->element($element) : $bem->block());
     },
     function ($modifier = '') use ($bem) {
-      return $modifier ? $bem->block()->modifier($modifier) : $bem->block();
+      return strval($modifier ? $bem->block()->modifier($modifier) : $bem->block());
     },
   ];
 }
