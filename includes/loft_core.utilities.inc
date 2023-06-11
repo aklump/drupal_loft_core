@@ -6,6 +6,7 @@
  */
 
 use AKlump\Bem\Fluent\Bem;
+use AKlump\Bem\Styles\OfficialPassThrough;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Url;
 
@@ -239,7 +240,7 @@ function loft_core_cl($base, $pass_through = FALSE) {
   if (!$pass_through) {
     $base = preg_replace('/[_ ]/', '-', $base);
   }
-  $bem = new Bem($base);
+  $bem = new Bem($base, NULL, new OfficialPassThrough());
 
   return function ($value = '', $is_element = TRUE) use ($bem) {
     $values = is_array($value) ? $value : [$value];
@@ -462,7 +463,8 @@ function loft_core_bem(string $block): array {
       return strval($element ? $bem->element($element) : $bem->block());
     },
     function ($modifier = '') use ($bem) {
-      return strval($modifier ? $bem->block()->modifier($modifier) : $bem->block());
+      return strval($modifier ? $bem->block()
+        ->modifier($modifier) : $bem->block());
     },
   ];
 }

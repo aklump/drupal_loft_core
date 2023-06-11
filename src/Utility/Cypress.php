@@ -3,6 +3,7 @@
 namespace Drupal\loft_core\Utility;
 
 use AKlump\Bem\Fluent\Bem;
+use AKlump\Bem\Styles\OfficialPassThrough;
 use Drupal\Core\Template\Attribute;
 
 /**
@@ -60,7 +61,7 @@ final class Cypress {
       throw new \RuntimeException("You must call ::tag() first.");
     }
 
-    $bem = new Bem($this->block);
+    $bem = new Bem($this->block, NULL, new OfficialPassThrough());
     if (empty($element) && !is_numeric($element)) {
       $test_id = $bem->block()->toString();
     }
