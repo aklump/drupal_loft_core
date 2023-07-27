@@ -12,6 +12,9 @@ use Drupal\filter\Plugin\FilterBase;
  *   description = @Translation("Replaces the final space in a string with &nbps; to prevent single-word orphans."),
  *   type = Drupal\filter\Plugin\FilterInterface::TYPE_MARKUP_LANGUAGE,
  * )
+ * 
+ * @deprecated Use drupal/runts_filter instead.
+ * @url https://github.com/aklump/drupal_runts_filter
  */
 class NoOrphansFilter extends FilterBase {
 
