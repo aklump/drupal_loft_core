@@ -1,0 +1,8 @@
+name: 'Loft Core Test Classes'
+description: 'Adds test classes to various elements, like forms and entities.'
+package: 'In the Loft Studios'
+core_version_requirement: ^8 || ^9
+php: '7.1'
+dependencies:
+  loft_core: 'drupal:loft_core'
+type: module

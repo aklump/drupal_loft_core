@@ -1,0 +1,12 @@
+'access raw static content':
+  'restrict access': true
+  title: 'Access raw static content'
+  description: 'Allow user to access static content files directly.'
+
+loft_core access permalink tab:
+  title: 'Access permalink tab'
+  description: 'Allow user to access the share link tab for pages.'
+
+loft_core access local link tab:
+  title: 'Access local link tab'
+  description: 'Allow user to access the copy link tab for pages.'

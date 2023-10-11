@@ -1,0 +1,11 @@
+name = "Loft Core Users"
+description = "Submodule augments user tracking and SPAM control options"
+package = Other
+version = 7.x-1.0
+core = 7.x
+php = 5.3
+configure = admin/config/people/loft-core-users
+author = aklump
+
+; Views handlers
+files[] = includes/views/handlers/views_handler_field_loft_core_users.inc

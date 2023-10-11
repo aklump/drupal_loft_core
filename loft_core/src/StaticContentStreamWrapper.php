@@ -1,0 +1,55 @@
+<?php
+
+namespace Drupal\loft_core;
+
+use DrupalLocalStreamWrapper;
+
+/**
+ * Provide a stream wrapper to load static content.
+ *
+ * An example of static content is an HTML document that lays out the terms of
+ * service, which you do not want exposed to the Drupal node system, but rather
+ * is programmatically appended to a page.  The static content should be added
+ * to SCM as well.
+ */
+class StaticContentStreamWrapper extends DrupalLocalStreamWrapper {
+
+  /**
+   * The base URL for static content when creating public URLs.
+   *
+   * @var string
+   */
+  const URL_BASE = 'system/content';
+
+  /**
+   * The default system path to static content files relative to \Drupal::root().
+   *
+   * @var string
+   */
+  const DEFAULT_PATH = '../private/default/content';
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getDirectoryPath() {
+    // @FIXME
+// // @FIXME
+// // This looks like another module's variable. You'll need to rewrite this call
+// // to ensure that it uses the correct configuration object.
+// return rtrim(variable_get('file_static_content_path', \Drupal::root() . '/' . self::DEFAULT_PATH), '/') . '/';
+
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getExternalUrl() {
+    $path = str_replace('\\', '/', $this->getTarget());
+
+    // @FIXME
+// url() expects a route name or an external URI.
+// return url(self::URL_BASE . "/$path", array('absolute' => TRUE));
+
+  }
+
+}

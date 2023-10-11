@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>Database</title>
+  <link href="search/tipuesearch.css" rel="stylesheet">
+  <link href="style.css" rel="stylesheet">
+</head>
+
+<body class="page--database">
+<header>
+  <div class="pager"><a href="README.html" class="prev README">&laquo;Loft Core</a><a href="index.html" class="index pager__book-title">Loft Drupal Core</a><a href="forms.html" class="next forms">Forms API&raquo;</a></div></header>
+<section class="sub-header">
+  <div class="breadcrumbs"><a href="index.html">Index</a>
+         &raquo
+      </div>      <div class="search__wrapper">
+  <form action="search--results.html">
+    <input type="text" class="search-input" name="q" id="tipue_search_input" autocomplete="off" required>
+  </form>
+</div>
+  </section>
+
+<section>
+  <h1>Database</h1>
+  
+
+<h2>loft_core_users</h2>
+
+<p>This table augments the <code>users</code> table.  By design, when a user is deleted, their associated record in this table remains; this is because thier information may be used to fight SPAM.</p>
+
+<h3><code>loft_core_users.status</code></h3>
+
+<p>This column shows if a user has been blocked as a robotrap.</p>
+
+</section>
+
+<div class="search__results">
+  <div id="tipue_search_content"></div>
+</div>
+
+<footer>
+  <div class="pager"><a href="README.html" class="prev README">&laquo;Loft Core</a><a href="index.html" class="index pager__book-title">Loft Drupal Core</a><a href="forms.html" class="next forms">Forms API&raquo;</a></div>  
+  <div id="footer-legaleeze">
+    <p class="legaleeze center">Version: 1.0 &bull; Last Updated: Mon, 09 Oct 2023 14:51:58 -0700</p>
+  </div>
+</footer>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script src="search/tipuesearch_content.js"></script>
+  <script src="search/tipuesearch_set.js"></script>
+  <script src="search/tipuesearch.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      $('#tipue_search_input').tipuesearch()
+    })
+  </script>
+<script src="js/core.js"></script>
+</body>
+</html>

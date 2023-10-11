@@ -1,0 +1,8 @@
+master: 8.x-1.x
+remote: origin
+create_tags: patch
+push_tags: auto
+push_master: auto
+push_develop: no
+patch_prefix: .
+version_file: loft_core.info.yml

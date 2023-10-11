@@ -1,0 +1,14 @@
+loft_core.node.local_link:
+  route_name: loft_core.node.local_link
+  base_route: entity.node.canonical
+  title: Copy link
+  # Using a weight of  1 is based on the fact that view, edit are 0 as defined
+  # in in node.links.task.yml, and the assumption is that is still true, hence
+  # locating these just to the right .
+  weight: 1
+
+loft_core.node.permalink:
+  route_name: loft_core.node.permalink
+  base_route: entity.node.canonical
+  title: Share link
+  weight: 1

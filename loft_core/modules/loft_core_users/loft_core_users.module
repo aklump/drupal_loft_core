@@ -1,0 +1,672 @@
+<?php
+/**
+ * @file
+ * Base file for the loft_core_users module.
+ *
+ * @defgroup loft_core_users Loft Core Users
+ * @{
+ */
+
+use Drupal\loft_core_users\Utility\LoftCoreUsers;
+
+/**
+ * Default setting for storing authenticated user IPs.
+ *
+ * @var LOFT_CORE_USERS_STORE_AUTHENTICATED_IPS
+ */
+define('LOFT_CORE_USERS_STORE_AUTHENTICATED_IPS', FALSE);
+
+/**
+ * How many days to remember the user as a cookie.
+ *
+ * @var LOFT_CORE_USERS_REMEMBER_USER_FOR_DAYS
+ */
+define('LOFT_CORE_USERS_REMEMBER_USER_FOR_DAYS', 90);
+
+/**
+ * The status value of a core blocked user.
+ */
+define('LOFT_CORE_USERS_STATUS_BLOCKED', 0);
+
+/**
+ * This account has no blocking flags.
+ */
+define('LOFT_CORE_USERS_STATUS_CLEAR', 1);
+
+/**
+ * This account was trapped as a robot.
+ */
+define('LOFT_CORE_USERS_STATUS_ROBOT', 2);
+
+/**
+ * This account was trapped by the honeypot module.
+ */
+define('LOFT_CORE_USERS_STATUS_HONEYBEAR', 3);
+
+/**
+ * This account was trapped by the honepot module then converted to SPAMMY.
+ */
+define('LOFT_CORE_USERS_STATUS_HONEYBEAR_MADE_SPAMMY', 34);
+
+/**
+ * For one reason or another this account appears spammy.
+ */
+define('LOFT_CORE_USERS_STATUS_SPAMMY', 4);
+
+/**
+ * Default minimum IP threshold.
+ *
+ * An ip must have at least this many loft_core_users_get_blocking_statuses()
+ * domains to appear in the apache snippet.
+ */
+define('LOFT_CORE_USERS_APACHE_MIN_DOMAINS_PER_IP_TO_LIST', 3);
+
+/**
+ * CSV list of domains to whitelist that cannot be blocked.
+ *
+ * No settings will override these domains; they will never be blacklisted.
+ *
+ * @var LOFT_CORE_USERS_DOMAIN_WHITELIST
+ *
+ * @see loft_core_users_get_domain_whitelist().
+ */
+define('LOFT_CORE_USERS_DOMAIN_WHITELIST', 'gmail.com,yahoo.com,mail.com,hotmail.com,aol.com');
+
+/**
+ * Return blocking statuses.
+ *
+ * @return array
+ *   All status codes that should block a user from the site.
+ */
+function loft_core_users_get_blocking_statuses() {
+  return [
+    LOFT_CORE_USERS_STATUS_BLOCKED,
+    LOFT_CORE_USERS_STATUS_ROBOT,
+    LOFT_CORE_USERS_STATUS_SPAMMY,
+    LOFT_CORE_USERS_STATUS_HONEYBEAR_MADE_SPAMMY,
+  ];
+}
+
+/**
+ * Return an array of domains that should not be blocked.
+ *
+ * @return
+ */
+function loft_core_users_get_domain_whitelist() {
+
+  // Module-defined, hardcoded domains that can never be blacklisted.
+  $whitelist = explode(',', trim(LOFT_CORE_USERS_DOMAIN_WHITELIST));
+
+  // This variable is modified when the admin form is submitted.
+  $whitelist = array_merge($whitelist, variable_get('loft_core_users_domain_whitelist', []));
+
+  // This CSV variable is not exposed in the UI and is meant to be used in your
+  // settings.php file for hard-coding values, something like this:
+  // $conf['loft_core_users_absolute_domain_whitelist'] = 'do.com,re.com'.
+  $whitelist = array_merge($whitelist, explode(',', trim(variable_get('loft_core_users_absolute_domain_whitelist'))));
+
+  $whitelist = array_unique(array_filter($whitelist));
+
+  return $whitelist;
+}
+
+/**
+ * Implements hook_module_implements_alter().
+ */
+function loft_core_users_module_implements_alter(&$implementations, $hook) {
+  if ($hook == 'user_restrictions_alter') {
+    // user_restrictions module overwrites our $error unless we call it first.
+    $group = $implementations['loft_core_users'];
+    unset($implementations['loft_core_users']);
+    $implementations['loft_core_users'] = $group;
+  }
+}
+
+/**
+ * Return the domain of an email address.
+ *
+ * @param string $email
+ *
+ * @return string
+ *
+ * @deprecated Use \Drupal\loft_core_users\Utility\Core instead.
+ */
+function _loft_core_users_get_email_domain($email) {
+  $core = new LoftCoreUsers();
+
+  return $core->getEmailDomain($email);
+}
+
+/**
+ * Block an authenticated user with (special) status.
+ *
+ * Drupal has a binary concept of blocking a user.  This module expands on this
+ * by adding different status reasons for blocking a user.  This function
+ * should be used when blocking the user as it will handle the extra work
+ * needed to track this non-binary status.  It leverages core as necessary.
+ *
+ * @param int $status
+ *   One of 1, 2, 3, 34, 4
+ * @param int $uid
+ *
+ * @throws \InvalidArgumentException If the status is not a valid status.
+ * @see loft_core_users_mark_user_spammy()
+ *
+ * @see LOFT_CORE_USERS_STATUS_*
+ *
+ */
+function loft_core_users_set_user_status($status, $uid) {
+  $valid = [
+    LOFT_CORE_USERS_STATUS_BLOCKED,
+    LOFT_CORE_USERS_STATUS_CLEAR,
+    LOFT_CORE_USERS_STATUS_ROBOT,
+    LOFT_CORE_USERS_STATUS_HONEYBEAR_MADE_SPAMMY,
+    LOFT_CORE_USERS_STATUS_HONEYBEAR,
+    LOFT_CORE_USERS_STATUS_SPAMMY,
+  ];
+  if (!in_array($status, $valid)) {
+    throw new \InvalidArgumentException("Status must be one of: " . implode(', ', $valid));
+  }
+
+  // We have to track statuses > 1 in our custom table.
+  if ($status > LOFT_CORE_USERS_STATUS_CLEAR) {
+    _loft_core_users_set_user_status($status, $uid, '');
+  }
+
+  // Status 1 means the user is no longer blocked.
+  if ($status == LOFT_CORE_USERS_STATUS_CLEAR) {
+    user_user_operations_unblock([$uid]);
+  }
+  else {
+    // Leverage core's blocking status.
+    $account = (object) [
+      'uid' => $uid,
+    ];
+    user_block_user_action($account);
+  }
+}
+
+/**
+ * Return current loft user status.
+ *
+ * If providiing $uid, that is all that is used.  Otherwise provide $uid, $mail
+ * and/or $ip.
+ *
+ * @param int $uid
+ * @param string $domain The domain (email is fine, but will be converted to
+ *                       domain).
+ * @param string $ip
+ *
+ * @return int|null
+ */
+function loft_core_users_get_user_status($uid = NULL, $domain = NULL, $ip = NULL) {
+  $status = NULL;
+  if ($uid !== NULL || $domain !== NULL || $ip !== NULL) {
+    $query = db_select('loft_core_users', 'lu')
+      ->fields('lu', ['status']);
+    if ($uid) {
+      $query->condition('uid', $uid);
+    }
+    else {
+      $query->condition('uid', $uid);
+      if (!is_null($domain)) {
+        $domain = _loft_core_users_get_email_domain($domain);
+        $query->condition('domain', $domain);
+      }
+      if (!is_null($ip)) {
+        $query->condition('ip', $ip);
+      }
+    }
+
+    try {
+      $result = $query->execute();
+      $status = $result->fetchField();
+    }
+    catch (Exception $e) {
+      watchdog_exception('loft_core_users', $e);
+    }
+  }
+
+  return is_numeric($status) ? intval($status) : NULL;
+}
+
+/**
+ * Set the Loft Core status of a user.
+ *
+ * You MUST update users.status separate; this module does not handle that.
+ *
+ * @param int $status
+ * @param int $uid
+ * @param string $mail email or domain.
+ * @param null|stringstring $ip
+ *
+ * @internal param $account
+ * @see      loft_core_users_set_user_status().
+ */
+function _loft_core_users_set_user_status($status, $uid, $mail, $ip = NULL) {
+  $status = intval($status);
+  $meta = [
+    'uid' => $uid,
+    'uid_init' => $uid,
+    'status' => $status,
+    'domain' => _loft_core_users_get_email_domain($mail),
+    'ip' => trim($ip),
+  ];
+  $meta = array_filter($meta, function ($value) {
+    return !is_null($value);
+  });
+
+  //
+  //
+  // Authenticated users
+  //
+  if ($uid) {
+    $query = db_select('loft_core_users', 'lu')
+      ->fields('lu', ['uid'])
+      ->condition('uid', $uid);
+    $exists = $query->execute()->fetchField();
+    $primary_key = 'uid';
+  }
+
+  //
+  //
+  // Anonymous users
+  //
+  else {
+    $exists = db_select('loft_core_users', 'lu')
+      ->condition('uid', 0)
+      ->condition('domain', $meta['domain'])
+      ->condition('ip', $meta['ip'])
+      ->countQuery()->execute()->fetchField();
+    $primary_key = ['uid', 'domain', 'ip'];
+  }
+  if ($exists) {
+    unset($meta['uid_init']);
+    drupal_write_record('loft_core_users', $meta, $primary_key);
+  }
+  else {
+    drupal_write_record('loft_core_users', $meta);
+  }
+
+  // Decide if we should auto ban this IP.
+  if (in_array($status, loft_core_users_get_blocking_statuses())
+    && variable_get('loft_core_users_auto_block_by_ip', TRUE)) {
+    $denied = (bool) db_query("SELECT 1 FROM {blocked_ips} WHERE ip = :ip", array(':ip' => $meta['ip']))->fetchField();
+    if (!$denied) {
+      $spammy_domains_by_ip = db_select('loft_core_users', 'lcu')
+        ->fields('lcu', array('domain'))
+        ->condition('ip', $meta['ip'])
+        ->condition('status', loft_core_users_get_blocking_statuses(), 'IN')
+        ->countQuery()
+        ->execute()
+        ->fetchField();
+      $min_count = variable_get('loft_core_users_apache_min_domains_per_ip_to_list', LOFT_CORE_USERS_APACHE_MIN_DOMAINS_PER_IP_TO_LIST);
+      if ($spammy_domains_by_ip && $spammy_domains_by_ip >= $min_count) {
+        db_insert('blocked_ips')
+          ->fields(array('ip' => $meta['ip']))
+          ->execute();
+      }
+    }
+  }
+}
+
+/**
+ * This can be used as an menu page callback to trap robots.
+ *
+ * The basic idea is that if a visitor hits an url that they shouldn't then by
+ * doing so they are exposing their nefarious intentions.  Their account will
+ * immediately be blocked and they are logged out.  Watchdog messages will show
+ * this has happened.
+ *
+ * To implement this feature, you need to modify a menu page callback.  And set
+ * this function as the page callback.  In this next example we are going to
+ * modify a node/add/user-collection to trap users.
+ *
+ * @code
+ *   if (isset($items['node/add/user-collection'])) {
+ *     array_unshift($items['node/add/user-collection']['page arguments'],
+ *     $items['node/add/user-collection']['page callback']);
+ *     $items['node/add/user-collection']['page callback'] =
+ *     'loft_core_users_robotrap_page_callback';
+ *   }
+ * @endcode
+ *
+ * You MUST implement hook_loft_core_users_robotrap_access().
+ * You MAY implement hook_loft_core_users_robotrap_goto_alter().
+ */
+function loft_core_users_robotrap_page_callback() {
+  global $user;
+  $args = func_get_args();
+  $callback = array_shift($args);
+  $context = [
+    'parent' => __FUNCTION__,
+    'account' => $user,
+    'page callback' => $callback,
+    'page arguments' => $args,
+  ];
+  $access = module_invoke_all('loft_core_users_robotrap_access', $context);
+  $access = end($access);
+  if (!$access) {
+    watchdog('loft core: robotrap', 'Robotrapped user %name', ['%name' => $user->name]);
+    loft_core_users_set_user_status(LOFT_CORE_USERS_STATUS_ROBOT, $user->uid);
+    module_load_include('inc', 'user', 'user.pages');
+    user_logout_current_user();
+    \Drupal::messenger()
+      ->addWarning(t('You have visited a forbidden url; your account has been locked for review.  Please contact us using the form below to unlock your account.', ['!url' => url('contact', ['query' => ['cid' => 6]])]), FALSE);
+    $path = module_exists('contact') ? 'contact' : '<front>';
+    unset($_GET['destination']);
+    $options = [];
+    $context['parent'] = __FUNCTION__;
+    drupal_alter('loft_core_users_robotrap_goto', $path, $options, $context);
+    drupal_goto($path, $options);
+
+    return FALSE;
+  }
+  else {
+    return call_user_func_array($callback, $args);
+  }
+}
+
+/**
+ * Implements hook_user_restrictions_alter().
+ */
+function loft_core_users_user_restrictions_alter(&$denied, &$error, &$context) {
+  //
+  //
+  // Restrict any email address whose domain matches that of an already robo-trapped user.
+  //
+  if ($context['type'] === 'mail') {
+
+    // Check if the domain has been trapped.
+    $domain = _loft_core_users_get_email_domain($context['form_state']['values']['mail']);
+
+    // Check if this domain is whitelisted.
+    if ($domain && !in_array($domain, loft_core_users_get_domain_whitelist())) {
+
+      $query = db_select('loft_core_users', 'lu')
+        ->fields('lu', ['uid', 'domain'])
+        ->condition('status', loft_core_users_get_blocking_statuses(), 'IN')
+        ->condition('domain', $domain);
+
+      // If trapped, leverage user_restrictions module to block by email address.
+      if ($is_suspicious = $query->execute()->fetchAllAssoc('uid')) {
+        watchdog('loft core: denied', 'Denied user from @%domain', ['%domain' => $domain]);
+        $context['mask'] = '*' . $domain;
+        $denied = TRUE;
+        $error['field'] = 'mail';
+        $contact = 'contact us';
+
+        // With the contact module enabled we give an easy way for mistakes to get corrected.
+        if (module_exists('contact')) {
+          unset($_GET['destination']);
+          $options = [];
+          $path = 'contact';
+          $contact = '<a href="!url">contact us</a>';
+          $context['parent'] = __FUNCTION__;
+          drupal_alter('loft_core_users_robotrap_goto', $path, $options, $context);
+        }
+        $error['message'] = t('Your email address is associated with a suspicious domain (%domain); please ' . $contact . ' if this is in error.', [
+          '%domain' => $domain,
+          '!url' => url($path, $options),
+        ]);
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_honeypot_reject().
+ *
+ * Make a note of this email address/user as a honeybear.
+ */
+function loft_core_users_honeypot_reject($form_id, $uid, $type) {
+  $mail = $_POST['mail'] ?? NULL;
+  if ($mail) {
+    $domain = _loft_core_users_get_email_domain($mail);
+    $default = explode(',', LOFT_CORE_USERS_DOMAIN_WHITELIST);
+    $may_block = !in_array($domain, variable_get('loft_core_users_domain_whitelist', $default));
+    if ($may_block) {
+      _loft_core_users_set_user_status(LOFT_CORE_USERS_STATUS_HONEYBEAR, $uid, $mail, ip_address());
+    }
+  }
+}
+
+/**
+ * Implements hook_action_info().
+ */
+function loft_core_action_info() {
+  return [
+    'loft_core_users_mark_user_spammy' => [
+      'label' => t('Block SPAMMY user'),
+      'type' => 'user',
+      'configurable' => FALSE,
+      'triggers' => ['any'],
+    ],
+  ];
+}
+
+/**
+ * Action to mark a user as spammy.
+ *
+ * @param       $entity
+ * @param array $context
+ */
+function loft_core_users_mark_user_spammy(&$entity, $context = []) {
+  // First priority: If there is a $entity->uid, block that user.
+  // This is most likely a user object or the author if a node or comment.
+  if (isset($entity->uid)) {
+    $uid = $entity->uid;
+  }
+  elseif (isset($context['uid'])) {
+    $uid = $context['uid'];
+  }
+  // If neither of those are valid, then block the current user.
+  else {
+    $uid = $GLOBALS['user']->uid;
+  }
+  $current_status = loft_core_users_get_user_status($uid);
+  $new_status = $current_status === LOFT_CORE_USERS_STATUS_HONEYBEAR ? LOFT_CORE_USERS_STATUS_HONEYBEAR_MADE_SPAMMY : LOFT_CORE_USERS_STATUS_SPAMMY;
+  loft_core_users_set_user_status($new_status, $uid);
+}
+
+/**
+ * Implements hook_form_form_id_alter().
+ */
+function loft_core_users_form_user_login_block_alter(&$form, &$form_state, $form_id) {
+  _loft_core_users_form_add_remember_me($form);
+}
+
+/**
+ * Implements hook_form_form_id_alter().
+ */
+function loft_core_users_form_user_login_alter(&$form, $form_state, $form_id) {
+  _loft_core_users_form_add_remember_me($form);
+}
+
+/**
+ * Adds remember me username to a form.
+ *
+ * @param array &$form
+ *   The form to alter.
+ */
+function _loft_core_users_form_add_remember_me(&$form) {
+  if (!variable_get('loft_core_users_remember_usernames', FALSE)) {
+    _loft_core_users_remove_persistent_username();
+
+    return;
+  }
+
+  $form['#loft_core_users_remember_key'] = 'loft_core_users_remember_username';
+  $form['loft_core_users_remember_username'] = [
+    '#type' => 'value',
+    '#value' => TRUE,
+  ];
+
+  if (module_exists('persistent_login')) {
+    $form['#loft_core_users_remember_key'] = 'persistent_login';
+    unset($form['loft_core_users_remember_username']);
+  }
+
+  // If we have the name as a cookie then retrieve it.
+  $name = $_COOKIE['loft_core_users_remember_me'] ?? NULL;
+  if ($name) {
+    $form['name']['#default_value'] = $name;
+  }
+
+  $form['#submit'][] = 'loft_core_users_form_user_login_submit';
+}
+
+/**
+ * Form submission handler.
+ */
+function loft_core_users_form_user_login_submit($form, &$form_state) {
+  $value_key = $form['#loft_core_users_remember_key'] ?? NULL;
+  if ($value_key
+    && ($form_state->getValue($value_key))
+    && ($cookie_value = $form_state->getValue('name'))) {
+    _loft_core_users_persist_username($cookie_value);
+  }
+  else {
+    _loft_core_users_remove_persistent_username();
+  }
+}
+
+/**
+ * Persist a username across sessions.
+ */
+function _loft_core_users_persist_username($cookie_value) {
+  $params = session_get_cookie_params();
+  $expire = time() + (86400 * variable_get('loft_core_users_remember_user_for_days', LOFT_CORE_USERS_REMEMBER_USER_FOR_DAYS));
+  setcookie('loft_core_users_remember_me', $cookie_value, $expire, $params['path'], $params['domain'], $params['secure'], $params['httponly']);
+}
+
+/**
+ * Remove the username persistence across sessions.
+ */
+function _loft_core_users_remove_persistent_username() {
+  $params = session_get_cookie_params();
+  setcookie('loft_core_users_remember_me', '', REQUEST_TIME - 3600, $params['path'], $params['domain'], $params['secure'], $params['httponly']);
+}
+
+/**
+ * Convert status code to a description word.
+ *
+ * @param int $value
+ *   The status code.
+ *
+ * @return string
+ *   A word(s) representing the status code.
+ */
+function loft_core_get_status_as_description($value) {
+  switch ($value) {
+    case LOFT_CORE_USERS_STATUS_BLOCKED:
+      $value = 'Blocked';
+      break;
+
+    case LOFT_CORE_USERS_STATUS_CLEAR:
+      $value = 'Active';
+      break;
+
+    case LOFT_CORE_USERS_STATUS_ROBOT:
+      $value = 'Robot';
+      break;
+
+    case LOFT_CORE_USERS_STATUS_HONEYBEAR:
+      $value = 'Honeybear';
+      break;
+
+    case LOFT_CORE_USERS_STATUS_SPAMMY:
+      $value = 'Spammy';
+      break;
+
+    case LOFT_CORE_USERS_STATUS_HONEYBEAR_MADE_SPAMMY:
+      $value = 'Spammy Honeybear';
+      break;
+
+    default:
+      $value = NULL;
+      break;
+  }
+
+  return $value;
+}
+
+/**
+ * Implements hook_form_user_registration_alter().
+ */
+function loft_core_users_form_user_register_form_alter(&$form, &$form_state) {
+  // If an admin is creating the user, we would not want to capture the IP because the ip would not be tracking the user, but the admin.  Therefor we don't even capture anything... as there is really no point, and to save database.
+  if (!path_is_admin(current_path())) {
+    $form['#submit'][] = 'loft_core_users_user_register_form_submit';
+  }
+}
+
+/**
+ * Submit handler to record the ip of a new user.
+ *
+ * @param $form
+ * @param $form_state
+ */
+function loft_core_users_user_register_form_submit($form, $form_state) {
+  if (variable_get('loft_core_users_store_authenticated_ips', FALSE)) {
+    // When a new account is submitted, capture the IP.
+    $account = $form_state['user'];
+    _loft_core_users_set_user_status($account->status, $account->uid, $account->init, ip_address());
+  }
+}
+
+/**
+ * Implements hook_menu().
+ */
+function loft_core_users_menu() {
+  $items['admin/config/people/loft-core-users'] = [
+    'title' => 'Loft Core Users Settings',
+    'description' => 'Enable user IP tracking; remember usernames; and SPAM and blocking settings.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => ['loft_core_users_settings_form'],
+    'access arguments' => ['loft_core_users:administer'],
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'loft_core_users.admin.inc',
+  ];
+
+  return $items;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function loft_core_users_permission() {
+  return [
+    'loft_core_users:administer' => [
+      'title' => t('Administer Loft Core Users'),
+      'description' => t('Perform administration tasks for Loft Core Users.'),
+      'restrict access' => TRUE,
+    ],
+  ];
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function loft_core_users_views_api() {
+  return [
+    'api' => 3,
+    'path' => drupal_get_path('module', 'loft_core_users') . '/includes/views',
+  ];
+}
+
+
+/**
+ * Implements hook_user_delete().
+ */
+function loft_core_users_user_delete($account) {
+  // When the user is deleted, change the UID to 0
+  db_update('loft_core_users')
+    ->fields([
+        'uid' => 0,
+        'uid_init' => $account->uid,
+      ]
+    )
+    ->condition('uid', $account->uid)
+    ->execute();
+}

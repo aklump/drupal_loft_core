@@ -1,0 +1,17 @@
+loft_core.test_mode_on:
+  path: loft-core/testing/enable/{token}
+  defaults:
+    _controller: \Drupal\loft_core\Controller\TestModeController::enable
+    state: enable
+  requirements:
+    _custom_access: \Drupal\loft_core\Controller\TestModeController::access
+
+loft_core.node.permalink:
+  path: node/{node}
+  requirements:
+    _permission: 'loft_core access permalink tab'
+
+loft_core.node.local_link:
+  path: node/{node}
+  requirements:
+    _permission: 'loft_core access local link tab'

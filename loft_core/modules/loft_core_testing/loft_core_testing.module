@@ -1,0 +1,161 @@
+<?php
+
+/**
+ * @file
+ * The main module file for loft_core_testing
+ */
+
+use Drupal\Core\Block\BlockPluginInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Markup;
+use Drupal\Core\Url;
+use Drupal\loft_core_testing\Component\Utility\TestingMarkup;
+
+/**
+ * Implements hook_form_alter().
+ *
+ * @param array $form
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
+ * @param string $form_id
+ */
+function loft_core_testing_form_alter(array &$form, FormStateInterface $form_state, $form_id) {
+  TestingMarkup::isTesting() && TestingMarkup::formAddClasses($form);
+}
+
+function loft_core_testing_preprocess_status_messages(&$vars) {
+  if (TestingMarkup::isTesting() && !empty($vars['message_list'])) {
+    foreach ($vars['message_list'] as $type => $items) {
+      foreach ($vars['message_list'][$type] as $delta => &$item) {
+        $prefix = sprintf('<span class="%s">', TestingMarkup::id("status-message--{$type}__{$delta}"));
+        $suffix = '</span>';
+        if (is_array($item)) {
+          $item = [
+              '#prefix' => $prefix,
+              '#suffix' => $suffix,
+            ] + [$item];
+        }
+        else {
+          $item = Markup::create($prefix . $item . $suffix);
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_preprocess_menu_local_task().
+ */
+function loft_core_testing_preprocess_menu_local_task(&$vars) {
+  if (isset($vars['link']) && ($id = $vars['link']['#url']->getRouteName())) {
+    $vars['link']['#options']['attributes']['class'][] = TestingMarkup::id('local_task--' . loft_core_css_safe($id));
+  }
+}
+
+/**
+ * Implements hook_preprocess_menu_local_task().
+ */
+function loft_core_testing_preprocess_menu_local_action(&$vars) {
+  if (isset($vars['link']) && ($id = $vars['link']['#url']->getRouteName())) {
+    $vars['link']['#options']['attributes']['class'][] = TestingMarkup::id('local_action--' . loft_core_css_safe($id));
+  }
+}
+
+/**
+ * Implements hook_preprocess_menu_link().
+ */
+function loft_core_testing_preprocess_menu(&$vars) {
+  foreach ($vars['items'] as $menu_name => $item) {
+    $id = loft_core_css_safe('menu--' . $menu_name . '--' . _loft_core_testing_get_link_id($item['url']));
+    $class = TestingMarkup::id($id);
+    $vars['items'][$menu_name]['attributes']->addClass($class);
+  }
+}
+
+/**
+ * Generate the link id to use for testing classes.
+ *
+ * You should preceed by menu name or other contextual info.
+ *
+ * @param \Url $url
+ *
+ * @return string
+ */
+function _loft_core_testing_get_link_id(Url $url) {
+  return md5($url->toString());
+}
+
+/**
+ * Implements hook_preprocess_views_view_list().
+ */
+function loft_core_testing_preprocess_views_view_list(&$vars) {
+  if (TestingMarkup::isTesting()) {
+    $view_id = $vars['view']->id();
+    foreach ($vars['rows'] as &$row) {
+      $row['attributes']
+        ->addClass(TestingMarkup::uniqueId($view_id . '--item'));
+    }
+  }
+}
+
+function loft_core_testing_preprocess_views_view_table(array &$vars) {
+  $id = $vars['view']->id();
+  foreach ($vars['rows'] as $row) {
+    $row['attributes']->addClass(TestingMarkup::uniqueId($id . '__row'));
+    foreach ($row['columns'] as $column) {
+      $column['attributes']->addClass(TestingMarkup::uniqueId($id . '__cell'));
+      if (isset($column['fields'][0])) {
+        $column['attributes']->addClass(TestingMarkup::uniqueId($id . '__column--' . $column['fields'][0]));
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_block_view_alter().
+ *
+ * Add testing classes to all blocks.
+ *
+ * @param array $build
+ * @param \Drupal\Core\Block\BlockPluginInterface $block
+ */
+function loft_core_testing_block_view_alter(array &$build, BlockPluginInterface $block) {
+  $build['#pre_render'][] = [\Drupal\loft_core_testing\RenderHelper::class, 'addTestingClasses'];
+  if (!empty($build['#base_plugin_id'])) {
+    $build['#loft_core_testing'][] = TestingMarkup::id($build['#base_plugin_id']);
+  }
+  if (!empty($build['#derivative_plugin_id'])) {
+    $build['#loft_core_testing'][] = TestingMarkup::id($build['#base_plugin_id'] . '--' . $build['#derivative_plugin_id']);
+  }
+}
+
+/**
+ * Implements hook_preprocess_HOOK().
+ */
+function loft_core_testing_preprocess_node(&$variables) {
+  TestingMarkup::addDataAttribute($variables['attributes'], 'nid', $variables['node']->id());
+}
+
+/**
+ * Implements hook_preprocess_HOOK().
+ */
+function loft_core_testing_preprocess_group(&$variables) {
+  TestingMarkup::addDataAttribute($variables['attributes'], 'group_id', $variables['group']->id());
+}
+
+function loft_core_testing_form_commerce_checkout_flow_multistep_default_alter(array &$form, FormStateInterface $form_state) {
+  if (($class = TestingMarkup::id('commerce-order-id'))) {
+    $form['#attributes']['class'][] = $class;
+    $form['#attributes']['data-order-id'] = $form_state->getFormObject()
+      ->getOrder()
+      ->id();
+  }
+}
+
+function loft_core_testing_preprocess_commerce_cart_block(&$vars) {
+  if (($class = TestingMarkup::id('shopping-cart'))) {
+    $carts = \Drupal::service('commerce_cart.cart_provider')
+      ->getCartIds($vars['user']);
+    $vars['attributes']['class'][] = $class;
+    $vars['attributes']['data-order-id'] = array_first($carts);
+  }
+}
