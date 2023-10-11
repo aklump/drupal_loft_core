@@ -16,7 +16,8 @@
     "vimeo/vimeo-api": ">=3",
     "owen-oj/laravel-getid3": "^1.3",
     "clwu/php-read-mp4info": "^2.0",
-    "aklump/bem": "@dev"
+    "aklump/bem": "@dev",
+    "illuminate/support": "^5"
   },
   "autoload-dev": {
     "psr-4": {
