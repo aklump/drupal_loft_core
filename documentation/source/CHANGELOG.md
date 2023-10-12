@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8] - 2023-10-12
+
+### Added
+
+- `\Drupal\loft_core\FeatureSwitches\OperatorAdapter`
+
+### Deprecated
+
+- `is_live()`; replace with https://github.com/aklump/drupal_feature_switches and use `\Drupal\loft_core\FeatureSwitches\OperatorAdapter` as necessary.
+
 ## [1.7] - 2022-05-18
 
 ### Changed
@@ -83,9 +93,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - The API for the redirect hooks have changed. You must update the following implementations per _loft_core.api.php_.
 
-    * `HOOK_loft_core_redirect_node_BUNDLE_TYPE_view`
-    * `HOOK_loft_core_redirect_node_BUNDLE_TYPE_edit`
-    * `HOOK_loft_core_redirect_node_BUNDLE_TYPE_delete`
+  * `HOOK_loft_core_redirect_node_BUNDLE_TYPE_view`
+  * `HOOK_loft_core_redirect_node_BUNDLE_TYPE_edit`
+  * `HOOK_loft_core_redirect_node_BUNDLE_TYPE_delete`
 
 ## 0.9.12
 

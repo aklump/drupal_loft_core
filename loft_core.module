@@ -27,6 +27,11 @@ require_once dirname(__FILE__) . '/includes/loft_core.utilities.inc';
  * HOOK_loft_core_code_release_info().
  *
  * @return bool
+ *
+ * @deprecated Use feature_switches module instead.
+ *
+ * @see \Drupal\feature_switches\FeatureList
+ * @see \Drupal\loft_core\FeatureSwitches\OperatorAdapter
  */
 function is_live($feature) {
   static $features = NULL;
@@ -320,7 +325,8 @@ function template_preprocess_form_help(array &$vars) {
  *
  * @see _loft_core_trackjs_get_severities().
  */
-function loft_core_trackjs_echo_drupal_messages(array &$commands, array $severities = [
+function loft_core_trackjs_echo_drupal_messages(
+  array &$commands, array $severities = [
   'warning',
   'error',
 ]

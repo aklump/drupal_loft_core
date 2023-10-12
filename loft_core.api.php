@@ -14,6 +14,10 @@ use Drupal\loft_core\Block\BlockRebuilder;
  *   Each element key is a unique feature key/tag.  Each element is an array
  *   with:
  *     - is_live bool False to disable the feature.
+ *
+ * @deprecated Use feature_switches module instead.
+ *
+ * @see \Drupal\loft_core\FeatureSwitches\OperatorAdapter
  */
 function hook_loft_core_code_release_info() {
   return array(
@@ -98,7 +102,7 @@ function HOOK_loft_core_suppress_messages() {
 function HOOK_loft_core_BUNDLE_node_form_alter(array &$form, \Drupal\Core\Form\FormStateInterface $form_state, string $form_id) {
   $node = $form_state->getFormObject()->getEntity();
 
-  ...
+  ///...
 }
 
 /**
@@ -122,7 +126,7 @@ class LearnMoreCardBlock extends BlockRebuilder {
   /**
    * {@inheritdoc}
    */
-  public function rebuild($label, $content) {
+  public function rebuild(array $element, $label, array $content) {
     return [
       '#theme' => 'learn_more_card',
       '#attributes' => $this->getAttributes(),
