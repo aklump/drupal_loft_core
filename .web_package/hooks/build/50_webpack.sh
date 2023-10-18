@@ -1,7 +1,5 @@
 #!/bin/bash
 
-source "${11}/functions.sh"
-
 # Remove previous dist folder.
 test -e "./dist" && rm -rf "./dist"
 
