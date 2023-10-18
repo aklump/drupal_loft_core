@@ -1,6 +1,6 @@
 {
   "license": "GPL-2.0-or-later",
-  "name": "drupal/loft_core",
+  "name": "aklump_drupal/loft_core",
   "description": "Additional Drupal toolbox and features.",
   "type": "drupal-custom-module",
   "authors": [
