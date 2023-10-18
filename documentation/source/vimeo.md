@@ -3,9 +3,14 @@
 * Use _\Drupal\loft_core\Utility\VimeoBasedEntityBuilder_ to help with pulling metadata from Vimeo into an entity.
 * https://developer.vimeo.com/apps
 
-## Suggested Modules
+* This is incompatible with Drupal 9.5.
+
+## Required Modules
 
 * `composer require vimeo/vimeo-api`
+
+## Suggested Modules
+
 * `composer require drupal/video_embed_field`
 
 ## _.env_
