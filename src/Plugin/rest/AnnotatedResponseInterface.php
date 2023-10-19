@@ -82,5 +82,6 @@ interface AnnotatedResponseInterface extends \JsonSerializable {
   /**
    * {@inheritdoc}
    */
+  #[\ReturnTypeWillChange]
   public function jsonSerialize();
 }
