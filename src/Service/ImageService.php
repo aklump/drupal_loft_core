@@ -508,7 +508,7 @@ class ImageService implements VisualMediaInterface {
       throw new \RuntimeException(sprintf('The provided URI does not exist: %s', $uri));
     }
 
-    $mime = \Drupal::service('file.mime_type.guesser')->guess($uri);
+    $mime = $this->mimeTypeGuesser->guess($uri);
     if ('image/svg+xml' === $mime) {
       preg_match_all('/(width|height)="(\d+)"/', file_get_contents($uri), $matches);
       $width = array_search('width', $matches[1]);

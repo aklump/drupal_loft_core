@@ -1,34 +1,40 @@
 {
-  "license": "GPL-2.0-or-later",
-  "name": "aklump_drupal/loft_core",
-  "description": "Additional Drupal toolbox and features.",
-  "type": "drupal-custom-module",
-  "authors": [
-    {
-      "name": "aklump",
-      "email": "sourcecode@intheloftstudios.com"
+    "license": "GPL-2.0-or-later",
+    "name": "aklump_drupal/loft_core",
+    "description": "Additional Drupal toolbox and features.",
+    "type": "drupal-custom-module",
+    "authors": [
+        {
+            "name": "aklump",
+            "email": "sourcecode@intheloftstudios.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Drupal\\loft_core\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Drupal\\Tests\\loft_core\\": "./tests/",
+            "Drupal\\loft_core_testing\\": [
+                "modules/loft_core_testing/src/"
+            ],
+            "Drupal\\loft_core_users\\": [
+                "modules/loft_core_users/src/"
+            ]
+        }
+    },
+    "require": {
+        "aklump/loft-lib": "^1|^2",
+        "league/color-extractor": "^0.3.2",
+        "owen-oj/laravel-getid3": "^1.3",
+        "clwu/php-read-mp4info": "^2.0",
+        "aklump/bem": "@dev",
+        "illuminate/support": "^5",
+        "ext-exif": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.6"
     }
-  ],
-  "require": {
-    "aklump/loft-lib": "^1|^2",
-    "league/color-extractor": "^0.3.2",
-    "owen-oj/laravel-getid3": "^1.3",
-    "clwu/php-read-mp4info": "^2.0",
-    "aklump/bem": "@dev",
-    "illuminate/support": "^5"
-  },
-  "autoload-dev": {
-    "psr-4": {
-      "Drupal\\loft_core\\": [
-        "src/",
-        "tests/src/"
-      ],
-      "Drupal\\loft_core_testing\\": [
-        "modules/loft_core_testing/src/"
-      ],
-      "Drupal\\loft_core_users\\": [
-        "modules/loft_core_users/src/"
-      ]
-    }
-  }
 }
