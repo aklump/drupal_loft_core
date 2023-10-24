@@ -2,4 +2,4 @@
 s="${BASH_SOURCE[0]}";[[ "$s" ]] || s="${(%):-%N}";while [ -h "$s" ];do d="$(cd -P "$(dirname "$s")" && pwd)";s="$(readlink "$s")";[[ $s != /* ]] && s="$d/$s";done;__DIR__=$(cd -P "$(dirname "$s")" && pwd)
 
 cd "$__DIR__/.."
-chmod u+x bin/*.sh vendor/bin/phpunit
+chmod u+x bin/*.sh vendor/bin/phpunit node_modules/.bin/prettier node_modules/.bin/webpack documentation/core/compile.sh

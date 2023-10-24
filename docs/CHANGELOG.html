@@ -28,6 +28,14 @@
 
 <p>The format is based on <a href="https://keepachangelog.com/en/1.0.0/">Keep a Changelog</a>, and this project adheres to <a href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
 
+<h2>[2.0] - 2023-10-23</h2>
+
+<h3>Changed</h3>
+
+<ul>
+<li><strong>BREAKING CHANGE</strong> When calling <code>loft_core_bem</code> you get back two functions; if you pass to either of those functions string that is incompatible with https://github.com/aklump/bem an exception is now thrown. You should grep your entire codebase for loft_core_bem and review all arguments, and test thoroughly.</li>
+</ul>
+
 <h2>[1.8] - 2023-10-12</h2>
 
 <h3>Added</h3>
@@ -174,7 +182,7 @@
 <footer>
   <div class="pager"><a href="breadcrumb.html" class="prev breadcrumb">&laquo;Breadcrumb</a><a href="index.html" class="index pager__book-title">Loft Drupal Core</a><a href="clipboard.html" class="next clipboard">Clipboard API&raquo;</a></div>  
   <div id="footer-legaleeze">
-    <p class="legaleeze center">Version: 1.0 &bull; Last Updated: Wed, 18 Oct 2023 21:46:37 -0700</p>
+    <p class="legaleeze center">Version: 1.0 &bull; Last Updated: Mon, 23 Oct 2023 20:31:15 -0700</p>
   </div>
 </footer>
 
