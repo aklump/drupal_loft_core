@@ -458,13 +458,33 @@ function loft_core_bem(string $block): array {
     throw new \InvalidArgumentException("This BEM block name contains invalid characters: \"$block\".");
   }
 
+  // Due to a change in APIs some legacy values will be lost so this should
+  // catch them and forced an upgrade by the developer.
+  $assert_no_loss = function ($original, $result) use ($block) {
+    $result = substr($result, strlen($block) + 2);
+    if ($original !== $result) {
+      throw new \InvalidArgumentException(sprintf('$original contains invalid double characters; change "%s" to "%s".', $original, $result));
+    }
+  };
+
   return [
-    function ($element = '') use ($bem) {
-      return strval($element ? $bem->element($element) : $bem->block());
+    function ($element = '') use ($bem, $assert_no_loss) {
+      if ($element) {
+        $assert_no_loss($element, $bem->element($element));
+
+        return (string) $bem->element($element);
+      }
+
+      return (string) $bem->block();
     },
-    function ($modifier = '') use ($bem) {
-      return strval($modifier ? $bem->block()
-        ->modifier($modifier) : $bem->block());
+    function ($modifier = '') use ($bem, $assert_no_loss) {
+      if ($modifier) {
+        $assert_no_loss($modifier, $bem->block()->modifier($modifier));
+
+        return (string) $bem->block()->modifier($modifier);
+      }
+
+      return (string) $bem->block();
     },
   ];
 }

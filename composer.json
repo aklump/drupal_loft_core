@@ -35,6 +35,7 @@
         "ext-exif": "*"
     },
     "require-dev": {
-        "phpunit/phpunit": "^9.6"
+        "phpunit/phpunit": "^9.6",
+        "aklump/phpswap": "^0.0.7"
     }
 }
