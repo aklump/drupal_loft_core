@@ -68,4 +68,35 @@ class LoftCoreBemTest extends TestCase {
     $bem($subject);
   }
 
+  /**
+   * Provides data for testLoftCoreCl.
+   */
+  function DataForTestLoftCoreClProvider() {
+    $tests = array();
+    $tests[] = array(
+      'do',
+      're',
+      'do__re',
+      'do--re',
+    );
+    $tests[] = array(
+      'a_list_apart',
+      'chapter-one-thing',
+      'a-list-apart__chapter-one-thing',
+      'a-list-apart--chapter-one-thing',
+    );
+
+    return $tests;
+  }
+
+  /**
+   * @dataProvider DataForTestLoftCoreClProvider
+   */
+  public function testLoftCoreCl($base, $subject, $control_component, $control_version) {
+    $cl = \loft_core_cl($base);
+    $this->assertSame($control_component, $cl($subject));
+    $this->assertSame($control_component, $cl($subject, TRUE));
+    $this->assertSame($control_version, $cl($subject, FALSE));
+  }
+
 }

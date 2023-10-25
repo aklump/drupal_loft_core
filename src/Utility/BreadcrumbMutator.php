@@ -45,7 +45,7 @@ use Drupal\Core\Url;
  *   $breadcrumb = $mutator->get();
  * @endcode
  */
-final class BreadcrumbMutator {
+class BreadcrumbMutator {
 
   /**
    * Represents the end position.

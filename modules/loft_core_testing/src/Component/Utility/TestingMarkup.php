@@ -24,9 +24,11 @@ class TestingMarkup {
   /**
    * Holds the value of the environment test to determine if we're in test mode.
    *
+   * This is public so that it can be reset manually (e.g. unit tests)
+   *
    * @var null|bool
    */
-  private static $isTestingFlag;
+  public static $isTestingFlag = NULL;
 
   /**
    * Add a prefixed data attribute only for testing.
@@ -63,7 +65,9 @@ class TestingMarkup {
    */
   public static function isTesting() {
     if (is_null(self::$isTestingFlag)) {
-      self::$isTestingFlag = DRUPAL_ENV !== DRUPAL_ENV_PROD
+      $env = defined('DRUPAL_ENV') ?? 'live';
+      $env_prod = defined('DRUPAL_ENV_PROD') ?? 'live';
+      self::$isTestingFlag = $env !== $env_prod
         || ($expiry = \Drupal::state()->get('loft_core_test_mode_expiry'));
 
       // First time on page load that we get here, we may delete the expiry.
