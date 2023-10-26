@@ -71,7 +71,7 @@ class TestingMarkup {
         $env = DRUPAL_ENV;
       }
       if (defined('DRUPAL_ENV_PROD')) {
-        $env = DRUPAL_ENV_PROD;
+        $env_prod = DRUPAL_ENV_PROD;
       }
       self::$isTestingFlag = $env !== $env_prod
         || ($expiry = \Drupal::state()->get('loft_core_test_mode_expiry'));
