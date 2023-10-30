@@ -23,7 +23,7 @@ trait HasUserTrait {
    * {@inheritdoc}
    */
   public function setUser(AccountInterface $user): self {
-    if (!$user instanceof User) {
+    if (!$user instanceof UserInterface) {
       $user = User::load($user->id());
     }
 
