@@ -21,6 +21,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * class StudyResourceToParagraphs extends BatchProcessorBase { ...
  * @endcode
+ * 
+ * @deprecated Use https://github.com/aklump/drupal_batch_framework
  */
 abstract class BatchProcessorBase implements ContainerInjectionInterface {
 
