@@ -1,3 +1,4 @@
+# TODO Move this into loft_core_testing module.
 loft_core.test_mode_on:
   path: loft-core/testing/enable/{token}
   defaults:

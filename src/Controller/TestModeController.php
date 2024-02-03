@@ -7,6 +7,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
  * Handles enabling test mode for a time.
+ *
+ * TODO Move this into loft_core_testing module.
  */
 class TestModeController {
 
