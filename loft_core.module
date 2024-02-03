@@ -9,7 +9,6 @@
 use Drupal\Core\Asset\AttachedAssetsInterface;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Url;
-use Drupal\loft_core\StaticContentStreamWrapper;
 use Drupal\loft_core\Utility\RenderInPageBottom;
 use Drupal\loft_core_testing\Component\Utility\TestingMarkup;
 use Drupal\Component\Utility\NestedArray;
@@ -200,47 +199,6 @@ EOD;
 }
 
 /**
- * @FIXME
- * This implementation of hook_menu() cannot be automatically converted because
- * it contains logic (i.e., branching statements, function calls, object
- * instantiation, etc.) You will need to convert it manually. Sorry!
- *
- * For more information on how to convert hook_menu() to Drupal 8's new routing
- * and linking systems, see
- *   https://api.drupal.org/api/drupal/core%21includes%21menu.inc/group/menu/8
- */
-function loft_core_menu() {
-  $items[StaticContentStreamWrapper::URL_BASE] = [
-    'type' => MENU_CALLBACK,
-    'title' => 'Raw static content',
-    'page callback' => 'loft_core_static_content_stream',
-    'access arguments' => ['access raw static content'],
-  ];
-
-  return $items;
-}
-
-
-/**
- * Stream a static-content file.
- *
- * @param string $target
- *   The target static content file relative to the static content directory.
- */
-function loft_core_static_content_stream($target) {
-  $uri = 'static-content://' . $target;
-  if (file_exists($uri)) {
-    $headers = [];
-    file_transfer($uri, $headers);
-    drupal_access_denied();
-  }
-  else {
-    drupal_not_found();
-  }
-  drupal_exit();
-}
-
-/**
  * Implements hook_theme().
  */
 function loft_core_theme($existing, $type, $theme, $path) {
@@ -395,27 +353,6 @@ function loft_core_preprocess_status_report(&$vars) {
   if ($unset) {
     unset($vars['requirements'][$unset]);
   }
-}
-
-/**
- * Implements hook_stream_wrappers().
- */
-function loft_core_stream_wrappers() {
-
-  // This is here to address an issue of missing class when using drush updb.
-  if (!class_exists('\Drupal\loft_core\StaticContentStreamWrapper')) {
-    module_load_include('php', 'loft_core', 'src/Drupal/loft_core/StaticContentStreamWrapper');
-  }
-
-  $wrappers = [
-    'static-content' => [
-      'name' => t('Static content'),
-      'class' => '\Drupal\loft_core\StaticContentStreamWrapper',
-      'description' => t("Content that should not be exposed to the CMS, but included in the final output."),
-    ],
-  ];
-
-  return $wrappers;
 }
 
 /**
