@@ -12,7 +12,7 @@ final class AnnotatedCollectionJsonResponse implements AnnotatedResponseInterfac
 
   public function __construct($version) {
     $this->version = $version;
-    $this->annotatedResponse = \Drupal\loft_core\Plugin\rest\AnnotatedResponse::create();
+    $this->annotatedResponse = AnnotatedResponse::create();
   }
 
   public static function create($version = "1.0") {
@@ -47,7 +47,7 @@ final class AnnotatedCollectionJsonResponse implements AnnotatedResponseInterfac
       $items = [$items];
     }
 
-    if (!array_key_exists('data', $items[0])) {
+    if (count($items) && !array_key_exists('data', $items[0])) {
       throw new \InvalidArgumentException('$items[0][data] must be set.');
     }
 

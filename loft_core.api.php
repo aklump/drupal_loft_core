@@ -4,7 +4,7 @@
  * @file
  * Defines the API interfaces for loft_core module.
  */
-
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\loft_core\Block\BlockRebuilder;
 
 /**
@@ -99,7 +99,7 @@ function HOOK_loft_core_suppress_messages() {
  * @param \Drupal\Core\Form\FormStateInterface $form_state
  * @param string $form_id
  */
-function HOOK_loft_core_BUNDLE_node_form_alter(array &$form, \Drupal\Core\Form\FormStateInterface $form_state, string $form_id) {
+function HOOK_loft_core_BUNDLE_node_form_alter(array &$form, FormStateInterface $form_state, string $form_id) {
   $node = $form_state->getFormObject()->getEntity();
 
   ///...

@@ -4,12 +4,13 @@ namespace Drupal\loft_core\Service;
 
 use Drupal\Component\Utility\Xss;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\File\Event\FileUploadSanitizeNameEvent;
 use Drupal\Core\Image\ImageFactory;
 use Drupal\Core\Render\Markup;
 use Drupal\image\Entity\ImageStyle;
 use League\ColorExtractor\Color;
 use League\ColorExtractor\Palette;
-use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesserInterface;
+use Symfony\Component\Mime\MimeTypeGuesserInterface;
 
 /**
  * Functions for working with images.
@@ -26,7 +27,7 @@ class ImageService implements VisualMediaInterface {
   /**
    * A mime type guesser.
    *
-   * @var \Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesserInterface
+   * @var \Symfony\Component\Mime\MimeTypeGuesserInterface
    */
   protected $mimeTypeGuesser;
 
@@ -44,7 +45,7 @@ class ImageService implements VisualMediaInterface {
    *   Service instance.
    * @param \Drupal\Core\Image\ImageFactory $image_factory
    *   Service instance.
-   * @param \Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesserInterface $mime_type_guesser
+   * @param \Symfony\Component\Mime\MimeTypeGuesserInterface $mime_type_guesser
    *   Service instance.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, ImageFactory $image_factory, MimeTypeGuesserInterface $mime_type_guesser) {
@@ -124,7 +125,7 @@ class ImageService implements VisualMediaInterface {
       $vars['image_src'] = $style->buildUrl($vars['image_uri']);
     }
     else {
-      $vars['image_src'] = file_create_url($vars['image_uri']);
+      $vars['image_src'] = \Drupal::service('file_url_generator')->generateAbsoluteString($vars['image_uri']);
     }
 
     return $this;
@@ -147,7 +148,7 @@ class ImageService implements VisualMediaInterface {
    */
   public function getMarkup(string $file_resource, callable $processor = NULL) {
     $this->validateResourceExists($file_resource);
-    $mime = $this->mimeTypeGuesser->guess($file_resource);
+    $mime = $this->mimeTypeGuesser->guessMimeType($file_resource);
     if ('image/svg+xml' === $mime) {
       $dom = new \DOMDocument();
       $contents = file_get_contents($file_resource);
@@ -190,7 +191,7 @@ class ImageService implements VisualMediaInterface {
   public function getBase64DataSrc($file_resource): string {
     $this->validateResourceExists($file_resource);
     list($path) = explode('?', $file_resource . '?');
-    $mime = $this->mimeTypeGuesser->guess($path);
+    $mime = $this->mimeTypeGuesser->guessMimeType($path);
     if (is_null($mime)) {
       throw new \RuntimeException(sprintf('Unable to determine mimetype for: %s.', $path));
     }
@@ -339,13 +340,18 @@ class ImageService implements VisualMediaInterface {
     $file = [];
     $file['uid'] = \Drupal::currentUser()->id();
     $file['status'] = 0;
-    $file['filename'] = file_munge_filename($info['basename'], implode(' ', array_keys($allowed_extensions)));
+    $extensions = implode(' ', array_keys($allowed_extensions));
+    $event = new FileUploadSanitizeNameEvent($info['basename'], $extensions);
+    \Drupal::service('event_dispatcher')->dispatch($event);
+    $file['filename'] = $event->getFilename();
+
+
     $file['uri'] = 'temporary://' . $file['filename'];
     if (!copy($remote_url, $file['uri'])) {
       return FALSE;
     }
 
-    $file['filemime'] = $this->mimeTypeGuesser->guess($file['uri']);
+    $file['filemime'] = $this->mimeTypeGuesser->guessMimeType($file['uri']);
     $file['filesize'] = filesize($file['uri']);
 
     return $this->entityTypeManager->getStorage('file')->create($file);
@@ -508,7 +514,7 @@ class ImageService implements VisualMediaInterface {
       throw new \RuntimeException(sprintf('The provided URI does not exist: %s', $uri));
     }
 
-    $mime = $this->mimeTypeGuesser->guess($uri);
+    $mime = $this->mimeTypeGuesser->guessMimeType($uri);
     if ('image/svg+xml' === $mime) {
       preg_match_all('/(width|height)="(\d+)"/', file_get_contents($uri), $matches);
       $width = array_search('width', $matches[1]);

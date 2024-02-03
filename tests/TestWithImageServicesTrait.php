@@ -11,7 +11,7 @@ trait TestWithImageServicesTrait {
   private function getMimeTypeGuesser() {
     $guesser = $this->createMock(MimeTypeGuesser::class);
     $guesser
-      ->method('guess')
+      ->method('guessMimeType')
       ->willReturnCallback(function ($uri) {
         $type = getimagesize($uri)['mime'] ?? '';
         if (!$type) {

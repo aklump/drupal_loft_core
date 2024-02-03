@@ -6,7 +6,7 @@
  * @defgroup loft_core Loft Core
  * @{
  */
-
+use Drupal\Core\Asset\AttachedAssetsInterface;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Url;
 use Drupal\loft_core\StaticContentStreamWrapper;
@@ -36,7 +36,7 @@ require_once dirname(__FILE__) . '/includes/loft_core.utilities.inc';
 function is_live($feature) {
   static $features = NULL;
   if (is_null($features)) {
-    $features = \Drupal::moduleHandler()
+    $features = Drupal::moduleHandler()
       ->invokeAll('loft_core_code_release_info');
     $features[$feature]['is_live'] = isset($features[$feature]) ? $features[$feature]['is_live'] : TRUE;
   }
@@ -59,7 +59,7 @@ function loft_core_test_class(string $class): string {
 
     // First time on page load that we get here, we may delete the expiry.
     if (!$testing && !empty($expiry) && $expiry < time()) {
-      \Drupal::state()->delete('loft_core_test_mode_expiry');
+      Drupal::state()->delete('loft_core_test_mode_expiry');
     }
     $testing = TRUE;
 
@@ -120,7 +120,7 @@ function loft_core_element_add_test_classes(array &$element, array $paths): void
 /**
  * Implements hook_js_settings_build().
  */
-function loft_core_js_settings_build(array &$settings, \Drupal\Core\Asset\AttachedAssetsInterface $assets) {
+function loft_core_js_settings_build(array &$settings, AttachedAssetsInterface $assets) {
   $settings['env'] = [
     'env' => DRUPAL_ENV,
     'prod' => DRUPAL_ENV_PROD,
@@ -331,7 +331,7 @@ function loft_core_trackjs_echo_drupal_messages(
   'error',
 ]
 ) {
-  $groups = \Drupal::messenger()->all();
+  $groups = Drupal::messenger()->all();
   foreach ($groups as $level => $messages) {
     if (!in_array($level, $severities)) {
       continue;
@@ -351,50 +351,6 @@ function loft_core_trackjs_echo_drupal_messages(
       $commands[] = loft_core_ajax_command_trackjs_console($trackjs_level,
         $message);
     }
-  }
-}
-
-
-/**
- * Stash or unstash a user.
- *
- * This function:
- * - allows you to run some code as a different user inside of a callback
- * function, in which case you need simple call it once with $temporary_user
- * and $callback.
- * - allows you to set a temporary user for a time until you call this function
- * again.  Unless you call this function again, the temporary user will become
- * the logged in user, so USE WITH CARE.
- *
- * The stashed users will persist in the SESSION.
- *
- * @param null $temporary_user Leave null when unstashing a previously stashed
- *   user.
- * @param callable|NULL $callback
- */
-function loft_core_user_stash($temporary_user = NULL, callable $callback = NULL) {
-  $user = \Drupal::currentUser();
-  static $stashed = NULL;
-  $needs_unstash = is_null($temporary_user);
-
-  if ($temporary_user) {
-    if ($stashed) {
-      throw new \RuntimeException("A user has already been stashed; you must unstash before you try to stash another user.");
-    }
-    $needs_unstash = FALSE;
-    $stashed = $user;
-    $user = $temporary_user;
-
-    // When callback is provided, we unstash post $callback.
-    if ($callback) {
-      $callback();
-      $needs_unstash = TRUE;
-    }
-  }
-
-  if ($stashed && $needs_unstash) {
-    $user = $stashed;
-    $stashed = NULL;
   }
 }
 

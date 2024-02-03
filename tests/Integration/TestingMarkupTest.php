@@ -2,11 +2,12 @@
 
 namespace Drupal\Tests\loft_core\Integration;
 
+use PHPUnit\Framework\TestCase;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\State\StateInterface;
 use Drupal\loft_core_testing\Component\Utility\TestingMarkup;
 
-class TestingMarkupTest extends \PHPUnit\Framework\TestCase {
+class TestingMarkupTest extends TestCase {
 
   public function testClassIsPresentBasedOnExpiryState() {
     $this->setStateExpiryTo(time() + 86400);
@@ -31,6 +32,7 @@ class TestingMarkupTest extends \PHPUnit\Framework\TestCase {
   }
 
   protected function setUp(): void {
+    parent::setUp();
     TestingMarkup::$isTestingFlag = NULL;
   }
 

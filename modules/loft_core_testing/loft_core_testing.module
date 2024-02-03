@@ -4,7 +4,7 @@
  * @file
  * The main module file for loft_core_testing
  */
-
+use Drupal\loft_core_testing\RenderHelper;
 use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Markup;
@@ -119,7 +119,7 @@ function loft_core_testing_preprocess_views_view_table(array &$vars) {
  * @param \Drupal\Core\Block\BlockPluginInterface $block
  */
 function loft_core_testing_block_view_alter(array &$build, BlockPluginInterface $block) {
-  $build['#pre_render'][] = [\Drupal\loft_core_testing\RenderHelper::class, 'addTestingClasses'];
+  $build['#pre_render'][] = [RenderHelper::class, 'addTestingClasses'];
   if (!empty($build['#base_plugin_id'])) {
     $build['#loft_core_testing'][] = TestingMarkup::id($build['#base_plugin_id']);
   }

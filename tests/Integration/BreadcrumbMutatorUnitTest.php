@@ -142,6 +142,7 @@ class BreadcrumbMutatorUnitTest extends TestCase {
   }
 
   protected function setUp(): void {
+    parent::setUp();
     $breadcrumb = $this->createConfiguredMock(Breadcrumb::class, [
       'getLinks' => [
         $this->getMockLink('alpha'),

@@ -2,6 +2,7 @@
 
 namespace Drupal\loft_core_testing\Component\Utility;
 
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Render\Markup;
@@ -289,7 +290,7 @@ class TestingMarkup {
       if ($path && $class) {
         $test_class = self::id(implode('__', $class));
         $parents = is_array($path) ? $path : explode('.', $path);
-        $attributes = \Drupal\Component\Utility\NestedArray::getValue($element, $parents);
+        $attributes = NestedArray::getValue($element, $parents);
         if (is_null($attributes)) {
 
           switch ($element['#type']) {
@@ -307,7 +308,7 @@ class TestingMarkup {
         elseif (is_array($attributes)) {
           $attributes['class'][] = $test_class;
         }
-        \Drupal\Component\Utility\NestedArray::setValue($element, $parents, $attributes);
+        NestedArray::setValue($element, $parents, $attributes);
       }
     }
 

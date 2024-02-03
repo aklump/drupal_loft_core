@@ -117,6 +117,7 @@ class Loft {
     bool $load_entities = TRUE
   ): array {
     $query = \Drupal::entityQuery($referencing_entity_type);
+    $query->accessCheck(TRUE);
     $field_names = $query->orConditionGroup();
     foreach ($reference_field_names as $reference_field_name) {
       $field_names->condition($reference_field_name, $target_entity->id());

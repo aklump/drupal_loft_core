@@ -5,6 +5,8 @@
  * Functions that have to do with installation and updates.
  */
 
+use AKlump\LoftDataGrids\ExportData;
+use AKlump\LoftDataGrids\CSVExporter;
 use AKlump\LoftDataGrids\JSONExporter;
 use Drupal\Core\File\FileSystemInterface;
 
@@ -53,12 +55,13 @@ function loft_core_update__archive_entities(
   loft_data_grids_boot();
   $output = [];
   try {
-    $query = db_query($sql);
+    $query = \Drupal::database()->query($sql);
     $query->execute();
-    file_prepare_directory($destination_dir, FileSystemInterface::CREATE_DIRECTORY);
+    \Drupal::service('file_system')
+      ->prepareDirectory($destination_dir, FileSystemInterface::CREATE_DIRECTORY);
     $header = NULL;
 
-    $data = new \AKlump\LoftDataGrids\ExportData();
+    $data = new ExportData();
     while ($record = $query->fetchAssoc()) {
       foreach ($record as $key => $value) {
         $add_to_export = TRUE;
@@ -73,7 +76,8 @@ function loft_core_update__archive_entities(
           if ($key === $path_key) {
             $add_to_export = FALSE;
             $file_dir = "$destination_dir/files/";
-            file_prepare_directory($file_dir, FileSystemInterface::CREATE_DIRECTORY);
+            \Drupal::service('file_system')
+              ->prepareDirectory($file_dir, FileSystemInterface::CREATE_DIRECTORY);
             $destination = $file_dir . '/' . $record[$basename_key];
             if (!file_exists($destination)) {
               if (!file_unmanaged_copy($value, $destination, FileSystemInterface::EXISTS_REPLACE)) {
@@ -90,7 +94,7 @@ function loft_core_update__archive_entities(
       $data->next();
     }
 
-    $exporter = new \AKlump\LoftDataGrids\CSVExporter($data, $filename);
+    $exporter = new CSVExporter($data, $filename);
     $path = $exporter->saveFile($destination_dir);
     if (!file_exists($path)) {
       throw new \RuntimeException("Could not save: $destination_dir/$filename");
@@ -159,7 +163,11 @@ function loft_core_update__delete_content_and_entity_definition(array &$sandbox,
     }
   }
   $ids = array_splice($sandbox['to_delete'], 0, 10);
-  if (entity_delete_multiple($entity_type, $ids) === FALSE) {
+  if (\Drupal::service('entity_type.manager')
+      ->getStorage($entity_type)
+      ->delete(\Drupal::service('entity_type.manager')
+        ->getStorage($entity_type)
+        ->loadMultiple($ids)) === FALSE) {
     throw new \DrupalUpdateException("Could not delete entities");
   }
 
@@ -171,7 +179,8 @@ function loft_core_update__delete_content_and_entity_definition(array &$sandbox,
   if ($sandbox['#finished'] === 1) {
     if ($sandbox['total']) {
       $output[] = t('!entities of content have been deleted', [
-        '!entities' => \Drupal::translation()->formatPlural($sandbox['total'], '1 piece', '@count pieces'),
+        '!entities' => \Drupal::translation()
+          ->formatPlural($sandbox['total'], '1 piece', '@count pieces'),
       ]);
     }
 
@@ -231,7 +240,7 @@ function loft_core_update__delete_content_and_entity_definition(array &$sandbox,
     // in the direction of support for non-node entities.
     // TODO Make this work for entities other than node, then remove this.
     $info = node_type_get_type($bundle);
-    db_delete('node_type')
+    \Drupal::database()->delete('node_type')
       ->condition('type', $bundle)
       ->execute();
     \Drupal::moduleHandler()->invokeAll('node_type_delete', [$info]);
@@ -246,12 +255,12 @@ function loft_core_update__delete_content_and_entity_definition(array &$sandbox,
 
     if ($known_variables) {
       // @FIXME
-// if ($count = db_delete('variable')
-//         ->condition('name', $known_variables, 'IN')
-//         ->execute()) {
-//         $output[] = \Drupal::translation()->formatPlural($count, '1 variable deleted', '@count variables deleted.');
-//       }
-;
+      // if ($count = db_delete('variable')
+      //         ->condition('name', $known_variables, 'IN')
+      //         ->execute()) {
+      //         $output[] = \Drupal::translation()->formatPlural($count, '1 variable deleted', '@count variables deleted.');
+      //       }
+      ;
     }
 
 
@@ -294,12 +303,12 @@ function loft_core_update__delete_entity_fields($entity_type, $bundle, array $fi
     foreach ($field_names as $field_name) {
       $instance = field_info_instance($entity_type, $field_name, $bundle);
       // @FIXME
-// Fields and field instances are now exportable configuration entities, and
-// the Field Info API has been removed.
-//
-//
-// @see https://www.drupal.org/node/2012896
-// field_delete_instance($instance);
+      // Fields and field instances are now exportable configuration entities, and
+      // the Field Info API has been removed.
+      //
+      //
+      // @see https://www.drupal.org/node/2012896
+      // field_delete_instance($instance);
 
     }
     field_purge_batch(500);
@@ -382,12 +391,12 @@ function loft_core_update__delete_bundle($node_type) {
 
   $output = [];
   // @FIXME
-// if ($count = db_delete('variable')
-//     ->condition('name', $known_variables, 'IN')
-//     ->execute()) {
-//     $output[] = \Drupal::translation()->formatPlural($count, '1 variable deleted', '@count variables deleted.');
-//   }
-;
+  // if ($count = db_delete('variable')
+  //     ->condition('name', $known_variables, 'IN')
+  //     ->execute()) {
+  //     $output[] = \Drupal::translation()->formatPlural($count, '1 variable deleted', '@count variables deleted.');
+  //   }
+  ;
 
   $output[] = t('Node type %node_type deleted.', ['%node_type' => $node_type]);
 

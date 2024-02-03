@@ -185,7 +185,7 @@ function loft_core_smart_url(string $absolute_aliases_path, array $options = [])
     }
     if (preg_match($regex, $parts['host'])) {
       $absolute_aliases_path = rtrim($parts['path'], '/');
-      if (($system_path = \Drupal::service('path.alias_manager')
+      if (($system_path = \Drupal::service('path_alias.manager')
         ->getPathByAlias($absolute_aliases_path))) {
         $absolute_aliases_path = Url::fromUserInput($system_path, $options)
           ->toString();

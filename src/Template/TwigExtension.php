@@ -2,10 +2,12 @@
 
 namespace Drupal\loft_core\Template;
 
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 /**
  * Provides some Twig functions.
  */
-class TwigExtension extends \Twig_Extension {
+class TwigExtension extends AbstractExtension {
 
   /**
    * {@inheritdoc}
@@ -19,14 +21,14 @@ class TwigExtension extends \Twig_Extension {
    */
   public function getFunctions() {
     return [
-      new \Twig_SimpleFunction('splitBy', [
+      new TwigFunction('splitBy', [
         '\AKlump\LoftLib\Code\Strings',
         'splitBy',
       ]),
-      new \Twig_SimpleFunction('is_live', 'is_live'),
-      new \Twig_SimpleFunction('loft_core_test_class', 'loft_core_test_class'),
-      new \Twig_SimpleFunction('testing_id', 'loft_core_test_class'),
-      new \Twig_SimpleFunction('has_output', [
+      new TwigFunction('is_live', 'is_live'),
+      new TwigFunction('loft_core_test_class', 'loft_core_test_class'),
+      new TwigFunction('testing_id', 'loft_core_test_class'),
+      new TwigFunction('has_output', [
         $this,
         'hasOutput',
       ]),

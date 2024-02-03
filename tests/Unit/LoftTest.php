@@ -2,13 +2,14 @@
 
 namespace Drupal\Tests\loft_core\Unit;
 
+use PHPUnit\Framework\TestCase;
 use Drupal\loft_core\Loft;
 use Drupal\Tests\UnitTestCase;
 
 /**
  * @covers \Drupal\loft_core\Loft::overrideValuesByKey
  */
-class LoftTest extends \PHPUnit\Framework\TestCase {
+class LoftTest extends TestCase {
 
   public function testOverrideValuesByKey() {
     $form = [
