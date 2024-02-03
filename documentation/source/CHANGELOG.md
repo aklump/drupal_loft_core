@@ -10,28 +10,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - Drupal 10 support.
 
-### Changed
-
-- lorem
-
-### Deprecated
-
-- lorem
-
 ### Removed
 
 - `loft_core_testing` it is available as stand alone module now.
 - `loft_core_user_stash` function
 - `loft_core_users` module.  No longer available.
 - `static-content` stream wrapper
-
-### Fixed
-
-- lorem
-
-### Security
-
-- lorem
 
 ## [2.0.9] - 2023-12-03
 

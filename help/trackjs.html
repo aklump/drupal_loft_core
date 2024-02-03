@@ -1,0 +1,18 @@
+
+<ol>
+<li>Sign up for an account at http://www.trackjs.com</li>
+<li><p>Obtain your token and add it to <code>settings.php</code></p>
+
+<pre><code>$conf['loft_core_trackjs_token'] = '5302679c8b624e0395a6a6da5b1199d6';
+</code></pre></li>
+<li><p>Add the following snippet in <code>html.tpl.php</code> in your theme before <code>$scripts</code> output.</p>
+
+<pre><code>&lt;?= $loft_core_tracking ?&gt;
+&lt;?= $scripts; ?&gt;
+</code></pre></li>
+<li><p>This will only be present when <code>DRUPAL_ENV</code> is <code>prod</code>.</p></li>
+</ol>
+
+<h2>Config and Metadata</h2>
+
+<p>See <code>HOOK_loft_core_trackjs_alter()</code> for more info.</p>

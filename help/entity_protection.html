@@ -1,0 +1,46 @@
+
+<p>With Loft Core, it's easy to protect critical entities that should not be deleted through the admin UI.  Learn more by looking at the docblocks in <code>\Drupal\loft_core\Service\EntityProtectionService</code>.</p>
+
+<ol>
+<li><p>Add this to <em>settings.php</em>, where <code>SE_CORE_</code> is the uppercase name of your custom module or other identifying prefix you wish to use for your PHP constants.</p>
+
+<pre><code>$config['loft_core.entity_protection']['prefix'] = 'SE_CORE_';
+</code></pre></li>
+<li><p>Define some constants like so, in your core module file.</p>
+
+<pre><code>&lt;?php
+
+/**
+ * @file
+ * Module entry file for se_core.
+ */
+
+define('SE_CORE_NID_ABOUT', 531);
+define('SE_CORE_USER_ID_API', 123);
+define('SE_CORE_BLOCK_CONTENT_ID_FOOTER_ADDRESS', 7);
+define('SE_CORE_COMMERCE_STORE_ID_SEAO', 1);
+
+...
+</code></pre></li>
+<li><p>Add this to <em>hook_form_alter</em> implementation:</p>
+
+<pre><code>/**
+ * Implements hook_form_alter().
+ */
+function se_core_form_alter(array &amp;$form, FormStateInterface $form_state, $form_id) {
+  \Drupal::service('loft_core.entity_protection')
+    -&gt;handleForm($form, $form_state, $form_id);
+  ...  
+</code></pre></li>
+<li><p>Add this to <em>hook_entity_predelete</em> implementation:</p>
+
+<pre><code>/**
+ * Implements hook_entity_predelete().
+ */
+function se_core_entity_predelete(EntityInterface $entity) {
+  \Drupal::service('loft_core.entity_protection')
+    -&gt;handlePreDelete($entity);
+}
+</code></pre></li>
+<li><p>The delete UI for these entities will be removed from Drupal.</p></li>
+</ol>
