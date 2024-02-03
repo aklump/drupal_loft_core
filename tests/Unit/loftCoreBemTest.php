@@ -4,6 +4,7 @@ namespace Drupal\Tests\loft_core\Unit;
 
 use Drupal\Tests\loft_core\TestWithFilesTrait;
 use PHPUnit\Framework\TestCase;
+use function loft_core_cl;
 
 require_once __DIR__ . '/../../includes/loft_core.utilities.inc';
 
@@ -26,6 +27,7 @@ class LoftCoreBemTest extends TestCase {
    * @dataProvider dataFortestLoftCoreBemReturnsExpectedValuesProvider
    */
   public function testLoftCoreBemReturnsExpectedValues(string $subject) {
+    /** @phpstan-ignore-next-line */
     list($bem, $bem_modifier) = loft_core_bem('foo');
     $this->assertSame('foo', $bem());
     $this->assertSame('foo__' . $subject, $bem($subject));
@@ -46,6 +48,7 @@ class LoftCoreBemTest extends TestCase {
    * @dataProvider dataForBemModifierThrowsProvider
    */
   public function testLoftCoreBemThrowsWithDoubleHyphenArgumentToModifier(string $subject) {
+    /** @phpstan-ignore-next-line */
     list(, $bem_modifier) = loft_core_bem('foo');
     $this->expectException(\InvalidArgumentException::class);
     $bem_modifier($subject);
@@ -63,6 +66,7 @@ class LoftCoreBemTest extends TestCase {
    * @dataProvider dataForBemThrowsProvider
    */
   public function testLoftCoreBemThrowsWithDoubleHyphenArgumentToElement(string $subject) {
+    /** @phpstan-ignore-next-line */
     list($bem) = loft_core_bem('foo');
     $this->expectException(\InvalidArgumentException::class);
     $bem($subject);
@@ -93,7 +97,8 @@ class LoftCoreBemTest extends TestCase {
    * @dataProvider DataForTestLoftCoreClProvider
    */
   public function testLoftCoreCl($base, $subject, $control_component, $control_version) {
-    $cl = \loft_core_cl($base);
+    /** @phpstan-ignore-next-line */
+    $cl = loft_core_cl($base);
     $this->assertSame($control_component, $cl($subject));
     $this->assertSame($control_component, $cl($subject, TRUE));
     $this->assertSame($control_version, $cl($subject, FALSE));
