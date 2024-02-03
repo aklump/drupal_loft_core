@@ -7,16 +7,8 @@
             "title": "Loft Core"
         },
         {
-            "id": "database",
-            "title": "Database"
-        },
-        {
             "id": "forms",
             "title": "Forms API"
-        },
-        {
-            "id": "loft_core_users",
-            "title": "Loft Core: Users"
         },
         {
             "id": "redirects",

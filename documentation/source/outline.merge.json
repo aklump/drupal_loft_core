@@ -7,10 +7,6 @@
             "title": "Loft Core"
         },
         {
-            "id": "database",
-            "title": "Database"
-        },
-        {
             "id": "forms",
             "title": "Forms API"
         },

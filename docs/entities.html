@@ -5,6 +5,7 @@
   <title>Working With Entities Cheat Sheet</title>
   <link href="search/tipuesearch.css" rel="stylesheet">
   <link href="style.css" rel="stylesheet">
+  <meta name="keywords" content="" />
 </head>
 
 <body class="page--entities">
@@ -22,7 +23,7 @@
 
 <section>
   <h1>Working With Entities Cheat Sheet</h1>
-  
+  <!--searchable_content-->
 
 <p>Using <code>EntityTrait</code> you want to always cast a variable at the top of your script, this will speed up your code.  The benchmarks show that the <code>get()</code> and <code>f()</code> methods have no performance difference; however instantiating the service expensive.</p>
 
@@ -68,7 +69,7 @@ $url = $extract-&gt;f('#', 'field_url');
 <li><code>check_markup($entity-&gt;field_thing['und'][0]['value'], $entity-&gt;field_thing['und'][0]['format'])</code></li>
 <li><code>Core::getSafeMarkupHandler()</code></li>
 </ol>
-
+<!--end_searchable_content-->
 </section>
 
 <div class="search__results">
@@ -78,7 +79,7 @@ $url = $extract-&gt;f('#', 'field_url');
 <footer>
   <div class="pager"><a href="vimeo.html" class="prev vimeo">&laquo;Vimeo</a><a href="index.html" class="index pager__book-title">Loft Drupal Core</a><a href="index.html" class="next index">Index&raquo;</a></div>  
   <div id="footer-legaleeze">
-    <p class="legaleeze center">Version: 1.0 &bull; Last Updated: Sun, 03 Dec 2023 07:51:19 -0800</p>
+    <p class="legaleeze center">Version: 3.0.0 &bull; Last Updated: Fri, 02 Feb 2024 18:42:36 -0800</p>
   </div>
 </footer>
 
