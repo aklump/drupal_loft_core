@@ -8,3 +8,4 @@ code-coverage/
 /documentation/core
 /documentation/README.md
 /.gitignore
+yarn.lock
