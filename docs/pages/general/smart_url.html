@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+      <link rel="stylesheet" href="/Users/aklump/Code/Packages/d8/loft_core/docs/dist/node_modules/bootstrap/dist/css/bootstrap.css?ver=3.0.1">
+      <link rel="stylesheet" href="/Users/aklump/Code/Packages/d8/loft_core/docs/dist/style.css?ver=3.0.1">
+      <link rel="stylesheet" href="/Users/aklump/Code/Packages/d8/loft_core/docs/dist/node_modules/bootstrap-icons/font/bootstrap-icons.min.css?ver=3.0.1">
+    <title>Smart Urls | Loft Core Drupal Module</title>
+</head>
+<body class="my-5">
+
+<header class="header bg-light fixed-top p-2 pt-1">
+  <div class="container-md">
+    <div class="d-flex justify-content-between align-items-center">
+      <div class="header__breadcrumbs flex-shrink-0 flex-grow-1 me-3">
+        <nav aria-label="breadcrumb">
+  <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item">
+      <a class="fw-bold" href="/Users/aklump/Code/Packages/d8/loft_core/docs/index.html">Loft Core Drupal Module</a>
+    </li>
+    <li class="breadcrumb-item">
+      <a class="fw-bold" href="#" data-bs-toggle="offcanvas"
+         data-bs-target="#table-of-contents"
+         aria-controls="table-of-contents">TOC</a>
+    </li>
+    <li class="breadcrumb-item">
+      <a href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/readme.html">General</a></li>
+  </ol>
+</nav>
+
+      </div>
+      <div class="header__tags me-3">  </div>
+      <div class="header__page-numbers flex-shrink-1">14
+        / 19</div>
+    </div>
+  </div>
+</header>
+
+<main class="container-md flex-column">
+  <div class="row mb-5 pt-5">
+    <article class="col">
+      <h1 class="mb-4 text-primary">Smart Urls</h1>
+      <ul>
+<li><p>User enters: <code>http://www.mysite.com/some-cool-aliased-title</code></p>
+</li>
+<li><p>You want: <code>/node/123</code></p>
+</li>
+<li><p>Use <code>loft_core_smart_url</code></p>
+</li>
+</ul>
+<p>Imagine an admin entering a link to the site.  As developer want the unaliased relative path, as the admin, they copy and past the absolute aliased path.  It's a pain to explain to theme that they have to convert it to the way you want it, so you give up.  But that's where <code>loft_core_smart_url()</code> comes in.  Hand it the url they entered, and it will give you the url you want.</p>
+<p>Add this to a presave hook after collection an url in a node form.</p>
+<p>Add this to a filter that can then convert the bad urls to good urls.</p>
+<p>Rock.</p>
+<h2>Configuration</h2>
+<p>This should work out of the box, but to fine tune it add something like the following to <em>settings.php</em>.</p>
+<pre><code>$config['loft_core.settings']['smart_url_regex'] = '/mysite.(?:org|loft)$/i';
+</code></pre>
+    </article>
+  </div>
+</main>
+
+  <footer class="footer d-flex justify-content-center">
+    <div class="flex-column justify-content-center">
+                  Version:
+          <strong>3.0.1</strong>
+          &bull;
+                Last Update: <strong>5/2/2024</strong>
+    </div>
+  </footer>
+
+
+<nav class="nav d-flex justify-content-center align-items-center
+  fixed-bottom">
+  <div class="btn-group flex-fill">
+              <a href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/readme.html" class="btn nav__prev-chapter btn-secondary"><i class="bi
+      bi-caret-left-fill"></i> Loft Core</a>
+  
+    
+              <a href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/permalink.html" class="btn nav__prev-page js-nav__prev-page
+    btn-primary"><i class="bi
+      bi-caret-left-fill"></i></a>
+  
+    
+    <a class="nav__toc btn btn-light" href="#"
+       data-bs-toggle="offcanvas"
+       data-bs-target="#table-of-contents"
+       aria-controls="table-of-contents"><i class="bi
+           bi-list-ol"></i></a>
+    
+              <a href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/testing.html" class="btn nav__next-page js-nav__next-page
+    btn-primary"><i class="bi bi-file-earmark"></i> Testing <i class="bi
+       bi-caret-right-fill"></i></a>
+  
+    
+              <span class="btn nav__next-chapter btn-secondary "></span>
+  
+  </div>
+</nav>
+
+
+<div class="offcanvas offcanvas-start" tabindex="-1" id="table-of-contents"
+     aria-labelledby="table-of-contents__title" data-bs-keyboard="true">
+  <div class="offcanvas-header">
+    <h1 class="h6 offcanvas-title js-chapter-list-title"
+        id="table-of-contents__title">All
+      Chapters
+      &amp; Pages</h1>
+    <h1 class="d-none h6 offcanvas-title js-search-results-title"
+        id="table-of-contents__title">Search Results</h1>
+    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+          <input class="js-search form-control mb-4" type="search"
+             placeholder="Search docs..."
+             aria-label="Search">
+      <div class="js-search-results d-none">
+        <h2 class="h4 mt-4">Matched Pages</h2>
+        <ol class="list-unstyled">
+                                              <li data-page="readme" value="1">
+      <a class="js-page-link" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/readme.html">Loft Core<span
+              class="js-search-score
+              badge
+              bg-info rounded-pill badge-sm"></span></a>&nbsp;[General]
+    </li>
+  
+                                    <li data-page="forms" value="2">
+      <a class="js-page-link" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/forms.html">Forms API<span
+              class="js-search-score
+              badge
+              bg-info rounded-pill badge-sm"></span></a>&nbsp;[General]
+    </li>
+  
+                                    <li data-page="redirects" value="3">
+      <a class="js-page-link" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/redirects.html">Redirects<span
+              class="js-search-score
+              badge
+              bg-info rounded-pill badge-sm"></span></a>&nbsp;[General]
+    </li>
+  
+                                    <li data-page="settings" value="4">
+      <a class="js-page-link" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/settings.html">settings.php<span
+              class="js-search-score
+              badge
+              bg-info rounded-pill badge-sm"></span></a>&nbsp;[General]
+    </li>
+  
+                                    <li data-page="trackjs" value="5">
+      <a class="js-page-link" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/trackjs.html">Add TrackJS.com to your website<span
+              class="js-search-score
+              badge
+              bg-info rounded-pill badge-sm"></span></a>&nbsp;[General]
+    </li>
+  
+                                    <li data-page="ajax" value="6">
+      <a class="js-page-link" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/ajax.html">Ajax<span
+              class="js-search-score
+              badge
+              bg-info rounded-pill badge-sm"></span></a>&nbsp;[General]
+    </li>
+  
+                                    <li data-page="breadcrumb" value="7">
+      <a class="js-page-link" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/breadcrumb.html">Breadcrumb<span
+              class="js-search-score
+              badge
+              bg-info rounded-pill badge-sm"></span></a>&nbsp;[General]
+    </li>
+  
+                                    <li data-page="clipboard" value="8">
+      <a class="js-page-link" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/clipboard.html">Clipboard API<span
+              class="js-search-score
+              badge
+              bg-info rounded-pill badge-sm"></span></a>&nbsp;[General]
+    </li>
+  
+                                    <li data-page="entities" value="9">
+      <a class="js-page-link" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/entities.html">Working With Entities Cheat Sheet<span
+              class="js-search-score
+              badge
+              bg-info rounded-pill badge-sm"></span></a>&nbsp;[General]
+    </li>
+  
+                                    <li data-page="entity_archive" value="10">
+      <a class="js-page-link" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/entity_archive.html">Archiving Entities<span
+              class="js-search-score
+              badge
+              bg-info rounded-pill badge-sm"></span></a>&nbsp;[General]
+    </li>
+  
+                                    <li data-page="entity_protection" value="11">
+      <a class="js-page-link" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/entity_protection.html">Protecting Critical Entities<span
+              class="js-search-score
+              badge
+              bg-info rounded-pill badge-sm"></span></a>&nbsp;[General]
+    </li>
+  
+                                    <li data-page="images" value="12">
+      <a class="js-page-link" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/images.html">Images<span
+              class="js-search-score
+              badge
+              bg-info rounded-pill badge-sm"></span></a>&nbsp;[General]
+    </li>
+  
+                                    <li data-page="permalink" value="13">
+      <a class="js-page-link" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/permalink.html">Permalink or "Copy link" tab<span
+              class="js-search-score
+              badge
+              bg-info rounded-pill badge-sm"></span></a>&nbsp;[General]
+    </li>
+  
+                                    <li data-page="smart_url" value="14">
+      <a class="js-page-link" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/smart_url.html">Smart Urls<span
+              class="js-search-score
+              badge
+              bg-info rounded-pill badge-sm"></span></a>&nbsp;[General]
+    </li>
+  
+                                    <li data-page="testing" value="15">
+      <a class="js-page-link" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/testing.html">Testing<span
+              class="js-search-score
+              badge
+              bg-info rounded-pill badge-sm"></span></a>&nbsp;[General]
+    </li>
+  
+                                    <li data-page="user_persistent_dismiss" value="16">
+      <a class="js-page-link" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/user_persistent_dismiss.html">User Persistent Dismiss<span
+              class="js-search-score
+              badge
+              bg-info rounded-pill badge-sm"></span></a>&nbsp;[General]
+    </li>
+  
+                                    <li data-page="vimeo" value="17">
+      <a class="js-page-link" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/vimeo.html">Vimeo<span
+              class="js-search-score
+              badge
+              bg-info rounded-pill badge-sm"></span></a>&nbsp;[General]
+    </li>
+  
+                                    <li data-page="changelog" value="18">
+      <a class="js-page-link" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/changelog.html">Changelog<span
+              class="js-search-score
+              badge
+              bg-info rounded-pill badge-sm"></span></a>&nbsp;[General]
+    </li>
+  
+                                    <li data-page="roadmap" value="19">
+      <a class="js-page-link" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/roadmap.html">Roadmap and Todo List<span
+              class="js-search-score
+              badge
+              bg-info rounded-pill badge-sm"></span></a>&nbsp;[General]
+    </li>
+  
+                              </ol>
+      </div>
+        
+    <div class="js-chapter-list">
+              <h2 class="h4 mt-4">General</h2>
+        <ol>
+                                <li data-page="readme" value="1">
+      <a class="js-page-link" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/readme.html">Loft Core</a>&nbsp;[General]
+    </li>
+  
+                                <li data-page="forms" value="2">
+      <a class="js-page-link" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/forms.html">Forms API</a>&nbsp;[General]
+    </li>
+  
+                                <li data-page="redirects" value="3">
+      <a class="js-page-link" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/redirects.html">Redirects</a>&nbsp;[General]
+    </li>
+  
+                                <li data-page="settings" value="4">
+      <a class="js-page-link" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/settings.html">settings.php</a>&nbsp;[General]
+    </li>
+  
+                                <li data-page="trackjs" value="5">
+      <a class="js-page-link" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/trackjs.html">Add TrackJS.com to your website</a>&nbsp;[General]
+    </li>
+  
+                                <li data-page="ajax" value="6">
+      <a class="js-page-link" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/ajax.html">Ajax</a>&nbsp;[General]
+    </li>
+  
+                                <li data-page="breadcrumb" value="7">
+      <a class="js-page-link" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/breadcrumb.html">Breadcrumb</a>&nbsp;[General]
+    </li>
+  
+                                <li data-page="clipboard" value="8">
+      <a class="js-page-link" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/clipboard.html">Clipboard API</a>&nbsp;[General]
+    </li>
+  
+                                <li data-page="entities" value="9">
+      <a class="js-page-link" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/entities.html">Working With Entities Cheat Sheet</a>&nbsp;[General]
+    </li>
+  
+                                <li data-page="entity_archive" value="10">
+      <a class="js-page-link" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/entity_archive.html">Archiving Entities</a>&nbsp;[General]
+    </li>
+  
+                                <li data-page="entity_protection" value="11">
+      <a class="js-page-link" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/entity_protection.html">Protecting Critical Entities</a>&nbsp;[General]
+    </li>
+  
+                                <li data-page="images" value="12">
+      <a class="js-page-link" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/images.html">Images</a>&nbsp;[General]
+    </li>
+  
+                                <li data-page="permalink" value="13">
+      <a class="js-page-link" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/permalink.html">Permalink or "Copy link" tab</a>&nbsp;[General]
+    </li>
+  
+                                <li data-page="smart_url" value="14">
+      <a class="js-page-link" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/smart_url.html">Smart Urls</a>&nbsp;[General]
+    </li>
+  
+                                <li data-page="testing" value="15">
+      <a class="js-page-link" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/testing.html">Testing</a>&nbsp;[General]
+    </li>
+  
+                                <li data-page="user_persistent_dismiss" value="16">
+      <a class="js-page-link" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/user_persistent_dismiss.html">User Persistent Dismiss</a>&nbsp;[General]
+    </li>
+  
+                                <li data-page="vimeo" value="17">
+      <a class="js-page-link" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/vimeo.html">Vimeo</a>&nbsp;[General]
+    </li>
+  
+                                <li data-page="changelog" value="18">
+      <a class="js-page-link" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/changelog.html">Changelog</a>&nbsp;[General]
+    </li>
+  
+                                <li data-page="roadmap" value="19">
+      <a class="js-page-link" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/roadmap.html">Roadmap and Todo List</a>&nbsp;[General]
+    </li>
+  
+                  </ol>
+          </div>
+  </div>
+</div>
+<div class="modal fade" id="modal" tabindex="-1"
+     aria-labelledby="modal-title" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="js-modal-title modal-title" id="modal-title"></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="mt-1 mb-4">
+                  </p>
+        
+                
+        <ul class="list-group list-group-flush">
+                                    <a class="list-group-item list-group-item-action"
+                 data-tags="[]" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/readme.html">Loft Core</a>
+                                                <a class="list-group-item list-group-item-action"
+                 data-tags="[]" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/forms.html">Forms API</a>
+                                                <a class="list-group-item list-group-item-action"
+                 data-tags="[]" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/redirects.html">Redirects</a>
+                                                <a class="list-group-item list-group-item-action"
+                 data-tags="[]" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/settings.html">settings.php</a>
+                                                <a class="list-group-item list-group-item-action"
+                 data-tags="[]" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/trackjs.html">Add TrackJS.com to your website</a>
+                                                <a class="list-group-item list-group-item-action"
+                 data-tags="[]" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/ajax.html">Ajax</a>
+                                                <a class="list-group-item list-group-item-action"
+                 data-tags="[]" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/breadcrumb.html">Breadcrumb</a>
+                                                <a class="list-group-item list-group-item-action"
+                 data-tags="[]" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/clipboard.html">Clipboard API</a>
+                                                <a class="list-group-item list-group-item-action"
+                 data-tags="[]" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/entities.html">Working With Entities Cheat Sheet</a>
+                                                <a class="list-group-item list-group-item-action"
+                 data-tags="[]" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/entity_archive.html">Archiving Entities</a>
+                                                <a class="list-group-item list-group-item-action"
+                 data-tags="[]" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/entity_protection.html">Protecting Critical Entities</a>
+                                                <a class="list-group-item list-group-item-action"
+                 data-tags="[]" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/images.html">Images</a>
+                                                <a class="list-group-item list-group-item-action"
+                 data-tags="[]" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/permalink.html">Permalink or &quot;Copy link&quot; tab</a>
+                                                <a class="list-group-item list-group-item-action"
+                 data-tags="[]" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/smart_url.html">Smart Urls</a>
+                                                <a class="list-group-item list-group-item-action"
+                 data-tags="[]" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/testing.html">Testing</a>
+                                                <a class="list-group-item list-group-item-action"
+                 data-tags="[]" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/user_persistent_dismiss.html">User Persistent Dismiss</a>
+                                                <a class="list-group-item list-group-item-action"
+                 data-tags="[]" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/vimeo.html">Vimeo</a>
+                                                <a class="list-group-item list-group-item-action"
+                 data-tags="[]" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/changelog.html">Changelog</a>
+                                                <a class="list-group-item list-group-item-action"
+                 data-tags="[]" href="/Users/aklump/Code/Packages/d8/loft_core/docs/pages/general/roadmap.html">Roadmap and Todo List</a>
+                              </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <script src="/Users/aklump/Code/Packages/d8/loft_core/docs/dist/node_modules/bootstrap/dist/js/bootstrap.min.js?ver=3.0.1"></script>
+  <script src="/Users/aklump/Code/Packages/d8/loft_core/docs/dist/lunr.js?ver=3.0.1"></script>
+  <script src="/Users/aklump/Code/Packages/d8/loft_core/docs/dist/knowledge.min.js?ver=3.0.1"></script>
+
+</body>
+</html>

@@ -1,29 +1,28 @@
 # Loft Core
 
-This module contains features that I wish were in core, and which I often use for all my projects.  Documentation can be found at _docs/index.html_ or by using the Advanced Help module.
+This module contains features that I wish were in core, and which I often use for all my projects. Documentation can be found at _docs/index.html_.
 
-## Installation
+## Install with Composer
 
-1. Add the following to the application's _composer.json_ above web root.
+1. Because this is an unpublished package, you must define it's repository in your project's _composer.json_ file. Add the following to _composer.json_ in the `repositories` array:
 
     ```json
     {
-      "repositories": [
-        {
-          "type": "path",
-          "url": "web/modules/custom/loft_core"
-        }
-      ]
+        "type": "github",
+        "url": "https://github.com/aklump/drupal_loft_core"
     }
     ```
 
-1. Now run `composer require drupal/loft-core`
+2. Require this package:
 
-## Contact
+    ```
+    composer require aklump_drupal/loft_core:^3.0
+    ```
 
-* **In the Loft Studios**
-* Aaron Klump - Developer
-* PO Box 29294 Bellingham, WA 98228-1294
-* _skype_: intheloftstudios
-* _d.o_: aklump
-* <http://www.InTheLoftStudios.com>
+3. Add the installed directory to _.gitignore_
+
+   ```php
+   /web/modules/custom/loft_core/
+   ```
+
+1. Enable this module.

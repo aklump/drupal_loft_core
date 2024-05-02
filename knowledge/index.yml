@@ -1,0 +1,20 @@
+page_order:
+  - readme
+  - forms
+  - redirects
+  - settings
+  - trackjs
+  - ajax
+  - breadcrumb
+  - clipboard
+  - entities
+  - entity_archive
+  - entity_protection
+  - images
+  - permalink
+  - smart_url
+  - testing
+  - user_persistent_dismiss
+  - vimeo
+  - changelog
+  - roadmap
