@@ -3,8 +3,9 @@
 namespace Drupal\loft_core\FeatureSwitches;
 
 use Drupal\feature_switches\Operator;
+use JsonSerializable;
 
-final class OperatorAdapter implements \JsonSerializable {
+final class OperatorAdapter implements JsonSerializable {
 
   /**
    * @var \Drupal\feature_switches\Operator
@@ -15,6 +16,7 @@ final class OperatorAdapter implements \JsonSerializable {
     $this->operator = $operator;
   }
 
+  #[\ReturnTypeWillChange]
   public function jsonSerialize() {
     $data = $this->operator->jsonSerialize();
 
