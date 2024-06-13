@@ -221,7 +221,7 @@ trait EntityDataAccessorTrait {
 
     if (!$date instanceof DrupalDateTime && is_object($date)) {
       $current_timezone = $date->getTimezone();
-      $date = $date->format(DATE_ISO8601);
+      $date = $date->format(DATE_ATOM);
     }
 
     $date = new DrupalDateTime($date, $current_timezone, [
