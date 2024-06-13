@@ -4,9 +4,7 @@
 
 This module contains features that I wish were in core, and which I often use for all my projects. Documentation can be found at _docs/index.html_.
 
-##   Install with Composer
-
-1. Because this is an unpublished package, you must define it's repository in
+## Install with Composer1. Because this is an unpublished package, you must define it's repository in
    your project's _composer.json_ file. Add the following to _composer.json_ in
    the `repositories` array:
    
