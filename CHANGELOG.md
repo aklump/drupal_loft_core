@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.0.5] - 2024-08-22
+
+### Removed
+
+- jquery.once and replaced with once. https://www.npmjs.com/package/@drupal/once
+
 ## [3.0.0] - 2024-02-02
 
 ### Added
@@ -14,7 +20,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - `loft_core_testing` it is available as stand alone module now.
 - `loft_core_user_stash` function
-- `loft_core_users` module.  No longer available.
+- `loft_core_users` module. No longer available.
 - `static-content` stream wrapper
 
 ## [2.0.9] - 2023-12-03
@@ -118,9 +124,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - The API for the redirect hooks have changed. You must update the following implementations per _loft_core.api.php_.
 
-  * `HOOK_loft_core_redirect_node_BUNDLE_TYPE_view`
-  * `HOOK_loft_core_redirect_node_BUNDLE_TYPE_edit`
-  * `HOOK_loft_core_redirect_node_BUNDLE_TYPE_delete`
+    * `HOOK_loft_core_redirect_node_BUNDLE_TYPE_view`
+    * `HOOK_loft_core_redirect_node_BUNDLE_TYPE_edit`
+    * `HOOK_loft_core_redirect_node_BUNDLE_TYPE_delete`
 
 ## 0.9.12
 
