@@ -11,3 +11,4 @@ clipboard:
     dist/clipboard.min.js: { minified: true }
   dependencies:
     - core/jquery
+    - core/once
