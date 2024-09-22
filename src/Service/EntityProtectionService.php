@@ -9,6 +9,7 @@ use Drupal\Core\Logger\LoggerChannelTrait;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\TempStore\PrivateTempStore;
 use Drupal\Core\TempStore\PrivateTempStoreFactory;
 
 /**
@@ -55,6 +56,16 @@ class EntityProtectionService {
   static private $entities;
 
   private $config;
+
+  /**
+   * @var \Drupal\Core\TempStore\PrivateTempStore
+   */
+  private $tempStore;
+
+  /**
+   * @var \Drupal\Core\Session\AccountInterface
+   */
+  private $currentUser;
 
   /**
    * EntityProtectionService constructor.
