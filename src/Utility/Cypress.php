@@ -5,6 +5,7 @@ namespace Drupal\loft_core\Utility;
 use AKlump\Bem\Fluent\Bem;
 use AKlump\Bem\Styles\OfficialPassThrough;
 use Drupal\Core\Template\Attribute;
+use RuntimeException;
 
 /**
  * Supports testing with Cypress.
@@ -30,6 +31,11 @@ final class Cypress {
   private $block;
 
   /**
+   * @var mixed
+   */
+  private $targetElement;
+
+  /**
    * Cypress constructor.
    *
    * @param string $block
@@ -47,7 +53,7 @@ final class Cypress {
    * @return static
    */
   public static function create(string $block) {
-    return new static($block);
+    return new Cypress($block);
   }
 
   /**
@@ -58,7 +64,7 @@ final class Cypress {
    */
   public function with(string $element): void {
     if (is_null($this->targetElement)) {
-      throw new \RuntimeException("You must call ::tag() first.");
+      throw new RuntimeException("You must call ::tag() first.");
     }
 
     $bem = new Bem($this->block, NULL, new OfficialPassThrough());
