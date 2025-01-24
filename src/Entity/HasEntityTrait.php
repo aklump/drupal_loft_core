@@ -4,6 +4,7 @@ namespace Drupal\loft_core\Entity;
 
 use AKlump\LoftLib\Code\Cache;
 use Drupal\Core\Entity\EntityInterface;
+use Exception;
 
 /**
  * Trait HasEntityTrait.
@@ -227,11 +228,11 @@ trait HasEntityTrait {
       try {
         return call_user_func_array([$this, 'requireEntity'], $arguments);
       }
-      catch (\Exception $exception) {
+      catch (Exception $exception) {
         continue;
       }
     }
-    throw new MissingRequiredEntityException(implode(', ', $entity_type_ids));
+    throw new MissingRequiredEntityException(implode(', ', $type_bundles));
   }
 
   /**

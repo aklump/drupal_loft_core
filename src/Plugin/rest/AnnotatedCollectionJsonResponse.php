@@ -6,11 +6,15 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 final class AnnotatedCollectionJsonResponse implements AnnotatedResponseInterface {
 
-  private $href = '';
+  private string $href = '';
 
-  private $links = [];
+  private array $links = [];
 
-  public function __construct($version) {
+  private string $version;
+
+  private AnnotatedResponse $annotatedResponse;
+
+  public function __construct(string $version) {
     $this->version = $version;
     $this->annotatedResponse = AnnotatedResponse::create();
   }

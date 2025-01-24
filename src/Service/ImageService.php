@@ -2,6 +2,7 @@
 
 namespace Drupal\loft_core\Service;
 
+use DOMDocument;
 use Drupal\Component\Utility\Xss;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\File\Event\FileUploadSanitizeNameEvent;
@@ -10,6 +11,7 @@ use Drupal\Core\Render\Markup;
 use Drupal\image\Entity\ImageStyle;
 use League\ColorExtractor\Color;
 use League\ColorExtractor\Palette;
+use RuntimeException;
 use Symfony\Component\Mime\MimeTypeGuesserInterface;
 
 /**
@@ -150,10 +152,10 @@ class ImageService implements VisualMediaInterface {
     $this->validateResourceExists($file_resource);
     $mime = $this->mimeTypeGuesser->guessMimeType($file_resource);
     if ('image/svg+xml' === $mime) {
-      $dom = new \DOMDocument();
+      $dom = new DOMDocument();
       $contents = file_get_contents($file_resource);
       if (!$dom->loadXML($contents)) {
-        throw new \RuntimeException(sprintf('Failed to load SVG XML from %s', $file_resource));
+        throw new RuntimeException(sprintf('Failed to load SVG XML from %s', $file_resource));
       }
 
       // Strip XML header.
@@ -167,7 +169,7 @@ class ImageService implements VisualMediaInterface {
       $svg = $this->filterXssSvg($svg);
     }
     else {
-      throw new \RuntimeException("Unsupported filetype: $mime");
+      throw new RuntimeException("Unsupported filetype: $mime");
     }
 
     if (is_callable($processor)) {
@@ -193,7 +195,7 @@ class ImageService implements VisualMediaInterface {
     list($path) = explode('?', $file_resource . '?');
     $mime = $this->mimeTypeGuesser->guessMimeType($path);
     if (is_null($mime)) {
-      throw new \RuntimeException(sprintf('Unable to determine mimetype for: %s.', $path));
+      throw new RuntimeException(sprintf('Unable to determine mimetype for: %s.', $path));
     }
 
     return sprintf('data:%s;base64,%s', $mime, base64_encode(file_get_contents($file_resource)));
@@ -511,7 +513,7 @@ class ImageService implements VisualMediaInterface {
    */
   public function getAspectRatio(string $uri, string $style_name = NULL, &$width = NULL, &$height = NULL): float {
     if (!file_exists($uri)) {
-      throw new \RuntimeException(sprintf('The provided URI does not exist: %s', $uri));
+      throw new RuntimeException(sprintf('The provided URI does not exist: %s', $uri));
     }
 
     $mime = $this->mimeTypeGuesser->guessMimeType($uri);
@@ -612,7 +614,7 @@ class ImageService implements VisualMediaInterface {
    */
   public function getAspectRatioWidthAndHeight(string $uri, string $style_name = NULL): array {
     if (!file_exists($uri)) {
-      throw new \RuntimeException(sprintf('The provided URI does not exist: %s', $uri));
+      throw new RuntimeException(sprintf('The provided URI does not exist: %s', $uri));
     }
 
     $image = $this->imageFactory->get($uri);

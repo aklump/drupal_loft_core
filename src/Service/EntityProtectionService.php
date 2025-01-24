@@ -170,8 +170,9 @@ class EntityProtectionService {
   public function handleForm(array &$form, FormStateInterface $form_state, $form_id) {
     $form_object = $form_state->getFormObject();
     $base_form_id = $form_state->getBuildInfo()['base_form_id'] ?? $form_id;
-    $entity = NULL;
-    $entity_type = NULL;
+    $is_protected = function () {
+      return FALSE;
+    };
 
     if (method_exists($form_object, 'getEntity')) {
       $entity = $form_object->getEntity();
