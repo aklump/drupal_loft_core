@@ -11,10 +11,26 @@ use Drupal\Component\Utility\NestedArray;
  * Implements hook_js_settings_build().
  */
 function loft_core_js_settings_build(array &$settings, AttachedAssetsInterface $assets) {
+  $settings['env'] = [];
+  $settings['env']['env'] = DRUPAL_ENV;
+  $settings['env']['dev'] = DRUPAL_ENV_DEV;
+  if (defined('DRUPAL_ENV_PROD')) {
+    $settings['env']['prod'] = DRUPAL_ENV_PROD;
+  }
+  if (defined('DRUPAL_ENV_LIVE')) {
+    $settings['env']['live'] = DRUPAL_ENV_LIVE;
+  }
+  elseif (defined('DRUPAL_ENV_PROD')) {
+    $settings['env']['live'] = DRUPAL_ENV_PROD;
+  }
+  if (defined('DRUPAL_ENV_STAGING')) {
+    $settings['env']['staging'] = DRUPAL_ENV_STAGING;
+  }
+
   $settings['env'] = [
     'env' => DRUPAL_ENV,
-    'prod' => DRUPAL_ENV_PROD,
-    'staging' => DRUPAL_ENV_STAGING,
+    'prod' => defined('DRUPAL_ENV_LIVE') ? DRUPAL_ENV_LIVE : DRUPAL_ENV_PROD,
+    'staging' => defined('DRUPAL_ENV_STAGING') ? DRUPAL_ENV_STAGING : 'staging',
     'dev' => DRUPAL_ENV_DEV,
   ];
 }
