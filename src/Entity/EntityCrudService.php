@@ -24,6 +24,11 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
  */
 abstract class EntityCrudService implements HasEntityInterface {
 
+  /**
+   * @var array
+   */
+  private $_validFilterFormats;
+
   use EntityDataAccessorTrait;
   use HasEntityTrait;
   use StringTranslationTrait;

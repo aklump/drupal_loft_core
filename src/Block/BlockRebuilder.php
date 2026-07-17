@@ -16,6 +16,16 @@ use Drupal\Core\Template\Attribute;
 abstract class BlockRebuilder {
 
   /**
+   * @var array
+   */
+  protected $element;
+
+  /**
+   * @var bool
+   */
+  protected $mergeAttributes;
+
+  /**
    * BlockRebuilder constructor.
    *
    * @param array $element

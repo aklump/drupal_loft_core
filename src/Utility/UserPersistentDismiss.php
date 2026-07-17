@@ -66,7 +66,7 @@ final class UserPersistentDismiss implements CacheableDependencyInterface {
    *   An expiration date to use to limit the hide lifetime.  You may omit this
    *   to use the default, which is one year from now.
    */
-  public function __construct(string $id, \DateTime $expires_on = NULL) {
+  public function __construct(string $id, ?\DateTime $expires_on = NULL) {
     if (strstr($id, '.') !== FALSE) {
       throw new \InvalidArgumentException('$id may not contain a period.');
     }

@@ -83,7 +83,7 @@ function loft_core_form_tabindex(array &$element, &$index, $key = '#attributes')
  * @param null $message
  *   If the default message is not sufficient, enter a custom message here.
  */
-function loft_core_form_disable_elements(array &$form, array $paths, $module_name = NULL, $message = NULL) {
+function loft_core_form_disable_elements(array &$form, array $paths, ?string $module_name = NULL, ?string $message = NULL) {
   if (is_null($message)) {
     $module_name = empty($module_name) ? 'Loft Core' : $module_name;
     $message = t('This field is controlled by the %module module and cannot be modified in the UI.',

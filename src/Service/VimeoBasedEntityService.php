@@ -67,7 +67,7 @@ final class VimeoBasedEntityService {
    *
    * @return \Drupal\loft_core\Service\VimeoBasedEntityService
    */
-  public function setPosterField(string $field_name, callable $handler = NULL): VimeoBasedEntityService {
+  public function setPosterField(string $field_name, ?callable $handler = NULL): VimeoBasedEntityService {
     $this->fields['poster'] = $field_name;
     $this->posterHandler = $handler;
 

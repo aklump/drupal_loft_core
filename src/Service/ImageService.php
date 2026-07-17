@@ -148,7 +148,7 @@ class ImageService implements VisualMediaInterface {
    * @return string
    *   The markup representing the image.
    */
-  public function getMarkup(string $file_resource, callable $processor = NULL) {
+  public function getMarkup(string $file_resource, ?callable $processor = NULL) {
     $this->validateResourceExists($file_resource);
     $mime = $this->mimeTypeGuesser->guessMimeType($file_resource);
     if ('image/svg+xml' === $mime) {
@@ -511,7 +511,7 @@ class ImageService implements VisualMediaInterface {
    *   for the CSS padding bottom trick, including computing as a percentage
    *   (100%/$ratio), e.g. `'padding-bottom', 100 / $ratio . '%'
    */
-  public function getAspectRatio(string $uri, string $style_name = NULL, &$width = NULL, &$height = NULL): float {
+  public function getAspectRatio(string $uri, ?string $style_name = NULL, &$width = NULL, &$height = NULL): float {
     if (!file_exists($uri)) {
       throw new RuntimeException(sprintf('The provided URI does not exist: %s', $uri));
     }
@@ -612,7 +612,7 @@ class ImageService implements VisualMediaInterface {
    *
    * @deprecated Use getAspectRatio() instead.
    */
-  public function getAspectRatioWidthAndHeight(string $uri, string $style_name = NULL): array {
+  public function getAspectRatioWidthAndHeight(string $uri, ?string $style_name = NULL): array {
     if (!file_exists($uri)) {
       throw new RuntimeException(sprintf('The provided URI does not exist: %s', $uri));
     }

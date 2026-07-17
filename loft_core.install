@@ -50,7 +50,7 @@ function loft_core_update__archive_entities(
   $sql,
   $filename,
   array $file_keys_map = [],
-  callable $value_transform_callback = NULL
+  ?callable $value_transform_callback = NULL
 ) {
   loft_data_grids_boot();
   $output = [];
@@ -80,7 +80,7 @@ function loft_core_update__archive_entities(
               ->prepareDirectory($file_dir, FileSystemInterface::CREATE_DIRECTORY);
             $destination = $file_dir . '/' . $record[$basename_key];
             if (!file_exists($destination)) {
-              if (!file_unmanaged_copy($value, $destination, FileSystemInterface::EXISTS_REPLACE)) {
+              if (!\Drupal::service('file_system')->copy($value, $destination, FileSystemInterface::EXISTS_REPLACE)) {
                 throw new \RuntimeException("Could not copy: $value.");
               }
             }
@@ -185,7 +185,7 @@ function loft_core_update__delete_content_and_entity_definition(array &$sandbox,
     }
 
     // Delete bundle's fields.
-    \Drupal::entityManager()->onBundleDelete($entity_type, $bundle);
+    \Drupal::service('entity_type.manager')->onBundleDelete($entity_type, $bundle);
 
     // Delete the entity type.
 
@@ -239,7 +239,7 @@ function loft_core_update__delete_content_and_entity_definition(array &$sandbox,
     // Taken from node_type_delete(), but we pulled out the above code as a step
     // in the direction of support for non-node entities.
     // TODO Make this work for entities other than node, then remove this.
-    $info = node_type_get_type($bundle);
+    $info = \Drupal::service('entity_type.manager')->getStorage('node_type')->load($bundle);
     \Drupal::database()->delete('node_type')
       ->condition('type', $bundle)
       ->execute();
@@ -336,7 +336,7 @@ function loft_core_update__delete_entity_fields($entity_type, $bundle, array $fi
  */
 function loft_core_update__delete_bundle($node_type) {
 
-  if (!$info = node_type_get_type($node_type)) {
+  if (!$info = \Drupal::service('entity_type.manager')->getStorage('node_type')->load($node_type)) {
     throw new \DrupalUpdateException("Unknown node type: %type", [
       '%type' => $node_type,
     ]);
@@ -385,7 +385,7 @@ function loft_core_update__delete_bundle($node_type) {
     'xmlsitemap_settings_node_' . $node_type,
     'workflow_' . $node_type,
   ];
-  node_type_delete($node_type);
+  \Drupal::service('entity_type.manager')->getStorage('node_type')->load($node_type)->delete();
   node_types_rebuild();
   menu_rebuild();
 
@@ -418,18 +418,16 @@ function loft_core_update__delete_bundle($node_type) {
  *   If the vocabulary cannot be deleted.
  */
 function loft_core_update__delete_taxonomy_vocabulary($vid) {
-  if (!($vocabulary = taxonomy_vocabulary_load($vid))) {
+  if (!($vocabulary = \Drupal::service('entity_type.manager')->getStorage('taxonomy_vocabulary')->load($vid))) {
     return t("There is no vocabulary vid = %vid to delete; skipping this update.", [
       '%vid' => $vid,
     ]);
   }
   try {
-    if (SAVED_DELETED === taxonomy_vocabulary_delete($vid)) {
-      return t('Deleted vocabulary %title".', ['%title' => $vocabulary->name]);
-    }
+    $vocabulary->delete();
+    return t('Deleted vocabulary %title".', ['%title' => $vocabulary->label()]);
   }
   catch (\Exception $exception) {
     throw new DrupalUpdateException("Could not delete vocabulary vid = " . $vid . ': ' . $exception->getMessage());
   }
-
 }

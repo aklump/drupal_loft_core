@@ -14,3 +14,5 @@ fi
 ./vendor/bin/phpswap use 8.0 $verbose './vendor/bin/phpunit -c ./tests/Unit/phpunit.xml'
 ./vendor/bin/phpswap use 8.1 $verbose './vendor/bin/phpunit -c ./tests/Unit/phpunit.xml'
 ./vendor/bin/phpswap use 8.2 $verbose './vendor/bin/phpunit -c ./tests/Unit/phpunit.xml'
+./vendor/bin/phpswap use 8.3 $verbose './vendor/bin/phpunit -c ./tests/Unit/phpunit.xml'
+./vendor/bin/phpswap use 8.4 $verbose './vendor/bin/phpunit -c ./tests/Unit/phpunit.xml'
