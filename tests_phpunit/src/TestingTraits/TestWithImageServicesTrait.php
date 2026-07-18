@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Tests\loft_core;
+namespace Drupal\Tests\loft_core\TestingTraits;
 
 use Drupal\Core\File\MimeType\MimeTypeGuesser;
 use Drupal\Core\Image\ImageFactory;

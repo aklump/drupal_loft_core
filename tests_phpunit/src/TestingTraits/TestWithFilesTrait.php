@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Tests\loft_core;
+namespace Drupal\Tests\loft_core\TestingTraits;
 
 trait TestWithFilesTrait {
 

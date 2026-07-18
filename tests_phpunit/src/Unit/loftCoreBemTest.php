@@ -2,11 +2,11 @@
 
 namespace Drupal\Tests\loft_core\Unit;
 
-use Drupal\Tests\loft_core\TestWithFilesTrait;
+use Drupal\Tests\loft_core\TestingTraits\TestWithFilesTrait;
 use PHPUnit\Framework\TestCase;
 use function loft_core_cl;
 
-require_once __DIR__ . '/../../includes/loft_core.utilities.inc';
+require_once __DIR__ . '/../../../includes/loft_core.utilities.inc';
 
 /**
  * @covers loft_core_bem

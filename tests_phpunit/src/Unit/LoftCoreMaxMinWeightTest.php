@@ -4,7 +4,7 @@ namespace Drupal\Tests\loft_core\Unit;
 
 use PHPUnit\Framework\TestCase;
 
-require_once __DIR__ . '/../../includes/loft_core.utilities.inc';
+require_once __DIR__ . '/../../../includes/loft_core.utilities.inc';
 
 /**
  * @covers loft_core_min_weight
