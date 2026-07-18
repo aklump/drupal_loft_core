@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.1] - 2026-07-17
+
+### Added
+
+- PHP 8.4 compatibility.
+- Fixed deprecated implicit nullable parameters.
+- Replaced `#[AllowDynamicProperties]` with explicit property declarations in relevant classes to ensure PHP 8.4 compatibility while maintaining PHP 7.3 support.
+
 ## [3.0.5] - 2024-08-22
 
 ### Removed
