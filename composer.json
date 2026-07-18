@@ -16,7 +16,7 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "Drupal\\Tests\\loft_core\\": "tests_phpunit/src/"
+      "Drupal\\Tests\\loft_core\\": "tests/src/"
     }
   },
   "require": {

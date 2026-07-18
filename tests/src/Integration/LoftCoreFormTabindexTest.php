@@ -5,7 +5,7 @@ namespace Drupal\Tests\loft_core\Integration;
 use Drupal\Core\Template\Attribute;
 use PHPUnit\Framework\TestCase;
 
-require_once __DIR__ . '/../../includes/loft_core.forms.inc';
+require_once __DIR__ . '/../../../includes/loft_core.forms.inc';
 
 /**
  * @covers loft_core_min_weight

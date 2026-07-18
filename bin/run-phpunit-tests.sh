@@ -6,8 +6,8 @@ PHP="$(command -v php)"
 #PHP=/opt/homebrew/opt/php@8.5/bin/php
 
 # Paths should be relative to THIS file:
-INSTALL_PATH="../tests_phpunit/"
-CONFIG="../tests_phpunit/phpunit.xml"
+INSTALL_PATH="../tests/"
+CONFIG="../tests/phpunit.xml"
 VENDOR="../vendor/"
 # ========= End Configuration =========
 
