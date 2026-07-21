@@ -9,6 +9,8 @@ use PHPUnit\Framework\TestCase;
 
 class BreadcrumbMutatorUnitTest extends TestCase {
 
+  protected $obj;
+
   public function testAddLinkWithBadPositionThrows() {
     $this->expectException(\OutOfRangeException::class);
     $this->obj

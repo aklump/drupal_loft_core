@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Tests\loft_core;
+namespace Drupal\Tests\loft_core\TestingTraits;
 
 trait TestWithFilesTrait {
 
@@ -54,7 +54,7 @@ trait TestWithFilesTrait {
   }
 
   private function getTestFilesDirectory() {
-    $basepath = __DIR__ . '/files/';
+    $basepath = __DIR__ . '/../files/';
     if (!file_exists($basepath)) {
       mkdir($basepath, 0755, TRUE);
     }

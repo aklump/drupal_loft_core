@@ -57,7 +57,7 @@ Because this is an unpublished, custom Drupal module, the way you install and de
 * Re-build Drupal caches, if necessary.
 * Enable this module, e.g.,
   ```shell
-  drush pm-install loft_core
+  drush pm-enable loft_core
   ```
 
 1. Enable this module.

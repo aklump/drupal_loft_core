@@ -7,9 +7,9 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Image\ImageFactory;
 use Drupal\loft_core\Service\ImageService;
 use Drupal\loft_core\Service\VisualMediaInterface;
+use Drupal\Tests\loft_core\TestingTraits\TestWithFilesTrait;
+use Drupal\Tests\loft_core\TestingTraits\TestWithImageServicesTrait;
 use PHPUnit\Framework\TestCase;
-use Drupal\Tests\loft_core\TestWithImageServicesTrait;
-use Drupal\Tests\loft_core\TestWithFilesTrait;
 
 /**
  * @covers \Drupal\loft_core\Service\ImageService
