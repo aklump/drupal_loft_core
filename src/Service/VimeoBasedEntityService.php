@@ -16,6 +16,8 @@ use Vimeo\Vimeo;
  */
 final class VimeoBasedEntityService {
 
+  protected \Psr\Log\LoggerInterface $logger;
+
   private $fields = [];
 
   private $client;
